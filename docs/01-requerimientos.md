@@ -17,7 +17,7 @@
 
 | Nombre | Rol en el equipo | Módulo(s) a cargo (referencial) |
 |---|---|---|
-| Daniel Machaca  | Líder de proyecto | Coordinación general, base de datos, integración |
+| Daniel          | Líder de proyecto | Coordinación general, base de datos, integración |
 | _(por definir)_ | _(por definir)_ | Ej: Interfaz JavaFX (pantallas de citas y pacientes) |
 | _(por definir)_ | _(por definir)_ | Ej: Historia clínica y odontograma |
 | _(por definir)_ | _(por definir)_ | Ej: Reportes, pagos y documentación |
