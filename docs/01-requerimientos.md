@@ -70,7 +70,6 @@ Estas exclusiones pueden convertirse en una "versión 2" del proyecto más adela
 | RF-11 | El sistema debe permitir exportar la historia clínica o el odontograma de un paciente en PDF para impresión. | Odontólogo/a | Baja |
 | RF-12 | El sistema debe mostrar una alerta interna (no necesariamente correo) de las citas próximas del día al iniciar sesión. | Recepcionista | Baja |
 
-> Nota: marqué RF-11 y RF-12 como "Baja" porque son buenas para diferenciarte y para la memoria descriptiva, pero no son bloqueantes si el tiempo se ajusta — puedes dejarlas para el final.
 
 ## 5. Requerimientos no funcionales (RNF)
 
