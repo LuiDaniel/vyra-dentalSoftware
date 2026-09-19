@@ -49,7 +49,7 @@ flowchart TD
 
 **Modelo:** clases simples (POJOs) que representan las entidades — sin lógica de negocio ni de base de datos, solo atributos y getters/setters.
 
-## 3. Estructura de paquetes recomendada
+## 3. Estructura de paquetes 
 
 ```
 com.vyra/
