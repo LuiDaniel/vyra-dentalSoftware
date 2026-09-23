@@ -12,14 +12,9 @@ import com.vyra.dental.model.Usuario;
  * implementacion concreta con JDBC en dao/impl/.
  */
 public interface UsuarioDAO {
-
     Usuario crear(Usuario usuario);
-
     Optional<Usuario> buscarPorId(int idUsuario);
-
     List<Usuario> listarTodos();
-
     boolean actualizar(Usuario usuario);
-
     boolean eliminar(int idUsuario);
 }
