@@ -1,17 +1,13 @@
 package com.vyra.dental.dao.impl;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 import com.vyra.dental.dao.PacienteDAO;
 import com.vyra.dental.model.Paciente;
 import com.vyra.dental.util.ConexionBD;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class PacienteDAOImpl implements PacienteDAO {
 

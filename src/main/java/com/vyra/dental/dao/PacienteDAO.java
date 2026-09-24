@@ -1,4 +1,4 @@
-package com.vyra.dental.dao.impl;
+package com.vyra.dental.dao;
 
 import com.vyra.dental.model.Paciente;
 
@@ -12,4 +12,5 @@ public interface PacienteDAO {
     List<Paciente> listarTodos();
     boolean actualizar(Paciente paciente);
     boolean eliminar(int idPaciente);
+}
 }

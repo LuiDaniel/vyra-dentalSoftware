@@ -1,13 +1,9 @@
 package com.vyra.dental.demo;
 
 import java.util.List;
-import java.util.Optional;
 
 import com.vyra.dental.dao.UsuarioDAO;
-import com.vyra.dental.dao.impl.PacienteDAO;
-import com.vyra.dental.dao.impl.PacienteDAOImpl;
 import com.vyra.dental.dao.impl.UsuarioDAOImpl;
-import com.vyra.dental.model.Paciente;
 import com.vyra.dental.model.Rol;
 import com.vyra.dental.model.Usuario;
 
@@ -29,8 +25,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-
-import static jdk.internal.org.jline.terminal.Terminal.MouseTracking.Button;
 
 /**
  * PANEL DE PRUEBA (no forma parte de la app real, App.java no lo usa).

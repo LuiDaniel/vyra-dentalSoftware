@@ -1,29 +1,22 @@
 package com.vyra.dental.demo;
 
-import java.util.List;
-
-import com.vyra.dental.dao.impl.PacienteDAO;
+import com.vyra.dental.dao.PacienteDAO;
 import com.vyra.dental.dao.impl.PacienteDAOImpl;
 import com.vyra.dental.model.Paciente;
-
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+
+import java.util.List;
 
 public class PacienteCrudDemoApp extends Application {
 
