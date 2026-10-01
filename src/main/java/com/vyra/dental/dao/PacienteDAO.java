@@ -13,4 +13,3 @@ public interface PacienteDAO {
     boolean actualizar(Paciente paciente);
     boolean eliminar(int idPaciente);
 }
-}
