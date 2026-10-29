@@ -27,6 +27,6 @@ public class Pill extends Label {
     }
 
     public Pill(MetodoPago metodo) {
-        this(metodo.getEtiqueta(), "pill-neutra");
+        this(metodo.getEtiqueta(), metodo.getClaseCss());
     }
 }

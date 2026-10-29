@@ -71,6 +71,7 @@
                 <ToggleButton fx:id="pestanaDatos" text="Datos" styleClass="pestana" selected="true"/>
                 <ToggleButton fx:id="pestanaHistoria" text="Historia clínica" styleClass="pestana"/>
                 <ToggleButton fx:id="pestanaCitas" text="Citas" styleClass="pestana"/>
+                <ToggleButton fx:id="pestanaPagos" text="Pagos" styleClass="pestana"/>
             </HBox>
 
             <!-- Pestaña Historia clínica: la arma HistoriaClinicaController (solo odontólogo y administrador) -->
@@ -78,6 +79,9 @@
 
             <!-- Pestaña Citas: las citas del paciente, de la más reciente a la más antigua -->
             <VBox fx:id="contenidoCitas" styleClass="ficha-citas"/>
+
+            <!-- Pestaña Pagos: tratamientos del paciente con lo pagado y el saldo (solo administrador y recepción) -->
+            <VBox fx:id="contenidoPagos" styleClass="ficha-citas"/>
 
             <VBox fx:id="contenidoDatos" styleClass="ficha-formulario">
                 <Label text="DATOS PERSONALES" styleClass="seccion-titulo"/>

@@ -272,6 +272,7 @@ Cada pantalla indica: archivo FXML, controlador, requerimientos que cubre, roles
 - **Debajo, dos tarjetas:**
   - Pieza seleccionada: cuadro con el número y su color, "Pieza 36 · Primer molar inferior izquierdo", "Estado actual: En tratamiento", campo "Observación del cambio" y enlace "Registrar tratamiento para esta pieza" (abre Tratamientos con la pieza ya elegida).
   - Historial de la pieza: línea de tiempo (estado, fecha, profesional y nota). Los cambios sin guardar aparecen arriba como "Hoy · sin guardar". Si no hay registros: "Sin cambios registrados..."
+- **Implementación (fase 5):** sin paciente (menú lateral) la pantalla muestra primero un buscador; desde Pacientes se abre directo. `OdontogramaController` implementa `ConfirmaSalida`: `MainController` le pregunta antes de cambiar de pantalla o cerrar sesión. La observación es una sola por guardado (se copia a todas las piezas cambiadas). El historial no muestra profesional porque `odontograma_pieza` no lo guarda. "Exportar PDF" queda deshabilitado hasta la fase 8. "Registrar tratamiento..." abre Tratamientos con el número de pieza como parámetro (la pantalla llega en la fase 6).
 - **Nombre de las piezas:** posición (1 incisivo central, 2 incisivo lateral, 3 canino, 4 primer premolar, 5 segundo premolar, 6 primer molar, 7 segundo molar, 8 tercer molar) + cuadrante (1 superior derecho, 2 superior izquierdo, 3 inferior izquierdo, 4 inferior derecho).
 
 ### 7.7 Tratamientos — `TratamientosView.fxml` / `TratamientosController`
@@ -281,6 +282,7 @@ Cada pantalla indica: archivo FXML, controlador, requerimientos que cubre, roles
 - **Tabla:** Fecha, Paciente (avatar + nombre), Descripción, Piezas (chips pequeños con los números: "36", "47"), Costo, Pagado (barra de progreso + "S/ 250 de S/ 650"), Estado (píldora).
 - **Panel "Nuevo tratamiento":** Cita (las citas de hoy y las atendidas recientes, "29 oct · María Quispe · Endodoncia"), Descripción*, Piezas (mini odontograma de selección múltiple o campo "36, 47" validado con la notación FDI), Costo (S/)*, Estado (segmentado En curso / Finalizado).
 - Seleccionar uno existente muestra su detalle, sus pagos y el botón "Marcar como finalizado".
+- **Implementación (fase 6):** el odontólogo solo ve las citas de hoy y de los últimos 30 días que no estén canceladas y sean suyas (`TratamientoService.citasParaRegistrar`). Las piezas se escriben como texto ("36, 47"), no con un mini odontograma; el odontograma abre esta pantalla con la pieza ya escrita. Admin y recepción solo consultan y tienen el botón "Registrar pago" (abre Pagos con ese tratamiento). El paciente y el profesional salen de la cita del tratamiento.
 
 ### 7.8 Pagos — `PagosView.fxml` / `PagosController`
 **Referencia:** `docs/ui/Pagos.html` · **Cubre:** RF-10, CU-10 · **Roles:** Admin y Recepción
@@ -295,6 +297,7 @@ Cada pantalla indica: archivo FXML, controlador, requerimientos que cubre, roles
   - N.º de operación (opcional).
   - Pie: "Saldo después de este pago: S/ 200.00" (se recalcula al escribir) y botón primario de ancho completo "Registrar pago de S/ 200.00".
 - **Errores:** monto mayor al saldo → "El monto supera el saldo pendiente (S/ 400.00)".
+- **Implementación (fase 6):** el selector de periodo es Hoy / Semana (desde el lunes) / {mes actual}; el % se compara con ayer, la semana pasada o el mes pasado. El tratamiento se busca por paciente o DNI entre los que aún tienen saldo; al abrir Pagos desde un tratamiento o desde la pestaña Pagos de la ficha, llega ya elegido y con el saldo como monto. Los montos se comparan en céntimos enteros (`PagoService.aCentimos`). "Exportar" queda deshabilitado hasta la fase 8. El odontólogo no ve Pagos ni la pestaña Pagos.
 
 ### 7.9 Reportes — `ReportesView.fxml` / `ReportesController`
 **Referencia:** sin pantalla propia; usar tarjetas `.card` y el estilo de KPI de Inicio · **Cubre:** RF-09, CU-09 · **Roles:** Admin

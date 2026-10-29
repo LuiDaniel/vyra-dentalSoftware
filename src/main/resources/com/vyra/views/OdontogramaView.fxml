@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- Odontograma: docs/08-guia-frontend.md §7.6. Las tarjetas se arman en OdontogramaController. -->
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:id="pagina" fx:controller="com.vyra.dental.controller.OdontogramaController"
+      styleClass="pagina">
+
+    <VBox styleClass="pagina-titulos">
+        <Label text="Odontograma" styleClass="titulo-pagina"/>
+        <Label fx:id="subtitulo" styleClass="texto-secundario"/>
+    </VBox>
+
+    <VBox fx:id="selector" spacing="12"/>
+    <VBox fx:id="clinica" spacing="18" visible="false" managed="false"/>
+</VBox>

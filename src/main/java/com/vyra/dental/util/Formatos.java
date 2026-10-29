@@ -98,6 +98,21 @@ public final class Formatos {
         return "S/ " + formato.format(monto);
     }
 
+    /**
+     * Lee un monto escrito por el usuario ("650", "650.50", "1,250.00", "S/ 80"). Devuelve null si no
+     * es un número válido; la coma se toma como separador de miles.
+     */
+    public static Double parsearMonto(String texto) {
+        if (texto == null) {
+            return null;
+        }
+        String limpio = texto.replace("S/", "").replace(",", "").strip();
+        if (!limpio.matches("\\d+(\\.\\d{1,2})?")) {
+            return null;
+        }
+        return Double.parseDouble(limpio);
+    }
+
     /** "987 654 321". Si no tiene 9 dígitos se devuelve sin cambios. */
     public static String telefono(String telefono) {
         if (telefono == null) {

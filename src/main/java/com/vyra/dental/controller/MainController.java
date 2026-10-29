@@ -48,6 +48,8 @@ public class MainController {
     private final Map<Pantalla, ToggleButton> botonesMenu = new EnumMap<>(Pantalla.class);
     private final Label contadorAgenda = new Label();
     private Rol rol;
+    private Pantalla pantallaActual;
+    private Object controladorActual;
 
     /**
      * El marco abierto, para que una pantalla abra otra:
@@ -86,19 +88,33 @@ public class MainController {
         if (!destino.permitidaPara(rol)) {
             return;
         }
+        if (!puedeSalirDeLaActual()) {
+            // El clic en el menú ya movió la selección: se devuelve al ítem de la pantalla abierta
+            botonesMenu.get(pantallaActual).setSelected(true);
+            return;
+        }
         ScrollPane desplazable = new ScrollPane(cargarVista(destino, parametro));
         desplazable.setFitToWidth(true);
         desplazable.getStyleClass().add("contenido-scroll");
         contenido.getChildren().setAll(desplazable);
 
+        pantallaActual = destino;
         botonesMenu.get(destino).setSelected(true);
         ruta.setText(destino == Pantalla.INICIO ? "Inicio" : "Inicio / " + destino.getTitulo());
     }
 
     @FXML
     private void salir() {
+        if (!puedeSalirDeLaActual()) {
+            return;
+        }
         Servicios.auth().cerrarSesion();
         App.mostrarLogin();
+    }
+
+    /** Pregunta a la pantalla abierta si tiene cambios sin guardar (ver {@link ConfirmaSalida}). */
+    private boolean puedeSalirDeLaActual() {
+        return !(controladorActual instanceof ConfirmaSalida confirma) || confirma.puedeSalir();
     }
 
     private void construirMenu() {
@@ -156,11 +172,13 @@ public class MainController {
     private Node cargarVista(Pantalla destino, Object parametro) {
         URL vista = getClass().getResource(destino.getRutaVista());
         if (vista == null) {
+            controladorActual = null;
             return enConstruccion(destino);
         }
         try {
             FXMLLoader loader = new FXMLLoader(vista);
             Node raiz = loader.load();
+            controladorActual = loader.getController();
             if (loader.getController() instanceof RecibeParametro receptor) {
                 receptor.recibir(parametro);
             }

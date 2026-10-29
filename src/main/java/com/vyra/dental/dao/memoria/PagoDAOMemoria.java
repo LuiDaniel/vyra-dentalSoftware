@@ -1,5 +1,6 @@
 package com.vyra.dental.dao.memoria;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +34,23 @@ public class PagoDAOMemoria implements PagoDAO {
     @Override
     public List<Pago> listarTodos() {
         return new ArrayList<>(pagos);
+    }
+
+    @Override
+    public List<Pago> listarPorTratamiento(int idTratamiento) {
+        return pagos.stream().filter(p -> p.getIdTratamiento() == idTratamiento).toList();
+    }
+
+    @Override
+    public List<Pago> listarPorPeriodo(LocalDate desde, LocalDate hasta) {
+        return pagos.stream()
+                .filter(p -> !p.getFechaPago().isBefore(desde) && !p.getFechaPago().isAfter(hasta))
+                .toList();
+    }
+
+    @Override
+    public double totalPagado(int idTratamiento) {
+        return pagos.stream().filter(p -> p.getIdTratamiento() == idTratamiento).mapToDouble(Pago::getMonto).sum();
     }
 
     @Override

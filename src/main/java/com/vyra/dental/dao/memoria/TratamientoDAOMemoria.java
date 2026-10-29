@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.vyra.dental.dao.TratamientoDAO;
+import com.vyra.dental.model.EstadoTratamiento;
 import com.vyra.dental.model.Tratamiento;
 import com.vyra.dental.util.Validador;
 
@@ -33,6 +34,16 @@ public class TratamientoDAOMemoria implements TratamientoDAO {
     @Override
     public List<Tratamiento> listarTodos() {
         return new ArrayList<>(tratamientos);
+    }
+
+    @Override
+    public List<Tratamiento> listarPorCita(int idCita) {
+        return tratamientos.stream().filter(t -> t.getIdCita() == idCita).toList();
+    }
+
+    @Override
+    public List<Tratamiento> listarPorEstado(EstadoTratamiento estado) {
+        return tratamientos.stream().filter(t -> t.getEstado() == estado).toList();
     }
 
     @Override

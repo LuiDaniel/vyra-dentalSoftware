@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.vyra.dental.ui.Icono?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- Tratamientos: docs/08-guia-frontend.md §7.7 (patrón lista + panel, como Pacientes). El panel lo arma el controlador. -->
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.vyra.dental.controller.TratamientosController"
+      styleClass="pagina">
+
+    <HBox styleClass="pagina-encabezado">
+        <VBox styleClass="pagina-titulos">
+            <Label text="Tratamientos" styleClass="titulo-pagina"/>
+            <Label fx:id="resumen" styleClass="texto-secundario"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="botonNuevo" text="Nuevo tratamiento" styleClass="btn-primario" onAction="#nuevo"
+                minWidth="-Infinity">
+            <graphic>
+                <Icono nombre="mas" tamano="16"/>
+            </graphic>
+        </Button>
+    </HBox>
+
+    <HBox styleClass="lista-y-panel" fillHeight="false">
+        <VBox styleClass="card,lista" HBox.hgrow="ALWAYS" minWidth="520">
+            <HBox styleClass="lista-barra">
+                <HBox styleClass="buscador" HBox.hgrow="ALWAYS">
+                    <Icono nombre="buscar" tamano="16"/>
+                    <TextField fx:id="campoBuscar" promptText="Buscar por paciente o DNI" HBox.hgrow="ALWAYS"
+                               accessibleText="Buscar tratamientos"/>
+                </HBox>
+                <HBox fx:id="filtros" styleClass="segmentado"/>
+            </HBox>
+            <TableView fx:id="tabla"/>
+        </VBox>
+
+        <VBox fx:id="panel" styleClass="panel-form,panel-ficha" prefWidth="440" minWidth="400" maxWidth="480"/>
+    </HBox>
+</VBox>

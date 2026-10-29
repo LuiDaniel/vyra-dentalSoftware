@@ -5,18 +5,18 @@
 
 Este documento ordena el trabajo de programación en fases cortas. Cada fase deja la aplicación **compilando y ejecutable**, termina con un commit y tiene criterios claros para saber que está lista. Está pensado para seguirse en orden, ya sea a mano o pidiéndole cada fase a Claude Code (ver la sección 4).
 
-## 1. Estado actual del código (2026-10-29, fase 5 en curso: historia clínica hecha, falta el odontograma)
+## 1. Estado actual del código (2026-10-29, fase 6 terminada: tratamientos y pagos)
 
 | Parte | Estado |
 |---|---|
 | `pom.xml` | JavaFX 21, SQLite JDBC, Lombok, Hibernate Validator, JUnit 5 + Surefire. Compila con `release 21` (fase 0). |
 | `model/` | 8 clases y 5 enums, alineados con la BD (fase 1). Los enums tienen `getEtiqueta()`; `EstadoPieza` además `getCodigo()` y los estados `getClaseCss()`. |
-| `dao/` | Usuario, Profesional, Paciente y Cita completos ([`04` §2](./04-diagrama-clases.md#2-acceso-a-datos-comvyradentaldao-y-daoimpl)), en SQLite (`dao/impl/`) y en memoria (`dao/memoria/`). Historia clínica también (`HistoriaClinicaDAO`, solo `crear`, `buscarPorId` y `listarPorPaciente`: RN-09). Tratamiento y Pago solo en memoria y sin los métodos nuevos. Falta Odontograma. |
+| `dao/` | Usuario, Profesional, Paciente y Cita completos ([`04` §2](./04-diagrama-clases.md#2-acceso-a-datos-comvyradentaldao-y-daoimpl)), en SQLite (`dao/impl/`) y en memoria (`dao/memoria/`). Historia clínica también (`HistoriaClinicaDAO`, solo `crear`, `buscarPorId` y `listarPorPaciente`: RN-09). Odontograma también (`OdontogramaDAO`: `registrar`, `estadoActual`, `historialPieza`; RN-09). Tratamiento y Pago también, con los métodos nuevos (`listarPorCita`, `listarPorEstado`, `listarPorTratamiento`, `listarPorPeriodo`, `totalPagado`); `TratamientoDAOSqlite` guarda el tratamiento y sus piezas en una transacción. |
 | `util/` | `ConexionBD` (abre SQLite, activa claves foráneas y ejecuta `schema.sql`), `Validador` (Jakarta), `HashUtil` (PBKDF2), `Formatos`, `Busqueda` (sin tildes) y `DatosIniciales` (admin inicial y datos de ejemplo). `schema.sql` es el de [`03` §3](./03-modelo-base-datos.md#3-script-sql-sqlite). |
-| `service/` | `ReglaNegocioException`, `AuthService`, `Sesion`, `PacienteService`, `CitaService`, `ProfesionalService`, `HistoriaClinicaService` y `Servicios` (crea los servicios con sus DAO SQLite). |
-| `controller/` | `LoginController`, `MainController` (menú por rol, navegación y contador de citas de hoy), `PacientesController`, `HistoriaClinicaController` (pestaña de la ficha), `ProfesionalesController`, `AgendaController`, enum `Pantalla` e interfaz `RecibeParametro`. |
-| `ui/` | `Icono`, `Avatar`, `Pill`, `Aviso`, `Notificacion`, `CampoFormulario`, `Dialogos` (confirmación) y `EstadoVacio`. |
-| Vistas FXML, CSS | `LoginView`, `MainView`, `PacientesView` (pestañas Datos, Historia clínica y Citas), `ProfesionalesView`, `AgendaView` (Día, Semana y Lista) y `styles/vyra.css`. Las demás pantallas muestran "En construcción" hasta que exista su FXML. |
+| `service/` | `ReglaNegocioException`, `AuthService`, `Sesion`, `PacienteService`, `CitaService`, `ProfesionalService`, `HistoriaClinicaService`, `OdontogramaService`, `TratamientoService`, `PagoService` (más los registros `TratamientoResumen` y `PagoDetalle`) y `Servicios` (crea los servicios con sus DAO SQLite). |
+| `controller/` | `LoginController`, `MainController` (menú por rol, navegación y contador de citas de hoy), `PacientesController`, `HistoriaClinicaController` (pestaña de la ficha), `OdontogramaController`, `TratamientosController`, `PagosController`, interfaz `ConfirmaSalida`, `ProfesionalesController`, `AgendaController`, enum `Pantalla` e interfaz `RecibeParametro`. |
+| `ui/` | `Icono`, `Avatar`, `Pill`, `PiezaDental`, `Aviso`, `Notificacion`, `CampoFormulario`, `Dialogos` (confirmación) y `EstadoVacio`. |
+| Vistas FXML, CSS | `LoginView`, `MainView`, `PacientesView` (pestañas Datos, Historia clínica, Citas y Pagos), `ProfesionalesView`, `OdontogramaView`, `TratamientosView`, `PagosView`, `AgendaView` (Día, Semana y Lista) y `styles/vyra.css`. Las demás pantallas muestran "En construcción" hasta que exista su FXML. |
 | `App.java` | Carga Inter, abre la BD, crea el admin si no hay usuarios y muestra el login; `mostrarLogin()`/`mostrarPrincipal()` cambian la escena de la ventana. |
 | `demo/` | 4 CRUDs de prueba + lanzador, hechos con código Java (sin FXML). |
 | Diseño | Listo: [`docs/ui/`](./ui) y [`08-guia-frontend.md`](./08-guia-frontend.md). |
@@ -60,7 +60,7 @@ Este documento ordena el trabajo de programación en fases cortas. Cada fase dej
 **Objetivo:** iniciar sesión y moverse por el menú, aunque las pantallas estén vacías.
 
 1. `styles/vyra.css` con las variables y clases de la [guía §2–4](./08-guia-frontend.md#2-colores-variables-css). Cargar las fuentes en `App`.
-2. Componentes `ui/`: `Icono`, `Avatar`, `Pill`, `Aviso`, `Notificacion`, `CampoFormulario`. Descomentar en `module-info.java` los `opens`/`exports` de `ui` y `controller` al crear sus primeras clases.
+2. Componentes `ui/`: `Icono`, `Avatar`, `Pill`, `PiezaDental`, `Aviso`, `Notificacion`, `CampoFormulario`. Descomentar en `module-info.java` los `opens`/`exports` de `ui` y `controller` al crear sus primeras clases.
 3. `UsuarioDAOSqlite`, `ProfesionalDAOSqlite`, `AuthService`, `Sesion`, `util.DatosIniciales.crearAdminSiNoExiste()`. Descomentar `exports com.vyra.dental.dao.impl` (el paquete queda vacío en la fase 1, al mover los DAO en memoria).
 4. `LoginView.fxml` + `LoginController` ([guía §7.1](./08-guia-frontend.md#71-inicio-de-sesión--loginviewfxml--logincontroller)).
 5. `MainView.fxml` + `MainController` con menú por rol, barra superior y navegación ([guía §6](./08-guia-frontend.md#6-estructura-común-mainviewfxml--maincontroller), [arquitectura §4](./05-arquitectura.md#4-navegación-entre-pantallas)). Enum `Pantalla`. Cada pantalla todavía no hecha muestra un marcador "En construcción".
@@ -87,15 +87,15 @@ Este documento ordena el trabajo de programación en fases cortas. Cada fase dej
 
 ### Fase 5 — Historia clínica y Odontograma
 1. ✔ *Hecho.* `HistoriaClinicaDAOSqlite` + `HistoriaClinicaService` + pestaña Historia clínica ([guía §7.5](./08-guia-frontend.md#75-historia-clínica--pestaña-de-la-ficha--historiaclinicacontroller)).
-2. `OdontogramaDAOSqlite` (consulta de estado actual de [`03` §5.1](./03-modelo-base-datos.md#51-estado-actual-del-odontograma-de-un-paciente-cu-05)) + `OdontogramaService` (pruebas: una pieza sin registros es SANA; el estado actual es el último registro; guardar no borra el historial).
-3. Componente `PiezaDental` + `OdontogramaView` ([guía §7.6](./08-guia-frontend.md#76-odontograma--odontogramaviewfxml--odontogramacontroller)).
+2. ✔ *Hecho.* `OdontogramaDAOSqlite` (consulta de estado actual de [`03` §5.1](./03-modelo-base-datos.md#51-estado-actual-del-odontograma-de-un-paciente-cu-05)) + `OdontogramaService` (pruebas: una pieza sin registros es SANA; el estado actual es el último registro; guardar no borra el historial).
+3. ✔ *Hecho.* Componente `PiezaDental` + `OdontogramaView` ([guía §7.6](./08-guia-frontend.md#76-odontograma--odontogramaviewfxml--odontogramacontroller)).
 
 **Listo cuando:** se ve como `docs/ui/Odontograma.html`; los cambios quedan pendientes hasta "Guardar"; el historial de cada pieza muestra todos los cambios con su fecha; la recepcionista no ve estas pantallas.
 
 ### Fase 6 — Tratamientos y Pagos
-1. `TratamientoDAOSqlite` (con `tratamiento_pieza` en una transacción) + `TratamientoService` + `TratamientosView` ([guía §7.7](./08-guia-frontend.md#77-tratamientos--tratamientosviewfxml--tratamientoscontroller)).
-2. `PagoDAOSqlite` + `PagoService` (pruebas: el saldo se calcula bien; no se puede pagar más que el saldo; no se aceptan fechas futuras) + `PagosView` ([guía §7.8](./08-guia-frontend.md#78-pagos--pagosviewfxml--pagoscontroller)).
-3. Pestaña Pagos en la ficha del paciente y enlace "Registrar tratamiento para esta pieza" desde el odontograma.
+1. ✔ *Hecho.* `TratamientoDAOSqlite` (con `tratamiento_pieza` en una transacción) + `TratamientoService` + `TratamientosView` ([guía §7.7](./08-guia-frontend.md#77-tratamientos--tratamientosviewfxml--tratamientoscontroller)).
+2. ✔ *Hecho.* `PagoDAOSqlite` + `PagoService` (pruebas: el saldo se calcula bien; no se puede pagar más que el saldo; no se aceptan fechas futuras) + `PagosView` ([guía §7.8](./08-guia-frontend.md#78-pagos--pagosviewfxml--pagoscontroller)).
+3. ✔ *Hecho.* Pestaña Pagos en la ficha del paciente y enlace "Registrar tratamiento para esta pieza" desde el odontograma.
 
 **Listo cuando:** se registra un tratamiento con varias piezas, se cobra en partes y el saldo se actualiza; la pantalla se ve como `docs/ui/Pagos.html`.
 
