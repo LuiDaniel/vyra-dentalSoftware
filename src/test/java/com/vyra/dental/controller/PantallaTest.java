@@ -1,6 +1,7 @@
 package com.vyra.dental.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -30,6 +31,14 @@ class PantallaTest {
         assertEquals(EnumSet.of(Pantalla.INICIO, Pantalla.AGENDA, Pantalla.PACIENTES,
                 Pantalla.ODONTOGRAMA, Pantalla.HISTORIA_CLINICA, Pantalla.TRATAMIENTOS),
                 visiblesPara(Rol.ODONTOLOGO));
+    }
+
+    @Test
+    void cadaPantallaDelMenuTieneSuVista() {
+        for (Pantalla pantalla : Pantalla.values()) {
+            assertNotNull(Pantalla.class.getResource(pantalla.getRutaVista()),
+                    "Falta el FXML de " + pantalla.getTitulo() + ": " + pantalla.getRutaVista());
+        }
     }
 
     private static Set<Pantalla> visiblesPara(Rol rol) {

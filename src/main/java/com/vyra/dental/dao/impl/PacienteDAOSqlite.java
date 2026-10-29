@@ -113,6 +113,20 @@ public class PacienteDAOSqlite implements PacienteDAO {
     }
 
     @Override
+    public int contarRegistradosDesde(LocalDate desde) {
+        String sql = "SELECT COUNT(*) FROM paciente WHERE activo = 1 AND fecha_registro >= ?";
+        Connection conexion = ConexionBD.obtenerConexion();
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setString(1, desde.toString());
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("No se pudo contar los pacientes nuevos", e);
+        }
+    }
+
+    @Override
     public boolean actualizar(Paciente paciente) {
         String sql = "UPDATE paciente SET nombres = ?, apellidos = ?, dni = ?, fecha_nacimiento = ?, telefono = ?, "
                 + "direccion = ?, contacto_emergencia = ?, alergias = ?, antecedentes = ?, activo = ?, "

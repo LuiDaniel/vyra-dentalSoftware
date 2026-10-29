@@ -59,7 +59,7 @@ import javafx.util.StringConverter;
  * Lista de pacientes + ficha con la pestaña Datos (docs/08-guia-frontend.md §7.4, CU-01).
  * Administrador y Recepción editan; el odontólogo solo consulta.
  */
-public class PacientesController {
+public class PacientesController implements RecibeParametro {
 
     private static final double ALTO_FILA = 58;
     private static final double ALTO_ENCABEZADO = 44;
@@ -310,6 +310,19 @@ public class PacientesController {
     @FXML
     private void nuevo() {
         prepararNuevo();
+    }
+
+    /**
+     * Desde Inicio: "nuevo" abre el formulario vacío; un {@link Paciente} abre su ficha. Desde el menú
+     * "Historia clínica" llega {@code "historia"}: la lista queda lista para elegir a quién abrir.
+     */
+    @Override
+    public void recibir(Object parametro) {
+        if (editable && "nuevo".equals(parametro)) {
+            prepararNuevo();
+        } else if (parametro instanceof Paciente paciente) {
+            mostrar(paciente);
+        }
     }
 
     private void prepararNuevo() {

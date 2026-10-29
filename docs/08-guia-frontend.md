@@ -204,7 +204,8 @@ Cada pantalla indica: archivo FXML, controlador, requerimientos que cubre, roles
 - **Agenda de hoy** (tarjeta grande): lista de filas con hora inicio/fin, avatar, nombre del paciente, "motivo · profesional" y píldora de estado. Clic en una fila → Agenda con esa cita seleccionada.
 - **Ingresos de la semana** (solo Administrador): barras verticales lunes a sábado; el día actual en `-vy-primario`, los demás en `-vy-primario-borde`. Se puede hacer con `HBox` de `Region` con alto proporcional (no hace falta `BarChart`).
 - **Accesos rápidos:** cuadrícula 2×2 de botones con ícono: Registrar paciente, Agendar cita, Registrar pago, Abrir odontograma.
-- **Datos:** `CitaService.citasDelDia(hoy)`, `PacienteService`, `TratamientoService`, `ReporteService.ingresosPorPeriodo()`.
+- **Datos:** `CitaService.citasDelDia(hoy)`, `PacienteService` (`nuevosDesde`), `TratamientoService` y `PagoService`.
+- **Implementación (fase 7):** el 4.º KPI depende del rol: Administrador = Ingresos del mes; Recepción = Pagos registrados hoy; Odontólogo = Atendidas hoy (no tiene acceso a pagos). "Tratamientos en curso" muestra cuántos se iniciaron este mes (el modelo no guarda fecha de fin). Hacer clic en una cita abre Agenda (sin seleccionarla). El aviso de la próxima hora lista las citas pendientes o confirmadas de las próximas 60 minutos. Los accesos rápidos solo muestran lo que el rol puede usar. El buscador global y `Ctrl+K` no se hicieron.
 
 ### 7.3 Agenda — `AgendaView.fxml` / `AgendaController`
 **Referencia:** `docs/ui/Citas.html` · **Cubre:** RF-02, RF-03, CU-02, CU-03 · **Roles:** Admin y Recepción (completo); Odontólogo (solo lectura de sus citas + "Marcar atendida")
@@ -308,12 +309,14 @@ Cada pantalla indica: archivo FXML, controlador, requerimientos que cubre, roles
 - **Historial de paciente:** tratamientos del paciente con costo, pagado y saldo.
 - **Ingresos:** total + tabla por método de pago + barras por día.
 - Botón "Exportar PDF" (en un `Task`, con indicador de progreso).
+- **Implementación (fase 7):** el reporte se regenera al cambiar cualquier filtro. Asistencia = atendidas / (total − canceladas). En Ingresos las barras muestran los últimos 14 días con cobros. "Exportar PDF" queda deshabilitado hasta la fase 8.
 
 ### 7.10 Profesionales — `ProfesionalesView.fxml` / `ProfesionalesController`
 **Cubre:** RF-07, CU-07 · **Roles:** Admin. Patrón lista + panel: tabla (avatar, nombre, especialidad, teléfono, horario, usuario asociado) y formulario (nombres*, apellidos*, especialidad, teléfono, horario de atención, `ComboBox` de usuario con rol Odontólogo).
 
 ### 7.11 Usuarios y roles — `UsuariosView.fxml` / `UsuariosController`
 **Cubre:** RF-08 · **Roles:** Admin. Patrón lista + panel: tabla (avatar, nombre completo, usuario, rol en píldora, estado Activo/Inactivo) y formulario (nombre completo*, usuario*, rol* segmentado, contraseña* solo al crear o con un botón "Restablecer contraseña", interruptor Activo). Un administrador no puede desactivarse a sí mismo.
+- **Implementación (fase 7):** además, nadie puede cambiarse su propio rol, siempre queda al menos un administrador activo y no se quita el rol Odontólogo a quien tiene un profesional asociado. La contraseña (mínimo 6 caracteres) se pide al crear; en un usuario existente se escribe una nueva y se pulsa "Restablecer contraseña". Los usuarios no se eliminan: se desactivan (RN-14).
 
 ## 8. Componentes reutilizables (`com.vyra.dental.ui`)
 

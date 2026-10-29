@@ -10,13 +10,15 @@ import com.vyra.dental.model.Rol;
  * Pantallas del menú lateral, en el orden en que aparecen. Los roles salen de
  * la matriz de permisos de docs/02-casos-de-uso.md §3: el menú muestra solo
  * las pantallas permitidas para el rol del usuario (RN-15).
+ * La historia clínica no tiene vista propia: es una pestaña de la ficha del paciente, así que su
+ * ítem del menú abre Pacientes (con el parámetro {@code "historia"}).
  */
 public enum Pantalla {
     INICIO("Inicio", "inicio", Grupo.PRINCIPAL, "InicioView", Rol.ADMIN, Rol.RECEPCION, Rol.ODONTOLOGO),
     AGENDA("Agenda", "agenda", Grupo.PRINCIPAL, "AgendaView", Rol.ADMIN, Rol.RECEPCION, Rol.ODONTOLOGO),
     PACIENTES("Pacientes", "pacientes", Grupo.PRINCIPAL, "PacientesView", Rol.ADMIN, Rol.RECEPCION, Rol.ODONTOLOGO),
     ODONTOGRAMA("Odontograma", "diente", Grupo.CLINICA, "OdontogramaView", Rol.ADMIN, Rol.ODONTOLOGO),
-    HISTORIA_CLINICA("Historia clínica", "historia", Grupo.CLINICA, "HistoriaClinicaView", Rol.ADMIN, Rol.ODONTOLOGO),
+    HISTORIA_CLINICA("Historia clínica", "historia", Grupo.CLINICA, "PacientesView", Rol.ADMIN, Rol.ODONTOLOGO),
     TRATAMIENTOS("Tratamientos", "tratamientos", Grupo.CLINICA, "TratamientosView", Rol.ADMIN, Rol.RECEPCION, Rol.ODONTOLOGO),
     PAGOS("Pagos", "pagos", Grupo.ADMINISTRACION, "PagosView", Rol.ADMIN, Rol.RECEPCION),
     REPORTES("Reportes", "reportes", Grupo.ADMINISTRACION, "ReportesView", Rol.ADMIN),

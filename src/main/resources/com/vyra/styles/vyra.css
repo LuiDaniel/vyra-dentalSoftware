@@ -1935,3 +1935,69 @@
     -fx-background-color: -vy-halo, -vy-primario, -vy-superficie;
     -fx-background-insets: -3, 0, 1;
 }
+
+/* ===== Inicio (docs/08-guia-frontend.md §7.2) ===== */
+.kpi-icono {
+    -fx-background-color: -vy-primario-suave;
+    -fx-background-radius: 10px;
+    -fx-min-width: 36px;
+    -fx-min-height: 36px;
+    -fx-max-width: 36px;
+    -fx-max-height: 36px;
+}
+
+.kpi-icono .icono {
+    -fx-stroke: -vy-primario;
+}
+
+.inicio-tarjeta {
+    -fx-padding: 18px 20px;
+}
+
+.inicio-fila-cita {
+    -fx-padding: 12px 20px;
+    -fx-border-color: transparent transparent -vy-separador transparent;
+    -fx-border-width: 0 0 1px 0;
+    -fx-cursor: hand;
+}
+
+.inicio-fila-cita:hover {
+    -fx-background-color: -vy-fila-hover;
+}
+
+.inicio-barra {
+    -fx-background-color: -vy-primario-borde;
+    -fx-background-radius: 6px;
+}
+
+.inicio-barra-hoy {
+    -fx-background-color: -vy-primario;
+    -fx-background-radius: 6px;
+}
+
+.inicio-acceso {
+    -fx-background-color: -vy-borde, -vy-fila-hover;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 10px;
+    -fx-pref-height: 56px;
+    -fx-alignment: center-left;
+    -fx-graphic-text-gap: 10px;
+    -fx-padding: 0 14px;
+    -fx-font-family: "Inter Medium";
+    -fx-text-fill: -vy-tinta;
+    -fx-cursor: hand;
+}
+
+.inicio-acceso .icono {
+    -fx-stroke: -vy-primario;
+}
+
+.inicio-acceso:hover {
+    -fx-background-color: -vy-primario-borde, -vy-primario-suave;
+}
+
+/* ===== Reportes (docs/08-guia-frontend.md §7.9) ===== */
+.reporte-filtros {
+    -fx-padding: 16px 20px;
+    -fx-spacing: 8px;
+}

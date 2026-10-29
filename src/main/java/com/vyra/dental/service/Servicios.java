@@ -24,6 +24,8 @@ public final class Servicios {
     private static OdontogramaService odontograma;
     private static TratamientoService tratamientos;
     private static PagoService pagos;
+    private static ReporteService reportes;
+    private static UsuarioService usuarios;
 
     private Servicios() {
     }
@@ -76,6 +78,20 @@ public final class Servicios {
             pagos = new PagoService(new PagoDAOSqlite(), new TratamientoDAOSqlite(), new CitaDAOSqlite());
         }
         return pagos;
+    }
+
+    public static synchronized ReporteService reportes() {
+        if (reportes == null) {
+            reportes = new ReporteService(new CitaDAOSqlite(), new PagoDAOSqlite(), tratamientos(), pagos());
+        }
+        return reportes;
+    }
+
+    public static synchronized UsuarioService usuarios() {
+        if (usuarios == null) {
+            usuarios = new UsuarioService(new UsuarioDAOSqlite(), new ProfesionalDAOSqlite());
+        }
+        return usuarios;
     }
 
     public static synchronized ProfesionalService profesionales() {
