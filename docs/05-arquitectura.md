@@ -85,6 +85,8 @@ exports com.vyra.dental.service;
 exports com.vyra.dental.ui;
 ```
 
+Java no permite `exports`/`opens` de un paquete sin clases, por eso estas líneas están comentadas en `module-info.java` hasta que cada paquete tenga su primera clase ([`09-plan-implementacion.md`](./09-plan-implementacion.md), fases 1 y 2).
+
 ## 4. Navegación entre pantallas
 
 ```mermaid
@@ -138,7 +140,7 @@ Los DAO nunca abren su propia conexión: así se evitan bloqueos del archivo `.d
 | Ejecutar pruebas | `mvn test` |
 | Ver el diseño de referencia | Abrir `docs/ui/Inicio.html` en el navegador |
 
-Versión de Java: **21** (JDK 21 + JavaFX 21). El `pom.xml` todavía compila con `release 17`; se cambia a 21 en la fase 0 del plan ([`09-plan-implementacion.md`](./09-plan-implementacion.md)).
+Versión de Java: **21** (JDK 21 + JavaFX 21); el `pom.xml` compila con `release 21`.
 
 ## 9. División de trabajo sugerida para el equipo
 

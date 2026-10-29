@@ -9,11 +9,12 @@ Este documento ordena el trabajo de programación en fases cortas. Cada fase dej
 
 | Parte | Estado |
 |---|---|
-| `pom.xml` | JavaFX 21, SQLite JDBC, Lombok, Hibernate Validator. Compila con `release 17` (el equipo usa JDK 21). Sin JUnit. |
+| `pom.xml` | JavaFX 21, SQLite JDBC, Lombok, Hibernate Validator, JUnit 5 + Surefire. Compila con `release 21` (fase 0). |
 | `model/` | 8 clases y 4 enums. Faltan campos respecto a la BD (ver [`04-diagrama-clases.md` §5](./04-diagrama-clases.md#5-diferencias-con-el-código-actual-a-corregir)). |
 | `dao/` | Interfaces de Usuario, Paciente, Tratamiento y Pago, con implementación **en memoria** (`*DAOImpl`). Faltan Cita, Profesional, Historia clínica y Odontograma, y todas las versiones SQLite. |
 | `util/` | `ConexionBD` (abre SQLite y ejecuta `schema.sql`) y `Validador` (Jakarta). |
-| `service/`, `controller/`, vistas FXML, CSS | No existen. |
+| `service/`, `controller/`, `ui/`, `dao/memoria/` | Paquetes creados (solo `package-info.java`, fase 0). |
+| Vistas FXML, CSS | Carpetas `views/` y `styles/` creadas, vacías. Fuente Inter en `fonts/` (fase 0). |
 | `App.java` | Ventana vacía con una etiqueta. |
 | `demo/` | 4 CRUDs de prueba + lanzador, hechos con código Java (sin FXML). |
 | Diseño | Listo: [`docs/ui/`](./ui) y [`08-guia-frontend.md`](./08-guia-frontend.md). |
@@ -36,7 +37,7 @@ Este documento ordena el trabajo de programación en fases cortas. Cada fase dej
 1. `pom.xml`: `maven.compiler.release` y `<release>` a **21**; agregar JUnit 5 (`junit-jupiter`, scope test) y `maven-surefire-plugin`.
 2. Crear los paquetes vacíos `service`, `controller`, `ui`, `dao/memoria` y las carpetas de recursos `views/`, `styles/`, `fonts/` (ver [`05-arquitectura.md` §3](./05-arquitectura.md#3-estructura-de-paquetes)).
 3. Descargar Inter (Regular, Medium, SemiBold, Bold `.ttf`, licencia OFL) en `resources/com/vyra/fonts/`.
-4. `module-info.java`: `opens`/`exports` de los paquetes nuevos (ver arquitectura §3).
+4. `module-info.java`: dejar escritos (comentados) los `opens`/`exports` de los paquetes nuevos (ver arquitectura §3). Java no permite exportar ni abrir un paquete que todavía no tiene clases, así que cada línea se descomenta en la fase que crea la primera clase de ese paquete (fases 1 y 2).
 
 **Listo cuando:** `mvn compile` y `mvn test` pasan, y `mvn javafx:run` abre la ventana actual.
 
@@ -47,8 +48,8 @@ Este documento ordena el trabajo de programación en fases cortas. Cada fase dej
 2. Reemplazar `schema.sql` por el script de [`03` §3](./03-modelo-base-datos.md#3-script-sql-sqlite).
 3. `ConexionBD`: ejecutar `PRAGMA foreign_keys = ON` al abrir.
 4. `util.HashUtil`: `hashear(String)` y `verificar(String, String)` con PBKDF2WithHmacSHA256 (sal aleatoria de 16 bytes, 120 000 iteraciones, formato `pbkdf2$iteraciones$salBase64$hashBase64`). Quitar `autenticar()`/`hashear()` de `Usuario`.
-5. `util.Formatos` (sección 9 de la guía de frontend) y `service.ReglaNegocioException`.
-6. Mover los `*DAOImpl` actuales a `dao/memoria/*DAOMemoria` y ajustar los demos para que sigan funcionando.
+5. `util.Formatos` (sección 9 de la guía de frontend) y `service.ReglaNegocioException`. Descomentar `exports com.vyra.dental.service` en `module-info.java`.
+6. Mover los `*DAOImpl` actuales a `dao/memoria/*DAOMemoria` y ajustar los demos para que sigan funcionando. Descomentar `exports com.vyra.dental.dao.memoria`.
 7. Pruebas: `HashUtil` (verifica la correcta, rechaza la incorrecta, dos hashes de la misma clave son distintos).
 
 **Listo cuando:** compila, las pruebas pasan, borrar `vyra.db` y arrancar crea todas las tablas nuevas.
@@ -57,7 +58,7 @@ Este documento ordena el trabajo de programación en fases cortas. Cada fase dej
 **Objetivo:** iniciar sesión y moverse por el menú, aunque las pantallas estén vacías.
 
 1. `styles/vyra.css` con las variables y clases de la [guía §2–4](./08-guia-frontend.md#2-colores-variables-css). Cargar las fuentes en `App`.
-2. Componentes `ui/`: `Icono`, `Avatar`, `Pill`, `Aviso`, `Notificacion`, `CampoFormulario`.
+2. Componentes `ui/`: `Icono`, `Avatar`, `Pill`, `Aviso`, `Notificacion`, `CampoFormulario`. Descomentar en `module-info.java` los `opens`/`exports` de `ui` y `controller` al crear sus primeras clases.
 3. `UsuarioDAOSqlite`, `ProfesionalDAOSqlite`, `AuthService`, `Sesion`, `util.DatosIniciales.crearAdminSiNoExiste()`.
 4. `LoginView.fxml` + `LoginController` ([guía §7.1](./08-guia-frontend.md#71-inicio-de-sesión--loginviewfxml--logincontroller)).
 5. `MainView.fxml` + `MainController` con menú por rol, barra superior y navegación ([guía §6](./08-guia-frontend.md#6-estructura-común-mainviewfxml--maincontroller), [arquitectura §4](./05-arquitectura.md#4-navegación-entre-pantallas)). Enum `Pantalla`. Cada pantalla todavía no hecha muestra un marcador "En construcción".
