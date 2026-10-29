@@ -251,6 +251,12 @@ Cada pantalla indica: archivo FXML, controlador, requerimientos que cubre, roles
 - **Línea de tiempo** de entradas, de la más reciente a la más antigua: fecha, profesional, diagnóstico (SemiBold) y observaciones. Mismo estilo que el "Historial de la pieza" del odontograma (punto + línea vertical).
 - **Botón primario "Nueva entrada":** abre un formulario en el mismo panel con Fecha (hoy, no editable), Cita (la cita de hoy del paciente, si existe), Diagnóstico y Observaciones.
 - Las entradas no se editan ni se borran (RN-09). Botón secundario "Exportar PDF" (RF-11).
+- *Implementación (fase 5):*
+  - La historia clínica es por ahora **solo la pestaña de la ficha de Pacientes** (`HistoriaClinicaController` arma el contenido por código); el ítem "Historia clínica" del menú sigue como "En construcción" hasta decidir si se necesita una pantalla propia.
+  - Recepción no ve la pestaña. El administrador la ve en solo lectura; el odontólogo edita alergias y antecedentes (botón "Guardar datos") y agrega entradas.
+  - La entrada tiene la fecha de hoy y, si el paciente tiene una cita de hoy no cancelada (con el profesional de la sesión), queda asociada a ella. La tabla no guarda el profesional: en cada entrada se muestra el de su cita, y las entradas sin cita no lo muestran.
+  - Hace falta un diagnóstico o unas observaciones; con ambos vacíos el error sale bajo "Diagnóstico".
+  - "Exportar PDF" queda para la fase 8.
 
 ### 7.6 Odontograma — `OdontogramaView.fxml` / `OdontogramaController`
 **Referencia:** `docs/ui/Odontograma.html` (y la versión interactiva del lienzo) · **Cubre:** RF-05, CU-05, RF-11 · **Roles:** Odontólogo (completo); Admin (lectura)

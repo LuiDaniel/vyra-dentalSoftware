@@ -5,18 +5,18 @@
 
 Este documento ordena el trabajo de programación en fases cortas. Cada fase deja la aplicación **compilando y ejecutable**, termina con un commit y tiene criterios claros para saber que está lista. Está pensado para seguirse en orden, ya sea a mano o pidiéndole cada fase a Claude Code (ver la sección 4).
 
-## 1. Estado actual del código (2026-10-29, después de la fase 4)
+## 1. Estado actual del código (2026-10-29, fase 5 en curso: historia clínica hecha, falta el odontograma)
 
 | Parte | Estado |
 |---|---|
 | `pom.xml` | JavaFX 21, SQLite JDBC, Lombok, Hibernate Validator, JUnit 5 + Surefire. Compila con `release 21` (fase 0). |
 | `model/` | 8 clases y 5 enums, alineados con la BD (fase 1). Los enums tienen `getEtiqueta()`; `EstadoPieza` además `getCodigo()` y los estados `getClaseCss()`. |
-| `dao/` | Usuario, Profesional, Paciente y Cita completos ([`04` §2](./04-diagrama-clases.md#2-acceso-a-datos-comvyradentaldao-y-daoimpl)), en SQLite (`dao/impl/`) y en memoria (`dao/memoria/`). Tratamiento y Pago solo en memoria y sin los métodos nuevos. Faltan Historia clínica y Odontograma. |
+| `dao/` | Usuario, Profesional, Paciente y Cita completos ([`04` §2](./04-diagrama-clases.md#2-acceso-a-datos-comvyradentaldao-y-daoimpl)), en SQLite (`dao/impl/`) y en memoria (`dao/memoria/`). Historia clínica también (`HistoriaClinicaDAO`, solo `crear`, `buscarPorId` y `listarPorPaciente`: RN-09). Tratamiento y Pago solo en memoria y sin los métodos nuevos. Falta Odontograma. |
 | `util/` | `ConexionBD` (abre SQLite, activa claves foráneas y ejecuta `schema.sql`), `Validador` (Jakarta), `HashUtil` (PBKDF2), `Formatos`, `Busqueda` (sin tildes) y `DatosIniciales` (admin inicial y datos de ejemplo). `schema.sql` es el de [`03` §3](./03-modelo-base-datos.md#3-script-sql-sqlite). |
-| `service/` | `ReglaNegocioException`, `AuthService`, `Sesion`, `PacienteService`, `CitaService`, `ProfesionalService` y `Servicios` (crea los servicios con sus DAO SQLite). |
-| `controller/` | `LoginController`, `MainController` (menú por rol, navegación y contador de citas de hoy), `PacientesController`, `ProfesionalesController`, `AgendaController`, enum `Pantalla` e interfaz `RecibeParametro`. |
+| `service/` | `ReglaNegocioException`, `AuthService`, `Sesion`, `PacienteService`, `CitaService`, `ProfesionalService`, `HistoriaClinicaService` y `Servicios` (crea los servicios con sus DAO SQLite). |
+| `controller/` | `LoginController`, `MainController` (menú por rol, navegación y contador de citas de hoy), `PacientesController`, `HistoriaClinicaController` (pestaña de la ficha), `ProfesionalesController`, `AgendaController`, enum `Pantalla` e interfaz `RecibeParametro`. |
 | `ui/` | `Icono`, `Avatar`, `Pill`, `Aviso`, `Notificacion`, `CampoFormulario`, `Dialogos` (confirmación) y `EstadoVacio`. |
-| Vistas FXML, CSS | `LoginView`, `MainView`, `PacientesView` (pestañas Datos y Citas), `ProfesionalesView`, `AgendaView` (Día, Semana y Lista) y `styles/vyra.css`. Las demás pantallas muestran "En construcción" hasta que exista su FXML. |
+| Vistas FXML, CSS | `LoginView`, `MainView`, `PacientesView` (pestañas Datos, Historia clínica y Citas), `ProfesionalesView`, `AgendaView` (Día, Semana y Lista) y `styles/vyra.css`. Las demás pantallas muestran "En construcción" hasta que exista su FXML. |
 | `App.java` | Carga Inter, abre la BD, crea el admin si no hay usuarios y muestra el login; `mostrarLogin()`/`mostrarPrincipal()` cambian la escena de la ventana. |
 | `demo/` | 4 CRUDs de prueba + lanzador, hechos con código Java (sin FXML). |
 | Diseño | Listo: [`docs/ui/`](./ui) y [`08-guia-frontend.md`](./08-guia-frontend.md). |
@@ -86,7 +86,7 @@ Este documento ordena el trabajo de programación en fases cortas. Cada fase dej
 **Listo cuando:** se agenda, confirma, reprograma, cancela y marca atendida; el cruce se detecta antes de guardar y los chips de horarios libres funcionan; todas las pruebas pasan.
 
 ### Fase 5 — Historia clínica y Odontograma
-1. `HistoriaClinicaDAOSqlite` + `HistoriaClinicaService` + pestaña Historia clínica ([guía §7.5](./08-guia-frontend.md#75-historia-clínica--pestaña-de-la-ficha--historiaclinicacontroller)).
+1. ✔ *Hecho.* `HistoriaClinicaDAOSqlite` + `HistoriaClinicaService` + pestaña Historia clínica ([guía §7.5](./08-guia-frontend.md#75-historia-clínica--pestaña-de-la-ficha--historiaclinicacontroller)).
 2. `OdontogramaDAOSqlite` (consulta de estado actual de [`03` §5.1](./03-modelo-base-datos.md#51-estado-actual-del-odontograma-de-un-paciente-cu-05)) + `OdontogramaService` (pruebas: una pieza sin registros es SANA; el estado actual es el último registro; guardar no borra el historial).
 3. Componente `PiezaDental` + `OdontogramaView` ([guía §7.6](./08-guia-frontend.md#76-odontograma--odontogramaviewfxml--odontogramacontroller)).
 

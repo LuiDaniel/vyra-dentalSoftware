@@ -69,8 +69,12 @@
 
             <HBox styleClass="pestanas">
                 <ToggleButton fx:id="pestanaDatos" text="Datos" styleClass="pestana" selected="true"/>
+                <ToggleButton fx:id="pestanaHistoria" text="Historia clínica" styleClass="pestana"/>
                 <ToggleButton fx:id="pestanaCitas" text="Citas" styleClass="pestana"/>
             </HBox>
+
+            <!-- Pestaña Historia clínica: la arma HistoriaClinicaController (solo odontólogo y administrador) -->
+            <VBox fx:id="contenidoHistoria" styleClass="ficha-formulario"/>
 
             <!-- Pestaña Citas: las citas del paciente, de la más reciente a la más antigua -->
             <VBox fx:id="contenidoCitas" styleClass="ficha-citas"/>

@@ -207,6 +207,7 @@ classDiagram
     class HistoriaClinicaDAO {
         <<interface>>
         +crear(HistoriaClinicaEntrada) HistoriaClinicaEntrada
+        +buscarPorId(int) Optional~HistoriaClinicaEntrada~
         +listarPorPaciente(int) List~HistoriaClinicaEntrada~
     }
     class OdontogramaDAO {
@@ -288,8 +289,13 @@ classDiagram
         +citasActivasDeHoy() int
     }
     class HistoriaClinicaService {
-        +registrarEntrada(HistoriaClinicaEntrada) void
-        +historial(int idPaciente) List~HistoriaClinicaEntrada~
+        +registrarEntrada(HistoriaClinicaEntrada) HistoriaClinicaEntrada
+        +actualizarDatosClinicos(int idPaciente, String alergias, String antecedentes) void
+        +entradasDe(int idPaciente) List~HistoriaClinicaEntrada~
+        +citaDe(HistoriaClinicaEntrada) Optional~Cita~
+        +citaDeHoy(int idPaciente) Optional~Cita~
+        +puedeVer() boolean
+        +puedeEscribir() boolean
     }
     class OdontogramaService {
         +estadoActual(int idPaciente) Map~Integer,EstadoPieza~

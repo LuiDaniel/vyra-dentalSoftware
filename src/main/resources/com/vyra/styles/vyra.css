@@ -1646,3 +1646,57 @@
     -fx-border-color: transparent transparent -vy-separador transparent;
     -fx-border-width: 0 0 1px 0;
 }
+
+/* Pestaña Historia clínica de la ficha del paciente */
+.hc-acciones {
+    -fx-alignment: center-right;
+}
+
+.hc-encabezado {
+    -fx-alignment: center-left;
+    -fx-padding: 8px 0 0 0;
+}
+
+.hc-formulario {
+    -fx-spacing: 10px;
+    -fx-padding: 14px;
+    -fx-background-color: -vy-primario-suave;
+    -fx-background-radius: 10px;
+    -fx-border-color: -vy-primario-borde;
+    -fx-border-radius: 10px;
+}
+
+.hc-linea-tiempo {
+    -fx-spacing: 0;
+}
+
+.hc-entrada {
+    -fx-alignment: top-left;
+}
+
+.hc-entrada-texto {
+    -fx-padding: 0 0 18px 0;
+}
+
+.hc-riel {
+    -fx-alignment: top-center;
+    -fx-min-width: 12px;
+    -fx-pref-width: 12px;
+    -fx-max-width: 12px;
+}
+
+.hc-punto {
+    -fx-background-color: -vy-primario;
+    -fx-background-radius: 6px;
+    -fx-min-width: 10px;
+    -fx-min-height: 10px;
+    -fx-max-width: 10px;
+    -fx-max-height: 10px;
+}
+
+.hc-linea {
+    -fx-background-color: -vy-borde;
+    -fx-min-width: 2px;
+    -fx-pref-width: 2px;
+    -fx-max-width: 2px;
+}

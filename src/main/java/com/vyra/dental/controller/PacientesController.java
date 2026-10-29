@@ -102,10 +102,14 @@ public class PacientesController {
     @FXML private Button botonGuardar;
     @FXML private ToggleButton pestanaDatos;
     @FXML private ToggleButton pestanaCitas;
+    @FXML private ToggleButton pestanaHistoria;
     @FXML private VBox contenidoDatos;
     @FXML private VBox contenidoCitas;
+    @FXML private VBox contenidoHistoria;
 
     private final PacienteService servicio = Servicios.pacientes();
+    private final boolean veHistoria = Servicios.historiaClinica().puedeVer();
+    private HistoriaClinicaController historia;
     private final CitaService citas = Servicios.citas();
     /** Última visita de cada paciente de la página (se consulta al cargar la lista). */
     private final Map<Integer, LocalDate> ultimasVisitas = new HashMap<>();
@@ -322,6 +326,7 @@ public class PacientesController {
         subtituloFicha.setText("Completa sus datos. Los campos con * son obligatorios.");
         botonGuardar.setText("Registrar paciente");
         pestanaCitas.setDisable(true);
+        pestanaHistoria.setDisable(true);
         pestanaDatos.setSelected(true);
         mostrarPestana();
         alternar(botonBaja, false);
@@ -350,6 +355,7 @@ public class PacientesController {
         botonGuardar.setText("Guardar cambios");
         alternar(botonBaja, editable);
         pestanaCitas.setDisable(false);
+        pestanaHistoria.setDisable(false);
         mostrarPestana();
     }
 
@@ -563,6 +569,7 @@ public class PacientesController {
         ToggleGroup pestanas = new ToggleGroup();
         pestanaDatos.setToggleGroup(pestanas);
         pestanaCitas.setToggleGroup(pestanas);
+        pestanaHistoria.setToggleGroup(pestanas);
         pestanas.selectedToggleProperty().addListener((obs, anterior, nueva) -> {
             if (nueva == null) {
                 anterior.setSelected(true);
@@ -571,16 +578,38 @@ public class PacientesController {
             }
         });
         alternar(contenidoCitas, false);
+        // La recepcionista no ve la historia clínica (matriz de permisos)
+        alternar(pestanaHistoria, veHistoria);
+        alternar(contenidoHistoria, false);
+        if (veHistoria) {
+            historia = new HistoriaClinicaController(contenidoHistoria, this::alActualizarDatosClinicos);
+        }
     }
 
     private void mostrarPestana() {
         boolean datos = pestanaDatos.isSelected();
+        boolean verHistoria = veHistoria && pestanaHistoria.isSelected();
+        boolean verCitas = pestanaCitas.isSelected();
         alternar(contenidoDatos, datos);
         alternar(pie, datos && editable);
-        alternar(contenidoCitas, !datos);
-        if (!datos) {
+        alternar(contenidoCitas, verCitas);
+        alternar(contenidoHistoria, verHistoria);
+        if (verCitas) {
             cargarCitasDelPaciente();
         }
+        if (verHistoria && seleccionado != null) {
+            historia.mostrar(seleccionado);
+        }
+    }
+
+    /** El odontólogo cambió alergias o antecedentes desde la historia clínica: se refresca la lista y la ficha. */
+    private void alActualizarDatosClinicos() {
+        if (seleccionado == null) {
+            return;
+        }
+        campoAlergias.setText(seleccionado.getAlergias());
+        campoAntecedentes.setText(seleccionado.getAntecedentes());
+        cargar();
     }
 
     /** Pestaña Citas: fecha, horario, profesional, motivo y estado de cada cita. */
