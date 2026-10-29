@@ -395,7 +395,7 @@ WHERE activo = 1
 ORDER BY apellidos, nombres
 LIMIT ? OFFSET ?;
 ```
-Los parámetros de texto se pasan como `"%" + texto + "%"`, con `\`, `%` y `_` escapados (`\%`, `\_`) para que se busquen tal cual. `contarActivos` usa el mismo `WHERE` con `SELECT COUNT(*)`.
+La comparación del nombre no distingue tildes ni mayúsculas: en el código, `nombres || ' ' || apellidos` va envuelto en `lower()` y una cadena de `replace()` (á→a, ñ→n...) que arma `util.Busqueda.sinTildesSql()`, y el texto del usuario se normaliza igual con `Busqueda.normalizar()`. Los parámetros de texto se pasan como `"%" + texto + "%"`, con `\`, `%` y `_` escapados (`\%`, `\_`) para que se busquen tal cual. `contarActivos` usa el mismo `WHERE` con `SELECT COUNT(*)`.
 
 ---
 

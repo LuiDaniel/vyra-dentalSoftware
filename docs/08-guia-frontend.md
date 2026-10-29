@@ -219,6 +219,13 @@ Cada pantalla indica: archivo FXML, controlador, requerimientos que cubre, roles
   - Odontólogo (`ComboBox` de "Dr. Marco Salinas · Endodoncia"), Fecha (`DatePicker`, sin fechas pasadas: RN-08), Inicio (`ComboBox` de horas cada 30 min), Fin (calculado; por defecto inicio + 30 min, editable), Motivo (`TextArea`), Estado inicial (segmentado Pendiente / Confirmada).
   - **Validación de cruce en vivo (CU-03):** cada vez que cambia el odontólogo, la fecha o la hora, se llama a `CitaService.existeCruceDeHorario()`. Si hay cruce: borde rojo en "Inicio", `aviso-error` "**Cruce de horario.** El Dr. Salinas ya atiende a María Quispe de 09:00 a 10:00." y una fila de chips "Horarios libres: 10:00 10:30 11:30" (`CitaService.horariosLibres()`); al hacer clic en un chip se cambia la hora. El botón "Agendar cita" queda deshabilitado mientras haya cruce. Sin cruce: `aviso-exito` "Horario disponible para el Dr. Salinas."
   - Al guardar: toast "Cita agendada", la cita aparece en la cuadrícula y el formulario se limpia.
+- *Implementación (fase 4):*
+  - Un clic en un espacio vacío de la cuadrícula abre "Nueva cita" con ese profesional, día y hora.
+  - Los textos usan el nombre completo del profesional ("Marco Salinas Vega · Endodoncia"), sin "Dr."/"Dra.": el modelo no guarda el tratamiento y no se deduce del nombre. Si se quiere mostrar, hay que agregar un campo al profesional.
+  - Además de las fechas pasadas, si la fecha es hoy no se acepta una hora que ya pasó (RN-08); los horarios libres de hoy empiezan desde la hora actual.
+  - Las flechas cambian de día en la vista Día (saltando el domingo) y de semana en Semana y Lista. La vista Lista muestra las citas de lunes a sábado de la semana elegida.
+  - El odontólogo ve solo su columna y el panel de detalle; no tiene el formulario de nueva cita. Si su usuario no tiene un profesional asociado, la agenda le indica que lo pida al administrador.
+  - El ítem "Agenda" del menú muestra la cantidad de citas de hoy que no están canceladas.
 
 ### 7.4 Pacientes — `PacientesView.fxml` / `PacientesController`
 **Referencia:** `docs/ui/Pacientes.html` · **Cubre:** RF-01, CU-01 · **Roles:** Admin y Recepción (completo); Odontólogo (lectura)

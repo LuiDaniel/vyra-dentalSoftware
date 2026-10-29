@@ -95,7 +95,7 @@ Son las reglas concretas que el código debe hacer cumplir. Cada una indica en q
 | RN-05 | Una cita debe tener `horaFin` posterior a `horaInicio`. Los horarios van en bloques de 30 minutos entre 08:00 y 20:00. | `CitaService` |
 | RN-06 | Un odontólogo no puede tener dos citas que se traslapen el mismo día. Solo cuentan las citas en estado `PENDIENTE` o `CONFIRMADA` (las canceladas y atendidas liberan el horario). | `CitaService.existeCruceDeHorario()` (CU-03) |
 | RN-07 | Una cita nunca se elimina: se cancela (`CANCELADA`) para mantener el historial. | `CitaService` |
-| RN-08 | No se puede agendar una cita en una fecha pasada. | `CitaService` |
+| RN-08 | No se puede agendar una cita en una fecha pasada ni, si es hoy, en una hora que ya pasó. | `CitaService` |
 | RN-09 | Las entradas de historia clínica y los cambios del odontograma nunca se sobrescriben ni se borran: cada cambio es una fila nueva con su fecha. | `HistoriaClinicaService`, `OdontogramaService` |
 | RN-10 | El número de pieza dental usa la notación FDI: cuadrantes 1–4 y posiciones 1–8 (11–18, 21–28, 31–38, 41–48). Las piezas temporales (51–85) quedan para una versión futura. | Modelo + `OdontogramaService` |
 | RN-11 | El costo de un tratamiento debe ser mayor a 0. | Modelo (`@Positive`) |

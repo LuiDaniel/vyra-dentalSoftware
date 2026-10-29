@@ -196,7 +196,11 @@ classDiagram
         +listarPorFecha(LocalDate) List~Cita~
         +listarPorProfesionalYFecha(int, LocalDate) List~Cita~
         +listarPorPaciente(int) List~Cita~
+        +listarEntre(LocalDate desde, LocalDate hasta) List~Cita~
+        +buscarCruce(int idProf, LocalDate, LocalTime ini, LocalTime fin, int excluirId) Optional~Cita~
         +existeCruce(int idProf, LocalDate, LocalTime ini, LocalTime fin, int excluirId) boolean
+        +ultimaVisita(int idPaciente) Optional~LocalDate~
+        +contarPorProfesional(int) int
         +actualizar(Cita) boolean
         +actualizarEstado(int, EstadoCita) boolean
     }
@@ -276,7 +280,12 @@ classDiagram
         +marcarAtendida(int) void
         +existeCruceDeHorario(Cita) boolean
         +horariosLibres(int idProf, LocalDate, int duracionMin) List~LocalTime~
+        +problemaDeFechaHora(LocalDate, LocalTime) Optional~String~
         +citasDelDia(LocalDate) List~Cita~
+        +citasEntre(LocalDate, LocalDate) List~Cita~
+        +citasDePaciente(int) List~Cita~
+        +ultimaVisita(int idPaciente) Optional~LocalDate~
+        +citasActivasDeHoy() int
     }
     class HistoriaClinicaService {
         +registrarEntrada(HistoriaClinicaEntrada) void
@@ -318,6 +327,9 @@ classDiagram
 
 - Cuando una regla no se cumple, el servicio lanza `ReglaNegocioException` (en `service/`, hereda de `RuntimeException`) con un mensaje listo para mostrarse al usuario: "El Dr. Salinas ya tiene una cita de 09:00 a 10:00". Si el error es de un campo, se crea con `new ReglaNegocioException("dni", mensaje)` y `getCampo()` lo devuelve, para mostrarlo bajo ese campo.
 - `Validador.validar()` lanza `util.ValidacionException` (hereda de `IllegalArgumentException`) con todos los mensajes de Jakarta y, en `getErrores()`, el mensaje de cada campo (`"dni"` → "El DNI debe tener 8 dígitos"). Los controladores atrapan las dos excepciones y muestran cada mensaje bajo su campo.
+- `CitaService` (fase 4) recibe además un `java.time.Clock` (opcional; por defecto el del sistema) para saber "hoy" y "ahora"; las pruebas usan un reloj fijo. `buscarCruce` devuelve la cita con la que choca, para explicar el error: "Marco Salinas Vega ya tiene una cita con María Quispe de 09:00 a 10:00." Los mensajes usan el nombre completo del profesional, sin "Dr."/"Dra.", porque el modelo no guarda el tratamiento y no se deduce del nombre. El odontólogo solo ve sus citas (filtradas por `Sesion.getProfesional()`) y solo puede marcarlas como atendidas.
+- `ProfesionalService` (fase 4) asocia como mucho un usuario con rol Odontólogo por profesional y no elimina a un profesional que tenga citas.
+- Las búsquedas de pacientes ignoran mayúsculas y tildes (`util.Busqueda`): "lucia" encuentra a "Lucía".
 - `PacienteService` (fase 3) normaliza antes de validar: quita espacios sobrantes, guarda los campos vacíos como `null` y acepta el teléfono con espacios ("987 654 321"). El DNI no se repite ni siquiera con un paciente dado de baja (RN-01). Los listados son de 20 por página (`TAMANO_PAGINA`).
 - `Sesion` guarda el usuario que inició sesión. Si es odontólogo, también guarda su `Profesional` (vía `ProfesionalDAO.buscarPorIdUsuario`).
 - `ProfesionalService` y `UsuarioService` son CRUD simples con validación. `UsuarioService.crear()` recibe la contraseña en texto plano y guarda `HashUtil.hashear(contrasena)`.
@@ -346,8 +358,8 @@ Las filas del modelo (de `Usuario` a `Pago`) quedaron corregidas en la fase 1 de
 | `OdontogramaPieza` | ✔ Corregido (fase 1) | Agregar |
 | `Tratamiento` | ✔ Corregido (fase 1) | Agregar |
 | `Pago` | ✔ Corregido (fase 1) | Agregar campos; `metodoPago` pasa a enum `MetodoPago` |
-| DAO | Usuario, Profesional y Paciente completos (SQLite y memoria, fases 2 y 3); Tratamiento y Pago solo en memoria | Las 8 interfaces de la sección 2, con implementación SQLite |
-| Servicios | `AuthService`, `Sesion` (fase 2) y `PacienteService` (fase 3) | Los de la sección 3 |
+| DAO | Usuario, Profesional, Paciente y Cita completos (SQLite y memoria, fases 2 a 4); Tratamiento y Pago solo en memoria | Las 8 interfaces de la sección 2, con implementación SQLite |
+| Servicios | `AuthService`, `Sesion` (fase 2), `PacienteService` (fase 3), `CitaService` y `ProfesionalService` (fase 4) | Los de la sección 3 |
 | `demo/*CrudDemoApp` | CRUD de prueba con `Alert` | Se mantienen hasta tener las pantallas reales; luego se borran |
 
 ---
