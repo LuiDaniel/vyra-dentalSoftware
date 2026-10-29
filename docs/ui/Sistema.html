@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vyra · Sistema visual</title>
+<!-- Exportado del lienzo de diseño de Vyra. Es una referencia visual: los datos son de ejemplo. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#F4F7F9}
+a{color:#0F766E}a:hover{color:#115E59}
+</style>
+</head>
+<body>
+<div style="min-height: 100vh; font-family: Inter, 'Segoe UI', system-ui, sans-serif; color: #0F172A; background: #F4F7F9">
+<div style="max-width: 1280px; margin: 0 auto; padding: 48px 32px 64px; display: flex; flex-direction: column; gap: 40px; box-sizing: border-box">
+
+<header style="display: flex; flex-direction: column; gap: 10px; max-width: 760px">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #0F766E">Guía para el frontend en JavaFX</span>
+<h1 style="margin: 0; font-size: 36px; font-weight: 700; letter-spacing: -0.02em">Sistema visual de Vyra</h1>
+<p style="margin: 0; font-size: 15px; line-height: 1.6; color: #475569">Colores, tipografía y componentes que usan todas las pantallas. Cada color tiene un nombre de variable para declararlo una sola vez en <code style="font-family: 'JetBrains Mono', monospace; font-size: 13px; background: #E9EEF3; padding: 1px 6px; border-radius: 5px">styles/vyra.css</code> y reutilizarlo en todo el proyecto.</p>
+</header>
+
+<section style="display: flex; flex-direction: column; gap: 18px">
+<h2 style="margin: 0; font-size: 20px; font-weight: 700">1. Colores</h2>
+
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 13px; font-weight: 600; color: #475569">Marca</span>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px">
+
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden">
+<div style="height: 64px; background: #0F766E; border-bottom: 1px solid #EEF2F6; display: flex; align-items: flex-end; padding: 8px 10px; box-sizing: border-box"><span style="font-size: 12px; font-weight: 700; color: #FFFFFF">Aa</span></div>
+<div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 13px; font-weight: 600">Primario</span>
+<span style="font-size: 12px; color: #475569; font-family: 'JetBrains Mono', monospace">#0F766E</span>
+<span style="font-size: 11px; color: #0F766E; font-family: 'JetBrains Mono', monospace">-vy-primario</span>
+</div>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden">
+<div style="height: 64px; background: #115E59; border-bottom: 1px solid #EEF2F6; display: flex; align-items: flex-end; padding: 8px 10px; box-sizing: border-box"><span style="font-size: 12px; font-weight: 700; color: #FFFFFF">Aa</span></div>
+<div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 13px; font-weight: 600">Primario hover</span>
+<span style="font-size: 12px; color: #475569; font-family: 'JetBrains Mono', monospace">#115E59</span>
+<span style="font-size: 11px; color: #0F766E; font-family: 'JetBrains Mono', monospace">-vy-primario-hover</span>
+</div>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden">
+<div style="height: 64px; background: #2DD4BF; border-bottom: 1px solid #EEF2F6; display: flex; align-items: flex-end; padding: 8px 10px; box-sizing: border-box"><span style="font-size: 12px; font-weight: 700; color: #0F172A">Aa</span></div>
+<div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 13px; font-weight: 600">Acento</span>
+<span style="font-size: 12px; color: #475569; font-family: 'JetBrains Mono', monospace">#2DD4BF</span>
+<span style="font-size: 11px; color: #0F766E; font-family: 'JetBrains Mono', monospace">-vy-acento</span>
+</div>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden">
+<div style="height: 64px; background: #F0FDFA; border-bottom: 1px solid #EEF2F6; display: flex; align-items: flex-end; padding: 8px 10px; box-sizing: border-box"><span style="font-size: 12px; font-weight: 700; color: #0F172A">Aa</span></div>
+<div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 13px; font-weight: 600">Primario suave</span>
+<span style="font-size: 12px; color: #475569; font-family: 'JetBrains Mono', monospace">#F0FDFA</span>
+<span style="font-size: 11px; color: #0F766E; font-family: 'JetBrains Mono', monospace">-vy-primario-suave</span>
+</div>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden">
+<div style="height: 64px; background: #0B1F2A; border-bottom: 1px solid #EEF2F6; display: flex; align-items: flex-end; padding: 8px 10px; box-sizing: border-box"><span style="font-size: 12px; font-weight: 700; color: #FFFFFF">Aa</span></div>
+<div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 13px; font-weight: 600">Menú lateral</span>
+<span style="font-size: 12px; color: #475569; font-family: 'JetBrains Mono', monospace">#0B1F2A</span>
+<span style="font-size: 11px; color: #0F766E; font-family: 'JetBrains Mono', monospace">-vy-sidebar</span>
+</div>
+</div>
+
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 13px; font-weight: 600; color: #475569">Neutros</span>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px">
+
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden">
+<div style="height: 64px; background: #0F172A; border-bottom: 1px solid #EEF2F6; display: flex; align-items: flex-end; padding: 8px 10px; box-sizing: border-box"><span style="font-size: 12px; font-weight: 700; color: #FFFFFF">Aa</span></div>
+<div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 13px; font-weight: 600">Tinta (texto)</span>
+<span style="font-size: 12px; color: #475569; font-family: 'JetBrains Mono', monospace">#0F172A</span>
+<span style="font-size: 11px; color: #0F766E; font-family: 'JetBrains Mono', monospace">-vy-tinta</span>
+</div>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden">
+<div style="height: 64px; background: #475569; border-bottom: 1px solid #EEF2F6; display: flex; align-items: flex-end; padding: 8px 10px; box-sizing: border-box"><span style="font-size: 12px; font-weight: 700; color: #FFFFFF">Aa</span></div>
+<div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 13px; font-weight: 600">Texto secundario</span>
+<span style="font-size: 12px; color: #475569; font-family: 'JetBrains Mono', monospace">#475569</span>
+<span style="font-size: 11px; color: #0F766E; font-family: 'JetBrains Mono', monospace">-vy-texto-2</span>
+</div>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden">
+<div style="height: 64px; background: #64748B; border-bottom: 1px solid #EEF2F6; display: flex; align-items: flex-end; padding: 8px 10px; box-sizing: border-box"><span style="font-size: 12px; font-weight: 700; color: #FFFFFF">Aa</span></div>
+<div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 13px; font-weight: 600">Texto tenue</span>
+<span style="font-size: 12px; color: #475569; font-family: 'JetBrains Mono', monospace">#64748B</span>
+<span style="font-size: 11px; color: #0F766E; font-family: 'JetBrains Mono', monospace">-vy-texto-3</span>
+</div>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden">
+<div style="height: 64px; background: #E2E8F0; border-bottom: 1px solid #EEF2F6; display: flex; align-items: flex-end; padding: 8px 10px; box-sizing: border-box"><span style="font-size: 12px; font-weight: 700; color: #0F172A">Aa</span></div>
+<div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 13px; font-weight: 600">Borde</span>
+<span style="font-size: 12px; color: #475569; font-family: 'JetBrains Mono', monospace">#E2E8F0</span>
+<span style="font-size: 11px; color: #0F766E; font-family: 'JetBrains Mono', monospace">-vy-borde</span>
+</div>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden">
+<div style="height: 64px; background: #F4F7F9; border-bottom: 1px solid #EEF2F6; display: flex; align-items: flex-end; padding: 8px 10px; box-sizing: border-box"><span style="font-size: 12px; font-weight: 700; color: #0F172A">Aa</span></div>
+<div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 13px; font-weight: 600">Fondo</span>
+<span style="font-size: 12px; color: #475569; font-family: 'JetBrains Mono', monospace">#F4F7F9</span>
+<span style="font-size: 11px; color: #0F766E; font-family: 'JetBrains Mono', monospace">-vy-fondo</span>
+</div>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden">
+<div style="height: 64px; background: #FFFFFF; border-bottom: 1px solid #EEF2F6; display: flex; align-items: flex-end; padding: 8px 10px; box-sizing: border-box"><span style="font-size: 12px; font-weight: 700; color: #0F172A">Aa</span></div>
+<div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 13px; font-weight: 600">Superficie</span>
+<span style="font-size: 12px; color: #475569; font-family: 'JetBrains Mono', monospace">#FFFFFF</span>
+<span style="font-size: 11px; color: #0F766E; font-family: 'JetBrains Mono', monospace">-vy-superficie</span>
+</div>
+</div>
+
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 13px; font-weight: 600; color: #475569">Estados de cita (fondo de píldora / texto)</span>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px">
+
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden">
+<div style="height: 64px; background: #FEF3C7; border-bottom: 1px solid #EEF2F6; display: flex; align-items: flex-end; padding: 8px 10px; box-sizing: border-box"><span style="font-size: 12px; font-weight: 700; color: #0F172A">Aa</span></div>
+<div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 13px; font-weight: 600">Pendiente</span>
+<span style="font-size: 12px; color: #475569; font-family: 'JetBrains Mono', monospace">#FEF3C7</span>
+<span style="font-size: 11px; color: #0F766E; font-family: 'JetBrains Mono', monospace">texto #92400E</span>
+</div>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden">
+<div style="height: 64px; background: #DBEAFE; border-bottom: 1px solid #EEF2F6; display: flex; align-items: flex-end; padding: 8px 10px; box-sizing: border-box"><span style="font-size: 12px; font-weight: 700; color: #0F172A">Aa</span></div>
+<div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 13px; font-weight: 600">Confirmada</span>
+<span style="font-size: 12px; color: #475569; font-family: 'JetBrains Mono', monospace">#DBEAFE</span>
+<span style="font-size: 11px; color: #0F766E; font-family: 'JetBrains Mono', monospace">texto #1E40AF</span>
+</div>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden">
+<div style="height: 64px; background: #D1FAE5; border-bottom: 1px solid #EEF2F6; display: flex; align-items: flex-end; padding: 8px 10px; box-sizing: border-box"><span style="font-size: 12px; font-weight: 700; color: #0F172A">Aa</span></div>
+<div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 13px; font-weight: 600">Atendida</span>
+<span style="font-size: 12px; color: #475569; font-family: 'JetBrains Mono', monospace">#D1FAE5</span>
+<span style="font-size: 11px; color: #0F766E; font-family: 'JetBrains Mono', monospace">texto #065F46</span>
+</div>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden">
+<div style="height: 64px; background: #FEE2E2; border-bottom: 1px solid #EEF2F6; display: flex; align-items: flex-end; padding: 8px 10px; box-sizing: border-box"><span style="font-size: 12px; font-weight: 700; color: #0F172A">Aa</span></div>
+<div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 13px; font-weight: 600">Cancelada</span>
+<span style="font-size: 12px; color: #475569; font-family: 'JetBrains Mono', monospace">#FEE2E2</span>
+<span style="font-size: 11px; color: #0F766E; font-family: 'JetBrains Mono', monospace">texto #991B1B</span>
+</div>
+</div>
+
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 13px; font-weight: 600; color: #475569">Odontograma (relleno / borde)</span>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px">
+
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden">
+<div style="height: 64px; background: #FFFFFF; border-bottom: 1px solid #EEF2F6; display: flex; align-items: flex-end; padding: 8px 10px; box-sizing: border-box"><span style="font-size: 12px; font-weight: 700; color: #0F172A">Aa</span></div>
+<div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 13px; font-weight: 600">Sana</span>
+<span style="font-size: 12px; color: #475569; font-family: 'JetBrains Mono', monospace">#FFFFFF</span>
+<span style="font-size: 11px; color: #0F766E; font-family: 'JetBrains Mono', monospace">borde #64748B</span>
+</div>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden">
+<div style="height: 64px; background: #FCA5A5; border-bottom: 1px solid #EEF2F6; display: flex; align-items: flex-end; padding: 8px 10px; box-sizing: border-box"><span style="font-size: 12px; font-weight: 700; color: #0F172A">Aa</span></div>
+<div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 13px; font-weight: 600">Cariada</span>
+<span style="font-size: 12px; color: #475569; font-family: 'JetBrains Mono', monospace">#FCA5A5</span>
+<span style="font-size: 11px; color: #0F766E; font-family: 'JetBrains Mono', monospace">borde #B91C1C</span>
+</div>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden">
+<div style="height: 64px; background: #93C5FD; border-bottom: 1px solid #EEF2F6; display: flex; align-items: flex-end; padding: 8px 10px; box-sizing: border-box"><span style="font-size: 12px; font-weight: 700; color: #0F172A">Aa</span></div>
+<div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 13px; font-weight: 600">Obturada</span>
+<span style="font-size: 12px; color: #475569; font-family: 'JetBrains Mono', monospace">#93C5FD</span>
+<span style="font-size: 11px; color: #0F766E; font-family: 'JetBrains Mono', monospace">borde #1D4ED8</span>
+</div>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden">
+<div style="height: 64px; background: #FCD34D; border-bottom: 1px solid #EEF2F6; display: flex; align-items: flex-end; padding: 8px 10px; box-sizing: border-box"><span style="font-size: 12px; font-weight: 700; color: #0F172A">Aa</span></div>
+<div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 13px; font-weight: 600">En tratamiento</span>
+<span style="font-size: 12px; color: #475569; font-family: 'JetBrains Mono', monospace">#FCD34D</span>
+<span style="font-size: 11px; color: #0F766E; font-family: 'JetBrains Mono', monospace">borde #B45309</span>
+</div>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden">
+<div style="height: 64px; background: #F1F5F9; border-bottom: 1px solid #EEF2F6; display: flex; align-items: flex-end; padding: 8px 10px; box-sizing: border-box"><span style="font-size: 12px; font-weight: 700; color: #0F172A">Aa</span></div>
+<div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 13px; font-weight: 600">Extraída</span>
+<span style="font-size: 12px; color: #475569; font-family: 'JetBrains Mono', monospace">#F1F5F9</span>
+<span style="font-size: 11px; color: #0F766E; font-family: 'JetBrains Mono', monospace">borde #64748B + X</span>
+</div>
+</div>
+
+</div>
+</div>
+
+</section>
+
+<section style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+<div style="flex: 1 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-size: 20px; font-weight: 700">2. Tipografía</h2>
+<p style="margin: 0; font-size: 14px; color: #475569; line-height: 1.6">Fuente <strong style="color: #0F172A">Inter</strong> (incluir los .ttf en <code style="font-family: 'JetBrains Mono', monospace; font-size: 12px">resources/com/vyra/fonts</code>). Si no se carga, Windows usa <strong style="color: #0F172A">Segoe UI</strong>, que también se ve bien.</p>
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; display: flex; flex-direction: column">
+
+<div style="display: flex; align-items: baseline; gap: 16px; padding: 14px 18px; border-bottom: 1px solid #F1F5F9; flex-wrap: wrap">
+<span style="width: 150px; font-size: 12px; color: #475569; flex: none">Título de página · 28 / 700</span>
+<span style="font-size: 28px; font-weight: 700; letter-spacing: -0.02em; color: #0F172A">Pacientes</span>
+</div>
+
+<div style="display: flex; align-items: baseline; gap: 16px; padding: 14px 18px; border-bottom: 1px solid #F1F5F9; flex-wrap: wrap">
+<span style="width: 150px; font-size: 12px; color: #475569; flex: none">Cifra destacada · 30 / 700</span>
+<span style="font-size: 30px; font-weight: 700; letter-spacing: -0.02em; color: #0F172A">S/ 18,450</span>
+</div>
+
+<div style="display: flex; align-items: baseline; gap: 16px; padding: 14px 18px; border-bottom: 1px solid #F1F5F9; flex-wrap: wrap">
+<span style="width: 150px; font-size: 12px; color: #475569; flex: none">Título de tarjeta · 16 / 600</span>
+<span style="font-size: 16px; font-weight: 600; letter-spacing: 0; color: #0F172A">Agenda de hoy</span>
+</div>
+
+<div style="display: flex; align-items: baseline; gap: 16px; padding: 14px 18px; border-bottom: 1px solid #F1F5F9; flex-wrap: wrap">
+<span style="width: 150px; font-size: 12px; color: #475569; flex: none">Cuerpo · 14 / 400</span>
+<span style="font-size: 14px; font-weight: 400; letter-spacing: 0; color: #0F172A">Endodoncia pieza 36 · Dr. Salinas</span>
+</div>
+
+<div style="display: flex; align-items: baseline; gap: 16px; padding: 14px 18px; border-bottom: 1px solid #F1F5F9; flex-wrap: wrap">
+<span style="width: 150px; font-size: 12px; color: #475569; flex: none">Etiqueta de campo · 13 / 600</span>
+<span style="font-size: 13px; font-weight: 600; letter-spacing: 0; color: #334155">Fecha de nacimiento</span>
+</div>
+
+<div style="display: flex; align-items: baseline; gap: 16px; padding: 14px 18px; border-bottom: 1px solid #F1F5F9; flex-wrap: wrap">
+<span style="width: 150px; font-size: 12px; color: #475569; flex: none">Texto de apoyo · 12 / 500</span>
+<span style="font-size: 12px; font-weight: 500; letter-spacing: 0; color: #475569">3 pendientes de confirmar</span>
+</div>
+
+</div>
+</div>
+<div style="flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-size: 20px; font-weight: 700">3. Espacios, radios y sombras</h2>
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 18px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; font-weight: 600">Escala de espacios (px)</span>
+<div style="display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap">
+
+<span style="display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; color: #475569"><span style="width: 4px; height: 4px; background: #99F6E4; border-radius: 3px"></span>4</span>
+
+<span style="display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; color: #475569"><span style="width: 8px; height: 8px; background: #99F6E4; border-radius: 3px"></span>8</span>
+
+<span style="display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; color: #475569"><span style="width: 12px; height: 12px; background: #99F6E4; border-radius: 3px"></span>12</span>
+
+<span style="display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; color: #475569"><span style="width: 16px; height: 16px; background: #99F6E4; border-radius: 3px"></span>16</span>
+
+<span style="display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; color: #475569"><span style="width: 20px; height: 20px; background: #99F6E4; border-radius: 3px"></span>20</span>
+
+<span style="display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; color: #475569"><span style="width: 24px; height: 24px; background: #99F6E4; border-radius: 3px"></span>24</span>
+
+<span style="display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; color: #475569"><span style="width: 32px; height: 32px; background: #99F6E4; border-radius: 3px"></span>32</span>
+
+</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+<div style="display: flex; flex-direction: column; gap: 6px; align-items: center; font-size: 12px; color: #475569"><span style="width: 64px; height: 40px; border: 1.5px solid #0F766E; border-radius: 10px"></span>10 · botones y campos</div>
+<div style="display: flex; flex-direction: column; gap: 6px; align-items: center; font-size: 12px; color: #475569"><span style="width: 64px; height: 40px; border: 1.5px solid #0F766E; border-radius: 14px"></span>14 · tarjetas</div>
+<div style="display: flex; flex-direction: column; gap: 6px; align-items: center; font-size: 12px; color: #475569"><span style="width: 64px; height: 28px; border: 1.5px solid #0F766E; border-radius: 999px"></span>999 · píldoras</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+<div style="height: 64px; border-radius: 14px; background: #FFFFFF; border: 1px solid #E2E8F0; box-shadow: 0 1px 2px rgba(15,23,42,0.04); display: flex; align-items: center; justify-content: center; font-size: 12px; color: #475569">Tarjeta normal</div>
+<div style="height: 64px; border-radius: 14px; background: #FFFFFF; border: 1px solid #E2E8F0; box-shadow: 0 4px 16px rgba(15,23,42,0.08); display: flex; align-items: center; justify-content: center; font-size: 12px; color: #475569">Panel de formulario</div>
+</div>
+</div>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 18px">
+<h2 style="margin: 0; font-size: 20px; font-weight: 700">4. Componentes</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 16px">
+
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+<span style="font-size: 14px; font-weight: 700">Botones</span>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
+<button style="height: 40px; padding: 0 16px; border-radius: 10px; border: 0; background: #0F766E; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600">Primario</button>
+<button style="height: 40px; padding: 0 16px; border-radius: 10px; border: 0; background: #115E59; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600">Primario :hover</button>
+<button style="height: 40px; padding: 0 16px; border-radius: 10px; border: 1px solid #CBD5E1; background: #FFFFFF; color: #0F172A; font: inherit; font-size: 14px; font-weight: 600">Secundario</button>
+<button style="height: 40px; padding: 0 16px; border-radius: 10px; border: 1px solid #FECACA; background: #FFFFFF; color: #B91C1C; font: inherit; font-size: 14px; font-weight: 600">Peligro</button>
+<button disabled style="height: 40px; padding: 0 16px; border-radius: 10px; border: 0; background: #E2E8F0; color: #64748B; font: inherit; font-size: 14px; font-weight: 600">Deshabilitado</button>
+</div>
+<span style="font-size: 12px; color: #475569">Alto 40 px · padding horizontal 16 · texto 14/600. Un solo botón primario por pantalla o panel.</span>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+<span style="font-size: 14px; font-weight: 700">Campos de formulario</span>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: #334155">Normal
+<input type="text" value="Carlos" style="height: 40px; padding: 0 12px; border: 1px solid #CBD5E1; border-radius: 9px; font: inherit; font-size: 14px; font-weight: 400; color: #0F172A; min-width: 0"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: #334155">:focused
+<input type="text" value="Pérez" style="height: 40px; padding: 0 12px; border: 1px solid #0F766E; box-shadow: 0 0 0 3px rgba(20,184,166,0.18); border-radius: 9px; font: inherit; font-size: 14px; font-weight: 400; color: #0F172A; outline: none; min-width: 0"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: #334155">Con error
+<input type="text" value="7248" style="height: 40px; padding: 0 12px; border: 1px solid #DC2626; border-radius: 9px; font: inherit; font-size: 14px; font-weight: 400; color: #0F172A; min-width: 0">
+<span style="font-size: 12px; font-weight: 500; color: #B91C1C">El DNI debe tener 8 dígitos</span></label>
+</div>
+<span style="font-size: 12px; color: #475569">Usa los mismos mensajes que ya tienen las anotaciones de Jakarta en el modelo, debajo del campo y en rojo.</span>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+<span style="font-size: 14px; font-weight: 700">Píldoras de estado (EstadoCita / EstadoTratamiento)</span>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+
+<span style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: #FEF3C7; color: #92400E"><span style="width: 6px; height: 6px; border-radius: 999px; background: #92400E"></span>Pendiente</span>
+
+<span style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: #DBEAFE; color: #1E40AF"><span style="width: 6px; height: 6px; border-radius: 999px; background: #1E40AF"></span>Confirmada</span>
+
+<span style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: #D1FAE5; color: #065F46"><span style="width: 6px; height: 6px; border-radius: 999px; background: #065F46"></span>Atendida</span>
+
+<span style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: #FEE2E2; color: #991B1B"><span style="width: 6px; height: 6px; border-radius: 999px; background: #991B1B"></span>Cancelada</span>
+
+<span style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: #FEF3C7; color: #92400E"><span style="width: 6px; height: 6px; border-radius: 999px; background: #92400E"></span>En curso</span>
+
+<span style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: #D1FAE5; color: #065F46"><span style="width: 6px; height: 6px; border-radius: 999px; background: #065F46"></span>Finalizado</span>
+
+</div>
+<span style="font-size: 12px; color: #475569">Siempre texto + color, nunca solo color.</span>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+<span style="font-size: 14px; font-weight: 700">Piezas del odontograma (EstadoPieza)</span>
+<div style="display: flex; flex-wrap: wrap; gap: 14px">
+
+<span style="display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; color: #334155; width: 72px">
+<svg width="34" height="40" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5.5C10.5 4 8.5 3 6.5 3.5 3.5 4.3 3 7.5 3.8 10.5c.6 2.2 1.2 4 1.5 6.5.3 2.3.8 4 2 4 1.7 0 1.7-5 4.7-5s3 5 4.7 5c1.2 0 1.7-1.7 2-4 .3-2.5.9-4.3 1.5-6.5.8-3 .3-6.2-2.7-7C15.5 3 13.5 4 12 5.5z" fill="#FFFFFF" stroke="#64748B" stroke-width="1.3" stroke-linejoin="round" stroke-dasharray=""></path><path d="M6.5 7.5l11 9M17.5 7.5l-11 9" stroke="transparent" stroke-width="1.8" stroke-linecap="round" fill="none"></path></svg>
+<span style="font-weight: 800; color: #64748B">—</span>
+<span style="text-align: center">Sana</span>
+</span>
+
+<span style="display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; color: #334155; width: 72px">
+<svg width="34" height="40" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5.5C10.5 4 8.5 3 6.5 3.5 3.5 4.3 3 7.5 3.8 10.5c.6 2.2 1.2 4 1.5 6.5.3 2.3.8 4 2 4 1.7 0 1.7-5 4.7-5s3 5 4.7 5c1.2 0 1.7-1.7 2-4 .3-2.5.9-4.3 1.5-6.5.8-3 .3-6.2-2.7-7C15.5 3 13.5 4 12 5.5z" fill="#FCA5A5" stroke="#B91C1C" stroke-width="1.3" stroke-linejoin="round" stroke-dasharray=""></path><path d="M6.5 7.5l11 9M17.5 7.5l-11 9" stroke="transparent" stroke-width="1.8" stroke-linecap="round" fill="none"></path></svg>
+<span style="font-weight: 800; color: #B91C1C">C</span>
+<span style="text-align: center">Cariada</span>
+</span>
+
+<span style="display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; color: #334155; width: 72px">
+<svg width="34" height="40" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5.5C10.5 4 8.5 3 6.5 3.5 3.5 4.3 3 7.5 3.8 10.5c.6 2.2 1.2 4 1.5 6.5.3 2.3.8 4 2 4 1.7 0 1.7-5 4.7-5s3 5 4.7 5c1.2 0 1.7-1.7 2-4 .3-2.5.9-4.3 1.5-6.5.8-3 .3-6.2-2.7-7C15.5 3 13.5 4 12 5.5z" fill="#93C5FD" stroke="#1D4ED8" stroke-width="1.3" stroke-linejoin="round" stroke-dasharray=""></path><path d="M6.5 7.5l11 9M17.5 7.5l-11 9" stroke="transparent" stroke-width="1.8" stroke-linecap="round" fill="none"></path></svg>
+<span style="font-weight: 800; color: #1D4ED8">O</span>
+<span style="text-align: center">Obturada</span>
+</span>
+
+<span style="display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; color: #334155; width: 72px">
+<svg width="34" height="40" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5.5C10.5 4 8.5 3 6.5 3.5 3.5 4.3 3 7.5 3.8 10.5c.6 2.2 1.2 4 1.5 6.5.3 2.3.8 4 2 4 1.7 0 1.7-5 4.7-5s3 5 4.7 5c1.2 0 1.7-1.7 2-4 .3-2.5.9-4.3 1.5-6.5.8-3 .3-6.2-2.7-7C15.5 3 13.5 4 12 5.5z" fill="#FCD34D" stroke="#B45309" stroke-width="1.3" stroke-linejoin="round" stroke-dasharray=""></path><path d="M6.5 7.5l11 9M17.5 7.5l-11 9" stroke="transparent" stroke-width="1.8" stroke-linecap="round" fill="none"></path></svg>
+<span style="font-weight: 800; color: #B45309">T</span>
+<span style="text-align: center">En tratamiento</span>
+</span>
+
+<span style="display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; color: #334155; width: 72px">
+<svg width="34" height="40" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5.5C10.5 4 8.5 3 6.5 3.5 3.5 4.3 3 7.5 3.8 10.5c.6 2.2 1.2 4 1.5 6.5.3 2.3.8 4 2 4 1.7 0 1.7-5 4.7-5s3 5 4.7 5c1.2 0 1.7-1.7 2-4 .3-2.5.9-4.3 1.5-6.5.8-3 .3-6.2-2.7-7C15.5 3 13.5 4 12 5.5z" fill="#F1F5F9" stroke="#64748B" stroke-width="1.3" stroke-linejoin="round" stroke-dasharray="2 1.5"></path><path d="M6.5 7.5l11 9M17.5 7.5l-11 9" stroke="#334155" stroke-width="1.8" stroke-linecap="round" fill="none"></path></svg>
+<span style="font-weight: 800; color: #64748B">X</span>
+<span style="text-align: center">Extraída</span>
+</span>
+
+</div>
+<span style="font-size: 12px; color: #475569">Cada estado lleva además una letra (C, O, T, X) para que se distinga sin depender del color.</span>
+</div>
+
+<div style="background: #0B1F2A; border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+<span style="font-size: 14px; font-weight: 700; color: #FFFFFF">Menú lateral</span>
+<div style="display: flex; flex-direction: column; gap: 4px; max-width: 240px">
+<span style="display: flex; align-items: center; gap: 12px; height: 40px; padding: 0 12px; border-radius: 10px; background: #123B40; color: #FFFFFF; font-size: 14px; font-weight: 600">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2DD4BF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM16 2v4M8 2v4M3 10h18"></path></svg>Seleccionado</span>
+<span style="display: flex; align-items: center; gap: 12px; height: 40px; padding: 0 12px; border-radius: 10px; background: #132D38; color: #FFFFFF; font-size: 14px; font-weight: 500">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M5 7a4 4 0 1 0 8 0a4 4 0 1 0-8 0"></path></svg>:hover</span>
+<span style="display: flex; align-items: center; gap: 12px; height: 40px; padding: 0 12px; border-radius: 10px; color: #C3D0D8; font-size: 14px; font-weight: 500">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM2 10h20"></path></svg>Normal</span>
+</div>
+<span style="font-size: 12px; color: #A9BCC8">Ancho 240 px · ítems de 40 px · grupos Principal, Clínica y Administración. Muestra solo lo que el rol puede usar.</span>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+<span style="font-size: 14px; font-weight: 700">Avisos</span>
+<div style="display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 10px; background: #F0FDFA; border: 1px solid #99F6E4; color: #134E4A; font-size: 13px; font-weight: 500">Información · citas próximas del día (RF-12)</div>
+<div style="display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 10px; background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46; font-size: 13px; font-weight: 500">Éxito · paciente registrado correctamente</div>
+<div style="display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 10px; background: #FFF7ED; border: 1px solid #FED7AA; color: #9A3412; font-size: 13px; font-weight: 500">Advertencia · el paciente tiene alergias registradas</div>
+<div style="display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 10px; background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B; font-size: 13px; font-weight: 500">Error · cruce de horario con otra cita (RF-03)</div>
+</div>
+</div>
+</section>
+
+<section style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+<div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-size: 20px; font-weight: 700">5. Cómo llevarlo a JavaFX</h2>
+<div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; overflow-x: auto">
+<div style="min-width: 620px">
+<div style="display: grid; grid-template-columns: 1fr 1.3fr 1.2fr; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: #475569; border-bottom: 1px solid #EEF2F6">
+<span style="padding: 12px 18px">En el diseño</span><span style="padding: 12px 12px">Control JavaFX</span><span style="padding: 12px 18px">Clase de estilo</span>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1.3fr 1.2fr; font-size: 14px; border-top: 1px solid #F1F5F9">
+<span style="padding: 11px 18px; font-weight: 600">Estructura general</span>
+<span style="padding: 11px 12px; color: #334155">BorderPane (left = menú, center = contenido)</span>
+<span style="padding: 11px 18px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #0F766E">.app-shell</span>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1.3fr 1.2fr; font-size: 14px; border-top: 1px solid #F1F5F9">
+<span style="padding: 11px 18px; font-weight: 600">Menú lateral</span>
+<span style="padding: 11px 12px; color: #334155">VBox con ToggleButton en un ToggleGroup</span>
+<span style="padding: 11px 18px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #0F766E">.sidebar, .nav-item:selected</span>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1.3fr 1.2fr; font-size: 14px; border-top: 1px solid #F1F5F9">
+<span style="padding: 11px 18px; font-weight: 600">Cambio de pantalla</span>
+<span style="padding: 11px 12px; color: #334155">StackPane central + FXMLLoader por vista</span>
+<span style="padding: 11px 18px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #0F766E">views/*.fxml</span>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1.3fr 1.2fr; font-size: 14px; border-top: 1px solid #F1F5F9">
+<span style="padding: 11px 18px; font-weight: 600">Tarjeta / panel</span>
+<span style="padding: 11px 12px; color: #334155">VBox o GridPane</span>
+<span style="padding: 11px 18px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #0F766E">.card, .card-title</span>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1.3fr 1.2fr; font-size: 14px; border-top: 1px solid #F1F5F9">
+<span style="padding: 11px 18px; font-weight: 600">Tabla de pacientes y pagos</span>
+<span style="padding: 11px 12px; color: #334155">TableView + cellFactory para avatar y píldora</span>
+<span style="padding: 11px 18px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #0F766E">.table-view, .table-row-cell</span>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1.3fr 1.2fr; font-size: 14px; border-top: 1px solid #F1F5F9">
+<span style="padding: 11px 18px; font-weight: 600">Píldora de estado</span>
+<span style="padding: 11px 12px; color: #334155">Label</span>
+<span style="padding: 11px 18px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #0F766E">.pill, .pill-confirmada</span>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1.3fr 1.2fr; font-size: 14px; border-top: 1px solid #F1F5F9">
+<span style="padding: 11px 18px; font-weight: 600">Campos</span>
+<span style="padding: 11px 12px; color: #334155">TextField, DatePicker, ComboBox, TextArea</span>
+<span style="padding: 11px 18px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #0F766E">.text-field:focused, .error</span>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1.3fr 1.2fr; font-size: 14px; border-top: 1px solid #F1F5F9">
+<span style="padding: 11px 18px; font-weight: 600">Agenda del día</span>
+<span style="padding: 11px 12px; color: #334155">GridPane (columnas = odontólogos, filas = 30 min)</span>
+<span style="padding: 11px 18px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #0F766E">.agenda-slot, .cita-bloque</span>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1.3fr 1.2fr; font-size: 14px; border-top: 1px solid #F1F5F9">
+<span style="padding: 11px 18px; font-weight: 600">Odontograma</span>
+<span style="padding: 11px 12px; color: #334155">HBox de Button con SVGPath como graphic</span>
+<span style="padding: 11px 18px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #0F766E">.pieza, .pieza-cariada</span>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1.3fr 1.2fr; font-size: 14px; border-top: 1px solid #F1F5F9">
+<span style="padding: 11px 18px; font-weight: 600">Indicadores (KPI)</span>
+<span style="padding: 11px 12px; color: #334155">TilePane o GridPane de tarjetas</span>
+<span style="padding: 11px 18px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #0F766E">.kpi, .kpi-valor</span>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1.3fr 1.2fr; font-size: 14px; border-top: 1px solid #F1F5F9">
+<span style="padding: 11px 18px; font-weight: 600">Avisos</span>
+<span style="padding: 11px 12px; color: #334155">HBox con Label (o un toast propio)</span>
+<span style="padding: 11px 18px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #0F766E">.alerta-info, .alerta-error</span>
+</div>
+
+</div>
+</div>
+</div>
+<div style="flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-size: 20px; font-weight: 700">Variables de color</h2>
+<pre style="margin: 0; padding: 18px 20px; border-radius: 14px; background: #0B1F2A; color: #DCE6EC; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.7; overflow-x: auto">.root {
+  <span style="color: #5EEAD4">-vy-primario</span>: #0F766E;
+  <span style="color: #5EEAD4">-vy-primario-hover</span>: #115E59;
+  <span style="color: #5EEAD4">-vy-acento</span>: #2DD4BF;
+  <span style="color: #5EEAD4">-vy-primario-suave</span>: #F0FDFA;
+  <span style="color: #5EEAD4">-vy-tinta</span>: #0F172A;
+  <span style="color: #5EEAD4">-vy-texto-2</span>: #475569;
+  <span style="color: #5EEAD4">-vy-borde</span>: #E2E8F0;
+  <span style="color: #5EEAD4">-vy-fondo</span>: #F4F7F9;
+  <span style="color: #5EEAD4">-vy-sidebar</span>: #0B1F2A;
+  -fx-font-family: "Inter";
+  -fx-background-color: -vy-fondo;
+}</pre>
+<p style="margin: 0; font-size: 13px; color: #475569; line-height: 1.6">Los íconos del mockup son trazos SVG de 24×24: copia el atributo <code style="font-family: 'JetBrains Mono', monospace; font-size: 12px">d</code> en un <code style="font-family: 'JetBrains Mono', monospace; font-size: 12px">SVGPath</code> sin relleno y con borde de 2 px.</p>
+</div>
+</section>
+
+</div>
+</div>
+</body>
+</html>

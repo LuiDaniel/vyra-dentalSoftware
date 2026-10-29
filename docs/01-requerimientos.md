@@ -1,10 +1,9 @@
 # Vyra
 ## Documento de Requerimientos — Sistema de Gestión de Citas y Expedientes (Consultorio Dental)
 
-**Versión:** 0.1
-**Fecha:** 2026-09-16
-**Líder de proyecto:** Daniel Machaca
-**Equipo:** 4 integrantes (ver sección 1.1)
+**Versión:** 0.2
+**Fecha:** 2026-10-29
+**Equipo:** Daniel, Evelyn, Smith y Johan (ver sección 1.1)
 **Repositorio:** `vyra`
 
 ---
@@ -15,14 +14,14 @@
 
 ### 1.1 Equipo de trabajo
 
-| Nombre | Rol en el equipo | Módulo(s) a cargo (referencial) |
-|---|---|---|
-| Daniel          | Líder de proyecto | Coordinación general, base de datos, integración |
-| _(por definir)_ | _(por definir)_ | Ej: Interfaz JavaFX (pantallas de citas y pacientes) |
-| _(por definir)_ | _(por definir)_ | Ej: Historia clínica y odontograma |
-| _(por definir)_ | _(por definir)_ | Ej: Reportes, pagos y documentación |
+| Nombre | Módulo(s) a cargo |
+|---|---|
+| Daniel | _(por definir)_ |
+| Evelyn | _(por definir)_ |
+| Smith | _(por definir)_ |
+| Johan | _(por definir)_ |
 
-> Como líder, Daniel mantiene visión y conocimiento de todos los módulos aunque la implementación se reparta entre los 4 integrantes. Esta tabla también sirve como matriz de responsabilidades para la sustentación del curso, y más adelante para dejar claro quiénes son los coautores si el proyecto se registra en INDECOPI (el registro de derecho de autor permite — y pide — listar a todos los autores reales de la obra, no solo a quien la presenta).
+> Los módulos se reparten según la sección 9 de [`05-arquitectura.md`](./05-arquitectura.md#9-división-de-trabajo-sugerida-para-el-equipo). Esta tabla también sirve como matriz de responsabilidades para la sustentación del curso y, más adelante, para dejar claro quiénes son los coautores si el proyecto se registra en INDECOPI (el registro de derecho de autor permite, y pide, listar a todos los autores reales de la obra).
 
 ## 2. Alcance
 
@@ -57,7 +56,7 @@ Estas exclusiones pueden convertirse en una "versión 2" del proyecto más adela
 
 | Código | Descripción | Actor principal | Prioridad |
 |---|---|---|---|
-| RF-01 | El sistema debe permitir registrar, editar, buscar y dar de baja pacientes (nombres, DNI, fecha de nacimiento, teléfono, dirección, contacto de emergencia). | Recepcionista | Alta |
+| RF-01 | El sistema debe permitir registrar, editar, buscar y dar de baja pacientes (nombres, DNI, fecha de nacimiento, teléfono, dirección, contacto de emergencia, alergias). "Dar de baja" es una baja lógica: el paciente deja de aparecer en las búsquedas, pero su historial se conserva. | Recepcionista | Alta |
 | RF-02 | El sistema debe permitir registrar, reprogramar y cancelar citas (fecha, hora, paciente, odontólogo, motivo, estado). | Recepcionista | Alta |
 | RF-03 | El sistema debe impedir que un mismo odontólogo tenga dos citas en el mismo horario (validación de cruce). | Sistema | Alta |
 | RF-04 | El sistema debe permitir crear y actualizar la historia clínica del paciente (antecedentes médicos, alergias, observaciones). | Odontólogo/a | Alta |
@@ -83,7 +82,29 @@ Estas exclusiones pueden convertirse en una "versión 2" del proyecto más adela
 | RNF-06 | El código debe seguir principios de POO, separando el proyecto en capas (modelo, acceso a datos/DAO, lógica de negocio, interfaz), tanto por buena práctica como para sustentarlo académicamente. |
 | RNF-07 | El proyecto debe mantenerse bajo control de versiones en Git desde el inicio, con commits descriptivos. |
 
-## 6. Glosario
+## 6. Reglas de negocio (RN)
+
+Son las reglas concretas que el código debe hacer cumplir. Cada una indica en qué capa se valida, para que no se dupliquen ni se olviden.
+
+| Código | Regla | Dónde se valida |
+|---|---|---|
+| RN-01 | El DNI de un paciente es obligatorio, tiene exactamente 8 dígitos y no puede repetirse. | Modelo (`@Pattern`) + `PacienteService` (duplicado) + `UNIQUE` en BD |
+| RN-02 | El teléfono, si se ingresa, tiene exactamente 9 dígitos. | Modelo (`@Pattern`) |
+| RN-03 | La fecha de nacimiento debe ser anterior a hoy. | Modelo (`@Past`) |
+| RN-04 | Dar de baja a un paciente no lo borra: se marca `activo = 0`. | `PacienteService` |
+| RN-05 | Una cita debe tener `horaFin` posterior a `horaInicio`. Los horarios van en bloques de 30 minutos entre 08:00 y 20:00. | `CitaService` |
+| RN-06 | Un odontólogo no puede tener dos citas que se traslapen el mismo día. Solo cuentan las citas en estado `PENDIENTE` o `CONFIRMADA` (las canceladas y atendidas liberan el horario). | `CitaService.existeCruceDeHorario()` (CU-03) |
+| RN-07 | Una cita nunca se elimina: se cancela (`CANCELADA`) para mantener el historial. | `CitaService` |
+| RN-08 | No se puede agendar una cita en una fecha pasada. | `CitaService` |
+| RN-09 | Las entradas de historia clínica y los cambios del odontograma nunca se sobrescriben ni se borran: cada cambio es una fila nueva con su fecha. | `HistoriaClinicaService`, `OdontogramaService` |
+| RN-10 | El número de pieza dental usa la notación FDI: cuadrantes 1–4 y posiciones 1–8 (11–18, 21–28, 31–38, 41–48). Las piezas temporales (51–85) quedan para una versión futura. | Modelo + `OdontogramaService` |
+| RN-11 | El costo de un tratamiento debe ser mayor a 0. | Modelo (`@Positive`) |
+| RN-12 | Un pago debe tener monto mayor a 0, fecha no futura, y no puede superar el saldo pendiente del tratamiento (saldo = costo − suma de pagos). | Modelo + `PagoService` |
+| RN-13 | La contraseña se guarda como hash con sal (PBKDF2), nunca en texto plano. El mensaje de error del login no dice cuál dato falló. | `util.HashUtil` + `AuthService` |
+| RN-14 | Un usuario desactivado (`activo = 0`) no puede iniciar sesión. | `AuthService` |
+| RN-15 | Cada rol solo ve las pantallas que le corresponden (ver la matriz de permisos en [`02-casos-de-uso.md`](./02-casos-de-uso.md#3-matriz-de-permisos-por-rol)). | `MainController` (menú) + cada Service (defensa en profundidad) |
+
+## 7. Glosario
 
 - **Odontograma:** representación gráfica de las piezas dentales de un paciente, usada para registrar su estado (sano, cariado, tratado, ausente, etc.) a lo largo del tiempo.
 - **Historia clínica / expediente:** conjunto de datos médicos y antecedentes de un paciente, acumulado a lo largo de sus visitas.

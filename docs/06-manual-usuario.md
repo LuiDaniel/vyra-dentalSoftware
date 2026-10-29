@@ -1,7 +1,7 @@
 # Vyra — Manual de Usuario
 
 **Versión:** 0.1 (plantilla — completar cuando el sistema esté funcionando)
-**Fecha:** 2026-09-17
+**Fecha:** 2026-10-29
 
 > Este documento se deja preparado con su estructura desde ahora, pero se completa al final del proyecto, cuando cada pantalla ya exista. Cada sección trae una guía de qué capturar y describir.
 
@@ -10,8 +10,11 @@ Breve resumen de qué es Vyra y a quién está dirigido (personal de un consulto
 
 ## 2. Requisitos para instalar y ejecutar
 - Sistema operativo compatible (Windows, según RNF-01).
-- Java requerido (JDK 21 o el que finalmente usen).
-- Pasos de instalación del `.jar` o instalador generado.
+- Java requerido: JDK 21.
+- Pasos de instalación del `.jar` o instalador generado (con `jpackage`, a definir al final).
+- Primer ingreso: usuario `admin`, contraseña `admin123` (se pide cambiarla).
+
+> Mientras el sistema no esté terminado, las capturas pueden tomarse del diseño de referencia en [`docs/ui`](./ui) para armar la estructura del manual, y luego reemplazarse por capturas reales.
 
 ## 3. Inicio de sesión (CU-08)
 *(Captura de pantalla del login)* + explicación de qué hacer si las credenciales son incorrectas.

@@ -1,7 +1,7 @@
 # Vyra — Casos de Uso
 
-**Versión:** 0.1
-**Fecha:** 2026-09-17
+**Versión:** 0.2
+**Fecha:** 2026-10-29
 
 Este documento se deriva directamente de los Requerimientos Funcionales (RF) definidos en [`01-requerimientos.md`](./01-requerimientos.md). Cada caso de uso (CU) mantiene el mismo número que su RF de origen, para que sea fácil rastrear de dónde sale cada uno.
 
@@ -94,8 +94,8 @@ flowchart LR
 - **Flujo principal:**
   1. El odontólogo abre el expediente del paciente desde la cita en curso.
   2. Selecciona "Nueva entrada de historia clínica".
-  3. Registra antecedentes médicos, alergias, observaciones y diagnóstico.
-  4. El sistema guarda la entrada asociada a la fecha y a la cita actual.
+  3. Registra observaciones y diagnóstico de la visita. Los antecedentes médicos y las alergias son datos generales del paciente (campos `antecedentes` y `alergias` de PACIENTE) y se editan desde la misma pantalla.
+  4. El sistema guarda la entrada asociada a la fecha, al paciente y a la cita actual.
 - **Postcondición:** La historia clínica del paciente queda actualizada con una nueva entrada (no se sobrescriben las anteriores).
 
 ### CU-05 — Registrar odontograma
@@ -134,9 +134,44 @@ flowchart LR
 |---|---|---|---|
 | CU-07 | Gestionar profesionales | Administrador | CRUD de odontólogos: nombres, especialidad, horario de atención. |
 | CU-09 | Generar reportes | Administrador | Selecciona tipo de reporte (citas del día/semana, historial de paciente, ingresos por periodo) y rango de fechas; el sistema consulta la BD y muestra/exporta el resultado. |
-| CU-10 | Registrar pago | Recepcionista | Selecciona un tratamiento o cita, ingresa monto, fecha y método de pago; el sistema lo asocia y actualiza el saldo. |
+| CU-10 | Registrar pago | Recepcionista | Selecciona un tratamiento, ingresa monto, fecha y método de pago; el sistema valida que el monto no supere el saldo (RN-12), guarda el pago y muestra el saldo actualizado. El saldo no se guarda: se calcula como costo − suma de pagos. |
 | CU-11 | Exportar a PDF | Odontólogo/a | Selecciona historia clínica u odontograma de un paciente y genera un PDF listo para imprimir. |
-| CU-12 | Ver alertas del día | Recepcionista | Al iniciar sesión, el sistema muestra automáticamente las citas programadas para el día actual. |
+| CU-12 | Ver alertas del día | Recepcionista | Al iniciar sesión, el inicio muestra un aviso con las citas de la próxima hora y la agenda completa del día. |
+
+---
+
+## 3. Matriz de permisos por rol
+
+Qué pantallas ve cada rol en el menú lateral. "Lectura" significa que puede ver, pero no crear ni modificar. El menú se arma a partir de esta tabla, y cada Service vuelve a verificar el rol antes de escribir.
+
+| Pantalla | Administrador | Recepcionista | Odontólogo/a |
+|---|---|---|---|
+| Inicio (dashboard) | Sí | Sí | Sí (solo sus citas) |
+| Agenda / citas | Sí | Sí | Lectura (sus citas) + marcar "Atendida" |
+| Pacientes | Sí | Sí | Lectura |
+| Historia clínica | Lectura | No | Sí |
+| Odontograma | Lectura | No | Sí |
+| Tratamientos | Lectura | Lectura (para cobrar) | Sí |
+| Pagos | Sí | Sí | No |
+| Reportes | Sí | No | No |
+| Profesionales | Sí | No | No |
+| Usuarios y roles | Sí | No | No |
+
+## 4. Trazabilidad: caso de uso → pantalla
+
+| CU | Pantalla (ver [`08-guia-frontend.md`](./08-guia-frontend.md)) |
+|---|---|
+| CU-01 | Pacientes |
+| CU-02, CU-03 | Agenda (formulario "Nueva cita") |
+| CU-04 | Historia clínica (pestaña dentro de la ficha del paciente) |
+| CU-05 | Odontograma |
+| CU-06 | Tratamientos (y el enlace "Registrar tratamiento" del odontograma) |
+| CU-07 | Profesionales |
+| CU-08 | Inicio de sesión |
+| CU-09 | Reportes |
+| CU-10 | Pagos |
+| CU-11 | Botón "Exportar PDF" en Odontograma e Historia clínica |
+| CU-12 | Aviso en Inicio |
 
 ---
 
