@@ -228,11 +228,12 @@ Cada pantalla indica: archivo FXML, controlador, requerimientos que cubre, roles
   - Paciente: avatar + nombre (SemiBold) + "DNI 72481935" debajo (12 px). Se hace con un `cellFactory`.
   - Teléfono ("987 654 321"), Edad ("34 años"), Última visita ("29 oct 2026"), Alergias (píldora naranja con ícono `alerta`, o "Ninguna" en gris), Acciones (botones `diente` → Odontograma y `agenda` → Nueva cita para ese paciente).
   - Pie: "Mostrando 1–7 de 248" + botones Anterior / Siguiente (20 por página).
+  - *Implementación (fase 3):* la lista se ordena por apellidos; los filtros se aplican en la consulta, así la paginación cuenta bien. "Última visita" muestra "—" hasta que existan las citas (fase 4). El panel tiene por ahora solo la pestaña Datos; las demás se agregan en sus fases.
 - **Panel de ficha (derecha):** avatar grande + nombre completo + "DNI · Paciente desde {mes año}". Pestañas: **Datos**, **Historia clínica** (ver 7.5), **Citas** (lista de sus citas) y **Pagos** (sus pagos y saldo). En Datos, un formulario en 3 secciones:
   - Datos personales: Nombres*, Apellidos*, DNI*, Fecha de nacimiento.
   - Contacto: Teléfono, Contacto de emergencia, Dirección (ancho completo).
   - Información clínica: Alergias (`TextArea`); si tiene texto, debajo aparece un `aviso-advertencia` "Esta alergia se mostrará como alerta al abrir el odontograma." Antecedentes (`TextArea`).
-  - Pie del panel: "Dar de baja" (`btn-peligro`, solo con un paciente existente; pide confirmación), "Cancelar" y el primario "Guardar cambios" o "Registrar paciente".
+  - Pie del panel: "Dar de baja" (`btn-peligro`, solo con un paciente existente; pide confirmación), "Cancelar" y el primario "Guardar cambios" o "Registrar paciente". Enter en un campo de texto guarda; en el diálogo de confirmación, Enter **cancela** (la baja hay que elegirla a propósito).
 - **Errores:** bajo cada campo, con el mensaje del modelo ("El DNI debe tener 8 dígitos"). DNI duplicado: "Ya existe un paciente con el DNI 72481935".
 
 ### 7.5 Historia clínica — pestaña de la ficha / `HistoriaClinicaController`

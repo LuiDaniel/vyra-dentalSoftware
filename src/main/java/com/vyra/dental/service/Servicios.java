@@ -1,5 +1,6 @@
 package com.vyra.dental.service;
 
+import com.vyra.dental.dao.impl.PacienteDAOSqlite;
 import com.vyra.dental.dao.impl.ProfesionalDAOSqlite;
 import com.vyra.dental.dao.impl.UsuarioDAOSqlite;
 
@@ -11,6 +12,7 @@ import com.vyra.dental.dao.impl.UsuarioDAOSqlite;
 public final class Servicios {
 
     private static AuthService auth;
+    private static PacienteService pacientes;
 
     private Servicios() {
     }
@@ -20,5 +22,12 @@ public final class Servicios {
             auth = new AuthService(new UsuarioDAOSqlite(), new ProfesionalDAOSqlite());
         }
         return auth;
+    }
+
+    public static synchronized PacienteService pacientes() {
+        if (pacientes == null) {
+            pacientes = new PacienteService(new PacienteDAOSqlite());
+        }
+        return pacientes;
     }
 }

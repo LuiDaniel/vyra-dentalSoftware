@@ -41,12 +41,23 @@ public class MainController {
     @FXML private Label fecha;
     @FXML private StackPane contenido;
 
+    private static MainController actual;
+
     private final ToggleGroup grupoMenu = new ToggleGroup();
     private final Map<Pantalla, ToggleButton> botonesMenu = new EnumMap<>(Pantalla.class);
     private Rol rol;
 
+    /**
+     * El marco abierto, para que una pantalla abra otra:
+     * {@code MainController.actual().navegar(Pantalla.ODONTOGRAMA, paciente)}.
+     */
+    public static MainController actual() {
+        return actual;
+    }
+
     @FXML
     private void initialize() {
+        actual = this;
         Usuario usuario = Sesion.get().getUsuario();
         rol = usuario.getRol();
         nombreUsuario.setText(usuario.getNombreCompleto());

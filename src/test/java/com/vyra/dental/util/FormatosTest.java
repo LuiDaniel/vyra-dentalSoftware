@@ -23,6 +23,19 @@ class FormatosTest {
     }
 
     @Test
+    void mesYAnio() {
+        assertEquals("marzo 2024", Formatos.mesAnio(LocalDate.of(2024, 3, 5)));
+        assertEquals("", Formatos.mesAnio(null));
+    }
+
+    @Test
+    void inicialesDeUnNombreCompleto() {
+        assertEquals("MQ", Formatos.iniciales("María Quispe"));
+        assertEquals("A", Formatos.iniciales("Administrador"));
+        assertEquals("", Formatos.iniciales("  "));
+    }
+
+    @Test
     void hora() {
         assertEquals("09:30", Formatos.hora(LocalTime.of(9, 30)));
     }

@@ -118,6 +118,12 @@ classDiagram
         EN_CURSO
         FINALIZADO
     }
+    class FiltroPaciente {
+        <<enumeration>>
+        TODOS
+        CON_ALERGIAS
+        MENORES_DE_EDAD
+    }
     class MetodoPago {
         <<enumeration>>
         EFECTIVO
@@ -178,8 +184,8 @@ classDiagram
         +crear(Paciente) Paciente
         +buscarPorId(int) Optional~Paciente~
         +buscarPorDni(String) Optional~Paciente~
-        +buscar(String texto, int limite, int desde) List~Paciente~
-        +contarActivos(String texto) int
+        +buscar(String texto, FiltroPaciente, int limite, int desde) List~Paciente~
+        +contarActivos(String texto, FiltroPaciente) int
         +actualizar(Paciente) boolean
         +darDeBaja(int) boolean
     }
@@ -258,7 +264,9 @@ classDiagram
         +registrar(Paciente) Paciente
         +actualizar(Paciente) void
         +darDeBaja(int) void
-        +buscar(String texto, int pagina) List~Paciente~
+        +buscar(String texto, FiltroPaciente, int pagina) List~Paciente~
+        +contar(String texto, FiltroPaciente) int
+        +puedeEditar() boolean
     }
     class CitaService {
         +agendar(Cita) Cita
@@ -308,8 +316,9 @@ classDiagram
     ReporteService --> PagoDAO
 ```
 
-- Cuando una regla no se cumple, el servicio lanza `ReglaNegocioException` (en `service/`, hereda de `RuntimeException`) con un mensaje listo para mostrarse al usuario: "El Dr. Salinas ya tiene una cita de 09:00 a 10:00".
-- `Validador.validar()` sigue lanzando `IllegalArgumentException` con los mensajes de Jakarta. Los controladores atrapan las dos excepciones y muestran el mensaje en el formulario.
+- Cuando una regla no se cumple, el servicio lanza `ReglaNegocioException` (en `service/`, hereda de `RuntimeException`) con un mensaje listo para mostrarse al usuario: "El Dr. Salinas ya tiene una cita de 09:00 a 10:00". Si el error es de un campo, se crea con `new ReglaNegocioException("dni", mensaje)` y `getCampo()` lo devuelve, para mostrarlo bajo ese campo.
+- `Validador.validar()` lanza `util.ValidacionException` (hereda de `IllegalArgumentException`) con todos los mensajes de Jakarta y, en `getErrores()`, el mensaje de cada campo (`"dni"` → "El DNI debe tener 8 dígitos"). Los controladores atrapan las dos excepciones y muestran cada mensaje bajo su campo.
+- `PacienteService` (fase 3) normaliza antes de validar: quita espacios sobrantes, guarda los campos vacíos como `null` y acepta el teléfono con espacios ("987 654 321"). El DNI no se repite ni siquiera con un paciente dado de baja (RN-01). Los listados son de 20 por página (`TAMANO_PAGINA`).
 - `Sesion` guarda el usuario que inició sesión. Si es odontólogo, también guarda su `Profesional` (vía `ProfesionalDAO.buscarPorIdUsuario`).
 - `ProfesionalService` y `UsuarioService` son CRUD simples con validación. `UsuarioService.crear()` recibe la contraseña en texto plano y guarda `HashUtil.hashear(contrasena)`.
 
@@ -337,8 +346,8 @@ Las filas del modelo (de `Usuario` a `Pago`) quedaron corregidas en la fase 1 de
 | `OdontogramaPieza` | ✔ Corregido (fase 1) | Agregar |
 | `Tratamiento` | ✔ Corregido (fase 1) | Agregar |
 | `Pago` | ✔ Corregido (fase 1) | Agregar campos; `metodoPago` pasa a enum `MetodoPago` |
-| DAO | Usuario y Profesional completos (SQLite y memoria, fase 2); Paciente, Tratamiento y Pago solo en memoria | Las 8 interfaces de la sección 2, con implementación SQLite |
-| Servicios | `AuthService` y `Sesion` (fase 2) | Los de la sección 3 |
+| DAO | Usuario, Profesional y Paciente completos (SQLite y memoria, fases 2 y 3); Tratamiento y Pago solo en memoria | Las 8 interfaces de la sección 2, con implementación SQLite |
+| Servicios | `AuthService`, `Sesion` (fase 2) y `PacienteService` (fase 3) | Los de la sección 3 |
 | `demo/*CrudDemoApp` | CRUD de prueba con `Alert` | Se mantienen hasta tener las pantallas reales; luego se borran |
 
 ---

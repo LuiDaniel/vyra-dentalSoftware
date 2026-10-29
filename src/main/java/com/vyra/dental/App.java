@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 
+import com.vyra.dental.dao.impl.PacienteDAOSqlite;
 import com.vyra.dental.dao.impl.UsuarioDAOSqlite;
 import com.vyra.dental.util.ConexionBD;
 import com.vyra.dental.util.DatosIniciales;
@@ -34,6 +35,9 @@ public class App extends Application {
         // Crea vyra.db y sus tablas (schema.sql) si todavía no existen
         ConexionBD.obtenerConexion();
         DatosIniciales.crearAdminSiNoExiste(new UsuarioDAOSqlite());
+        if (DatosIniciales.demoActivada()) {
+            DatosIniciales.cargarEjemplos(new PacienteDAOSqlite());
+        }
 
         ventana = stage;
         mostrarLogin();

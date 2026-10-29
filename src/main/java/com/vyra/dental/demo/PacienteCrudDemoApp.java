@@ -2,6 +2,7 @@ package com.vyra.dental.demo;
 
 import com.vyra.dental.dao.PacienteDAO;
 import com.vyra.dental.dao.memoria.PacienteDAOMemoria;
+import com.vyra.dental.model.FiltroPaciente;
 import com.vyra.dental.model.Paciente;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -77,7 +78,7 @@ public class PacienteCrudDemoApp extends Application {
 
         Button botonCrear = new Button("Crear");
         Button botonActualizar = new Button("Actualizar");
-        Button botonEliminar = new Button("Eliminar");
+        Button botonEliminar = new Button("Dar de baja");
         Button botonLimpiar = new Button("Limpiar");
 
         botonCrear.setOnAction(e -> crear());
@@ -194,7 +195,7 @@ public class PacienteCrudDemoApp extends Application {
         }
 
         try {
-            pacienteDAO.eliminar(seleccionado.getIdPaciente());
+            pacienteDAO.darDeBaja(seleccionado.getIdPaciente());
 
             limpiarFormulario();
             recargarTabla();
@@ -236,7 +237,7 @@ public class PacienteCrudDemoApp extends Application {
 
     private void recargarTabla() {
         try {
-            List<Paciente> pacientes = pacienteDAO.listarTodos();
+            List<Paciente> pacientes = pacienteDAO.buscar("", FiltroPaciente.TODOS, 1000, 0);
             datos.setAll(pacientes);
 
         } catch (Exception e) {

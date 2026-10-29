@@ -34,6 +34,8 @@ public final class Formatos {
             .toFormatter(ES_PE);
 
     private static final DateTimeFormatter HORA = DateTimeFormatter.ofPattern("HH:mm");
+    private static final DateTimeFormatter MES_ANIO = DateTimeFormatter.ofPattern("MMMM yyyy", ES_PE);
+    private static final DateTimeFormatter FECHA_CAMPO = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private Formatos() {
     }
@@ -50,6 +52,16 @@ public final class Formatos {
     /** "29 oct 2026". */
     public static String fechaCorta(LocalDate fecha) {
         return fecha == null ? "" : FECHA_CORTA.format(fecha);
+    }
+
+    /** "marzo 2024" (para "Paciente desde marzo 2024"). */
+    public static String mesAnio(LocalDate fecha) {
+        return fecha == null ? "" : MES_ANIO.format(fecha);
+    }
+
+    /** Formato de los campos de fecha (DatePicker): "14/03/1992". */
+    public static DateTimeFormatter formatoFechaCampo() {
+        return FECHA_CAMPO;
     }
 
     /** "09:30". */

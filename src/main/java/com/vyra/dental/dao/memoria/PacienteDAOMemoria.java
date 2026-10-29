@@ -1,10 +1,14 @@
 package com.vyra.dental.dao.memoria;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import com.vyra.dental.dao.PacienteDAO;
+import com.vyra.dental.model.FiltroPaciente;
 import com.vyra.dental.model.Paciente;
 import com.vyra.dental.util.Validador;
 
@@ -36,8 +40,18 @@ public class PacienteDAOMemoria implements PacienteDAO {
     }
 
     @Override
-    public List<Paciente> listarTodos() {
-        return new ArrayList<>(pacientes);
+    public List<Paciente> buscar(String texto, FiltroPaciente filtro, int limite, int desde) {
+        return pacientes.stream()
+                .filter(coincide(texto, filtro))
+                .sorted(Comparator.comparing(Paciente::getApellidos).thenComparing(Paciente::getNombres))
+                .skip(desde)
+                .limit(limite)
+                .toList();
+    }
+
+    @Override
+    public int contarActivos(String texto, FiltroPaciente filtro) {
+        return (int) pacientes.stream().filter(coincide(texto, filtro)).count();
     }
 
     @Override
@@ -53,7 +67,22 @@ public class PacienteDAOMemoria implements PacienteDAO {
     }
 
     @Override
-    public boolean eliminar(int idPaciente) {
-        return pacientes.removeIf(p -> p.getIdPaciente() == idPaciente);
+    public boolean darDeBaja(int idPaciente) {
+        Optional<Paciente> paciente = buscarPorId(idPaciente).filter(Paciente::isActivo);
+        paciente.ifPresent(p -> p.setActivo(false));
+        return paciente.isPresent();
+    }
+
+    /** Mismo criterio que PacienteDAOSqlite.buscar(). */
+    private Predicate<Paciente> coincide(String texto, FiltroPaciente filtro) {
+        String buscado = texto == null ? "" : texto.strip().toLowerCase(Locale.ROOT);
+        return p -> p.isActivo()
+                && (p.getDni().contains(buscado)
+                    || p.getNombreCompleto().toLowerCase(Locale.ROOT).contains(buscado))
+                && switch (filtro) {
+                    case TODOS -> true;
+                    case CON_ALERGIAS -> p.tieneAlergias();
+                    case MENORES_DE_EDAD -> p.getFechaNacimiento() != null && p.getEdad() < 18;
+                };
     }
 }

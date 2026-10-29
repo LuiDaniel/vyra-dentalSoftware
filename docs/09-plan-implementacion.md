@@ -5,18 +5,18 @@
 
 Este documento ordena el trabajo de programación en fases cortas. Cada fase deja la aplicación **compilando y ejecutable**, termina con un commit y tiene criterios claros para saber que está lista. Está pensado para seguirse en orden, ya sea a mano o pidiéndole cada fase a Claude Code (ver la sección 4).
 
-## 1. Estado actual del código (2026-10-29, después de la fase 2)
+## 1. Estado actual del código (2026-10-29, después de la fase 3)
 
 | Parte | Estado |
 |---|---|
 | `pom.xml` | JavaFX 21, SQLite JDBC, Lombok, Hibernate Validator, JUnit 5 + Surefire. Compila con `release 21` (fase 0). |
 | `model/` | 8 clases y 5 enums, alineados con la BD (fase 1). Los enums tienen `getEtiqueta()`; `EstadoPieza` además `getCodigo()` y los estados `getClaseCss()`. |
-| `dao/` | Usuario y Profesional completos ([`04` §2](./04-diagrama-clases.md#2-acceso-a-datos-comvyradentaldao-y-daoimpl)), en SQLite (`dao/impl/`) y en memoria (`dao/memoria/`). Paciente, Tratamiento y Pago solo en memoria y sin los métodos nuevos. Faltan Cita, Historia clínica y Odontograma. |
+| `dao/` | Usuario, Profesional y Paciente completos ([`04` §2](./04-diagrama-clases.md#2-acceso-a-datos-comvyradentaldao-y-daoimpl)), en SQLite (`dao/impl/`) y en memoria (`dao/memoria/`). Tratamiento y Pago solo en memoria y sin los métodos nuevos. Faltan Cita, Historia clínica y Odontograma. |
 | `util/` | `ConexionBD` (abre SQLite, activa claves foráneas y ejecuta `schema.sql`), `Validador` (Jakarta), `HashUtil` (PBKDF2), `Formatos` y `DatosIniciales` (admin inicial). `schema.sql` es el de [`03` §3](./03-modelo-base-datos.md#3-script-sql-sqlite). |
-| `service/` | `ReglaNegocioException`, `AuthService`, `Sesion` y `Servicios` (crea los servicios con sus DAO SQLite). |
-| `controller/` | `LoginController`, `MainController` (menú por rol y navegación), enum `Pantalla` e interfaz `RecibeParametro`. |
+| `service/` | `ReglaNegocioException`, `AuthService`, `Sesion`, `PacienteService` y `Servicios` (crea los servicios con sus DAO SQLite). |
+| `controller/` | `LoginController`, `MainController` (menú por rol y navegación), `PacientesController`, enum `Pantalla` e interfaz `RecibeParametro`. |
 | `ui/` | `Icono`, `Avatar`, `Pill`, `Aviso`, `Notificacion`, `CampoFormulario`. |
-| Vistas FXML, CSS | `LoginView.fxml`, `MainView.fxml` y `styles/vyra.css` completo (§2–4 de la guía). Las demás pantallas muestran "En construcción" hasta que exista su FXML. |
+| Vistas FXML, CSS | `LoginView.fxml`, `MainView.fxml`, `PacientesView.fxml` (pestaña Datos) y `styles/vyra.css`. Las demás pantallas muestran "En construcción" hasta que exista su FXML. |
 | `App.java` | Carga Inter, abre la BD, crea el admin si no hay usuarios y muestra el login; `mostrarLogin()`/`mostrarPrincipal()` cambian la escena de la ventana. |
 | `demo/` | 4 CRUDs de prueba + lanzador, hechos con código Java (sin FXML). |
 | Diseño | Listo: [`docs/ui/`](./ui) y [`08-guia-frontend.md`](./08-guia-frontend.md). |
@@ -72,7 +72,7 @@ Este documento ordena el trabajo de programación en fases cortas. Cada fase dej
 1. `PacienteDAOSqlite` (incluida la búsqueda paginada de [`03` §5.6](./03-modelo-base-datos.md#56-búsqueda-de-pacientes-pantalla-pacientes)).
 2. `PacienteService`: registrar (DNI único), actualizar, dar de baja, buscar. Pruebas con `PacienteDAOMemoria`.
 3. `PacientesView.fxml` + `PacientesController`, solo la pestaña Datos ([guía §7.4](./08-guia-frontend.md#74-pacientes--pacientesviewfxml--pacientescontroller)).
-4. `DatosIniciales.cargarEjemplos()` con los pacientes del diseño (solo con `-Dvyra.demo=true`).
+4. `DatosIniciales.cargarEjemplos()` con los pacientes del diseño (solo con `-Dvyra.demo=true`; el `pom.xml` lo pasa a la app: `mvn javafx:run -Dvyra.demo=true`).
 
 **Listo cuando:** se puede registrar, buscar, editar y dar de baja; un DNI repetido o mal formado muestra el error bajo el campo; los datos siguen ahí después de cerrar y abrir la app.
 
@@ -81,7 +81,7 @@ Este documento ordena el trabajo de programación en fases cortas. Cada fase dej
 2. `CitaDAOSqlite` (con la consulta de cruce de [`03` §5.2](./03-modelo-base-datos.md#52-cruce-de-horario-cu-03-rn-06)) y `CitaService`.
 3. **Pruebas de `CitaService.existeCruceDeHorario()`** (obligatorias): misma hora, traslape parcial al inicio y al final, una cita que contiene a la otra, citas contiguas (09:00–09:30 y 09:30–10:00, que **no** cruzan), otro profesional, otra fecha, cita cancelada (no cruza), reprogramar la misma cita (no cruza consigo misma).
 4. `AgendaView` en vista Día con el panel "Nueva cita" y la validación en vivo ([guía §7.3](./08-guia-frontend.md#73-agenda--agendaviewfxml--agendacontroller)). Después, las vistas Semana y Lista.
-5. Pestaña Citas en la ficha del paciente.
+5. Pestaña Citas en la ficha del paciente y la columna "Última visita" de la lista de pacientes (hoy muestra "—").
 
 **Listo cuando:** se agenda, confirma, reprograma, cancela y marca atendida; el cruce se detecta antes de guardar y los chips de horarios libres funcionan; todas las pruebas pasan.
 

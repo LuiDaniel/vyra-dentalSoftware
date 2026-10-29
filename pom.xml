@@ -16,6 +16,8 @@
         <javafx.maven.plugin.version>0.0.8</javafx.maven.plugin.version>
         <junit.version>5.11.3</junit.version>
         <mainClass>com.vyra.dental.App</mainClass>
+        <!-- Datos de ejemplo del diseño: mvn javafx:run -Dvyra.demo=true -->
+        <vyra.demo>false</vyra.demo>
     </properties>
 
     <dependencies>
@@ -109,6 +111,9 @@
                 <version>${javafx.maven.plugin.version}</version>
                 <configuration>
                     <mainClass>${mainClass}</mainClass>
+                    <options>
+                        <option>-Dvyra.demo=${vyra.demo}</option>
+                    </options>
                 </configuration>
             </plugin>
         </plugins>

@@ -33,6 +33,7 @@
     /* Complementarias (tomadas de docs/ui) */
     -vy-etiqueta: #334155;
     -vy-separador: #F1F5F9;
+    -vy-borde-suave: #EEF2F6;
     -vy-fila-hover: #F8FAFC;
     -vy-deshabilitado: #E2E8F0;
     -vy-halo: rgba(20, 184, 166, 0.18);
@@ -102,6 +103,18 @@
     -fx-font-family: "Inter Medium";
     -fx-font-size: 12px;
     -fx-text-fill: -vy-texto-3;
+}
+
+.texto-tenue {
+    -fx-font-size: 13px;
+    -fx-text-fill: -vy-texto-3;
+}
+
+.seccion-titulo {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -vy-texto-2;
+    -fx-padding: 6px 0 0 0;
 }
 
 .texto-centrado {
@@ -353,8 +366,165 @@
 }
 
 .pagina {
-    -fx-padding: 28px 32px;
+    -fx-padding: 28px 32px 40px 32px;
     -fx-spacing: 20px;
+}
+
+.pagina-encabezado {
+    -fx-alignment: bottom-left;
+    -fx-spacing: 16px;
+}
+
+.pagina-titulos {
+    -fx-spacing: 6px;
+}
+
+/* Patrón lista + panel (docs/08-guia-frontend.md §1) */
+.lista-y-panel {
+    -fx-spacing: 20px;
+    -fx-alignment: top-left;
+}
+
+.lista-barra {
+    -fx-padding: 14px 16px;
+    -fx-spacing: 12px;
+    -fx-alignment: center-left;
+    -fx-border-color: transparent transparent -vy-borde-suave transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.buscador {
+    -fx-background-color: -vy-borde, -vy-fila-hover;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 10px, 9px;
+    -fx-pref-height: 38px;
+    -fx-min-height: 38px;
+    -fx-padding: 0 12px;
+    -fx-spacing: 10px;
+    -fx-alignment: center-left;
+}
+
+.buscador:focus-within {
+    -fx-background-color: -vy-halo, -vy-primario, -vy-superficie;
+    -fx-background-insets: -3, 0, 1;
+    -fx-background-radius: 13px, 10px, 9px;
+}
+
+.buscador .text-field,
+.buscador .text-field:focused {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.filtros {
+    -fx-spacing: 6px;
+    -fx-alignment: center-left;
+}
+
+.lista-pie {
+    -fx-padding: 12px 16px;
+    -fx-spacing: 6px;
+    -fx-alignment: center-left;
+    -fx-border-color: -vy-borde-suave transparent transparent transparent;
+    -fx-border-width: 1px 0 0 0;
+}
+
+.lista-pie .label {
+    -fx-font-size: 13px;
+}
+
+/* Ficha (panel derecho) */
+.panel-ficha {
+    -fx-padding: 0;
+    -fx-spacing: 0;
+}
+
+.ficha-encabezado {
+    -fx-padding: 20px;
+    -fx-spacing: 14px;
+    -fx-alignment: center-left;
+    -fx-border-color: transparent transparent -vy-borde-suave transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.ficha-titulos {
+    -fx-spacing: 3px;
+}
+
+.ficha-titulos .texto-secundario {
+    -fx-font-size: 13px;
+}
+
+.pestanas {
+    -fx-padding: 0 16px;
+    -fx-spacing: 4px;
+    -fx-border-color: transparent transparent -vy-borde-suave transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.pestana {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 0 0 2px 0;
+    -fx-pref-height: 42px;
+    -fx-padding: 0 10px;
+    -fx-font-family: "Inter Medium";
+    -fx-font-size: 13px;
+    -fx-text-fill: -vy-texto-2;
+}
+
+.pestana:selected {
+    -fx-border-color: transparent transparent -vy-primario transparent;
+    -fx-font-family: "Inter SemiBold";
+    -fx-text-fill: -vy-primario;
+}
+
+.ficha-formulario {
+    -fx-padding: 20px;
+    -fx-spacing: 14px;
+}
+
+.rejilla-formulario {
+    -fx-hgap: 14px;
+    -fx-vgap: 14px;
+}
+
+.panel-pie {
+    -fx-padding: 16px 20px;
+    -fx-spacing: 8px;
+    -fx-alignment: center-left;
+    -fx-border-color: -vy-borde-suave transparent transparent transparent;
+    -fx-border-width: 1px 0 0 0;
+}
+
+/* Celdas de tablas */
+.celda-paciente {
+    -fx-spacing: 12px;
+    -fx-alignment: center-left;
+}
+
+.celda-titulo {
+    -fx-font-family: "Inter SemiBold";
+}
+
+.celda-sub {
+    -fx-font-size: 12px;
+    -fx-text-fill: -vy-texto-3;
+}
+
+.celda-acciones {
+    -fx-spacing: 4px;
+    -fx-alignment: center-right;
+}
+
+.celda-acciones .icono {
+    -fx-stroke: -vy-texto-2;
+}
+
+.table-view .column-header.columna-derecha .label {
+    -fx-alignment: center-right;
 }
 
 /* ===== 5. Tarjetas y estados vacíos ===== */
@@ -493,6 +663,19 @@
     -fx-background-color: -vy-separador;
 }
 
+.btn-icono:focus-visible {
+    -fx-border-color: -vy-primario;
+    -fx-border-radius: 8px;
+}
+
+.btn-chico {
+    -fx-pref-height: 32px;
+    -fx-min-height: 32px;
+    -fx-padding: 0 12px;
+    -fx-font-size: 13px;
+    -fx-background-radius: 8px, 7px;
+}
+
 .enlace,
 .enlace:visited,
 .enlace:hover {
@@ -515,20 +698,32 @@
 
 /* Filtros tipo píldora */
 .chip {
-    -fx-background-color: -vy-borde-campo, -vy-superficie;
+    -fx-background-color: -vy-borde, -vy-superficie;
     -fx-background-insets: 0, 1;
     -fx-background-radius: 999px;
     -fx-pref-height: 32px;
-    -fx-padding: 0 14px;
+    -fx-min-height: 32px;
+    -fx-padding: 0 12px;
     -fx-font-family: "Inter Medium";
     -fx-font-size: 13px;
-    -fx-text-fill: -vy-texto-2;
+    -fx-text-fill: -vy-etiqueta;
     -fx-cursor: hand;
+}
+
+.chip:hover {
+    -fx-background-color: -vy-borde-campo, -vy-fila-hover;
 }
 
 .chip:selected {
     -fx-background-color: -vy-primario, -vy-primario-suave;
     -fx-text-fill: -vy-primario;
+    -fx-font-family: "Inter SemiBold";
+}
+
+.chip:focus-visible {
+    -fx-background-color: -vy-halo, -vy-primario, -vy-primario-suave;
+    -fx-background-insets: -3, 0, 1;
+    -fx-background-radius: 999px;
 }
 
 /* Día / Semana / Lista */
@@ -592,6 +787,49 @@
 .text-area .content {
     -fx-background-color: transparent;
     -fx-padding: 8px 12px;
+}
+
+.text-area .scroll-pane,
+.text-area .scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+/* El editor del DatePicker no dibuja su propio borde: lo dibuja el DatePicker */
+.date-picker > .text-field,
+.date-picker > .text-field:focused {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+}
+
+.date-picker > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 12px;
+}
+
+.date-picker > .arrow-button > .arrow {
+    -fx-background-color: -vy-texto-3;
+}
+
+.date-picker:disabled {
+    -fx-opacity: 1;
+}
+
+.date-picker:disabled > .arrow-button {
+    visibility: hidden;
+}
+
+/* Solo lectura (el odontólogo ve la ficha sin poder editarla) */
+.text-field:readonly,
+.text-area:readonly,
+.date-picker:disabled {
+    -fx-background-color: -vy-borde, -vy-fila-hover;
+}
+
+.text-field:readonly:focused,
+.text-area:readonly:focused {
+    -fx-background-color: -vy-borde-campo, -vy-fila-hover;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 9px, 8px;
 }
 
 .campo-error,
@@ -701,6 +939,14 @@
 .pill-atendida   { -fx-background-color: -vy-pill-atendida-fondo;   -fx-text-fill: -vy-pill-atendida-texto; }
 .pill-cancelada  { -fx-background-color: -vy-pill-cancelada-fondo;  -fx-text-fill: -vy-pill-cancelada-texto; }
 .pill-alergia    { -fx-background-color: -vy-pill-alergia-fondo;    -fx-text-fill: -vy-pill-alergia-texto; }
+.pill-alergia {
+    -fx-graphic-text-gap: 6px;
+}
+
+.pill-alergia .icono {
+    -fx-stroke: -vy-pill-alergia-texto;
+}
+
 .pill-neutra     { -fx-background-color: -vy-separador;             -fx-text-fill: -vy-etiqueta; }
 
 /* ===== 9. Avatares (color según id % 7) ===== */
@@ -836,6 +1082,10 @@
 
 .table-row-cell:selected {
     -fx-background-color: -vy-primario-suave;
+}
+
+.table-row-cell:selected .table-cell {
+    -fx-text-fill: -vy-tinta;
 }
 
 .table-row-cell .table-cell {
@@ -986,4 +1236,29 @@
     -fx-pref-height: 48px;
     -fx-min-height: 48px;
     -fx-font-size: 15px;
+}
+
+/* ===== 14. Diálogos de confirmación ===== */
+.dialogo {
+    -fx-background-color: -vy-superficie;
+    -fx-padding: 8px;
+}
+
+.dialogo > .header-panel {
+    -fx-background-color: -vy-superficie;
+    -fx-padding: 16px 16px 4px 16px;
+}
+
+.dialogo > .header-panel .label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.dialogo > .content.label {
+    -fx-padding: 4px 16px 16px 16px;
+    -fx-text-fill: -vy-texto-2;
+}
+
+.dialogo > .button-bar > .container {
+    -fx-padding: 8px 16px 12px 16px;
 }

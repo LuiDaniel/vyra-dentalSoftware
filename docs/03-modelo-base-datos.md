@@ -388,11 +388,14 @@ GROUP BY metodo_pago;
 ```sql
 SELECT * FROM paciente
 WHERE activo = 1
-  AND (dni LIKE ? OR (nombres || ' ' || apellidos) LIKE ?)
+  AND (dni LIKE ? ESCAPE '\' OR (nombres || ' ' || apellidos) LIKE ? ESCAPE '\')
+  -- filtro opcional (chips de la pantalla), un fragmento fijo según FiltroPaciente:
+  --   CON_ALERGIAS:    AND alergias IS NOT NULL AND TRIM(alergias) <> ''
+  --   MENORES_DE_EDAD: AND fecha_nacimiento > date('now', '-18 years')
 ORDER BY apellidos, nombres
 LIMIT ? OFFSET ?;
 ```
-Los parámetros de texto se pasan como `"%" + texto + "%"`.
+Los parámetros de texto se pasan como `"%" + texto + "%"`, con `\`, `%` y `_` escapados (`\%`, `\_`) para que se busquen tal cual. `contarActivos` usa el mismo `WHERE` con `SELECT COUNT(*)`.
 
 ---
 

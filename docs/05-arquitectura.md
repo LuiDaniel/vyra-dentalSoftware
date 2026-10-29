@@ -131,7 +131,7 @@ Los DAO nunca abren su propia conexión: así se evitan bloqueos del archivo `.d
 ## 7. Errores, validación y tareas largas
 
 - **Validación en 3 niveles:** el controlador revisa campos vacíos y formato (para dar respuesta inmediata), el modelo tiene anotaciones Jakarta que `Validador` revisa, y el servicio verifica las reglas de negocio (duplicados, cruces, saldo).
-- **Mostrar errores:** junto al campo que falló (borde rojo + texto debajo) o en un `Aviso` dentro del formulario. No usar `Alert` emergentes para errores de validación; solo para confirmar acciones destructivas ("¿Dar de baja a este paciente?").
+- **Mostrar errores:** junto al campo que falló (borde rojo + texto debajo, con `ui.CampoFormulario`) o en un `Aviso` dentro del formulario. El controlador sabe qué campo falló por `ValidacionException.getErrores()` (Jakarta) y `ReglaNegocioException.getCampo()` (servicio). No usar `Alert` emergentes para errores de validación; solo para confirmar acciones destructivas ("¿Dar de baja a este paciente?").
 - **Éxito:** una notificación breve (toast) en la esquina inferior derecha, que desaparece sola a los 3 segundos.
 - **Hilos:** las operaciones con SQLite son rápidas (RNF-04: menos de 2 s) y pueden ir en el hilo de JavaFX. Solo la exportación a PDF y los reportes de periodos largos se ejecutan en un `javafx.concurrent.Task` para no congelar la ventana.
 
