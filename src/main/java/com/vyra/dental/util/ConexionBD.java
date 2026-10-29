@@ -17,7 +17,8 @@ import java.sql.Statement;
  */
 public class ConexionBD {
 
-    private static final String URL = "jdbc:sqlite:vyra.db";
+    // Las pruebas usan -Dvyra.bd.url=jdbc:sqlite::memory: (ver pom.xml) para no tocar vyra.db
+    private static final String URL = System.getProperty("vyra.bd.url", "jdbc:sqlite:vyra.db");
     private static final String SCHEMA_RESOURCE = "/com/vyra/schema.sql";
 
     private static Connection conexion;

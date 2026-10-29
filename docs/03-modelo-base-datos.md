@@ -327,7 +327,7 @@ CREATE INDEX IF NOT EXISTS idx_pago_fecha ON pago(fecha_pago);
 
 ## 4. Datos iniciales
 
-- **Usuario administrador:** no va en `schema.sql` porque la contraseña necesita calcularse con `HashUtil`. La clase `util.DatosIniciales` lo crea al arrancar **solo si la tabla `usuario` está vacía**: usuario `admin`, nombre "Administrador", rol `ADMIN`, contraseña inicial `admin123`. Se debe cambiar después del primer ingreso.
+- **Usuario administrador:** no va en `schema.sql` porque la contraseña necesita calcularse con `HashUtil`. La clase `util.DatosIniciales` lo crea al arrancar (`crearAdminSiNoExiste(UsuarioDAO)`) **solo si la tabla `usuario` está vacía**: usuario `admin`, nombre "Administrador", rol `ADMIN`, contraseña inicial `admin123`. Se debe cambiar después del primer ingreso.
 - **Datos de ejemplo (solo desarrollo):** `DatosIniciales.cargarEjemplos()` puede insertar los pacientes, profesionales y citas que aparecen en el diseño ([`docs/ui`](./ui)), para probar las pantallas con datos realistas. Se activa con la propiedad `-Dvyra.demo=true` y nunca en producción.
 
 ## 5. Consultas clave

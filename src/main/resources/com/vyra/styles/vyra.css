@@ -1,0 +1,989 @@
+/*
+ * Vyra — hoja de estilos única (docs/08-guia-frontend.md §2 a §4).
+ * Los colores se usan siempre a través de las variables -vy-*.
+ *
+ * Tipografía: JavaFX registra los pesos de Inter como familias distintas,
+ * así que Medium (500) y SemiBold (600) se piden por nombre de familia y solo
+ * Bold (700) con -fx-font-weight. -fx-font-weight: 600 sobre "Inter" se ve Regular.
+ */
+
+/* ===== 1. Variables ===== */
+.root {
+    -vy-primario: #0F766E;
+    -vy-primario-hover: #115E59;
+    -vy-acento: #2DD4BF;
+    -vy-primario-suave: #F0FDFA;
+    -vy-primario-borde: #99F6E4;
+    -vy-sidebar: #0B1F2A;
+    -vy-sidebar-activo: #123B40;
+    -vy-sidebar-hover: #132D38;
+    -vy-sidebar-texto: #C3D0D8;
+    -vy-sidebar-tenue: #7E95A3;
+    -vy-tinta: #0F172A;
+    -vy-texto-2: #475569;
+    -vy-texto-3: #64748B;
+    -vy-borde: #E2E8F0;
+    -vy-borde-campo: #CBD5E1;
+    -vy-fondo: #F4F7F9;
+    -vy-superficie: #FFFFFF;
+    -vy-error: #DC2626;
+    -vy-error-texto: #B91C1C;
+    -vy-alerta-naranja: #EA580C;
+
+    /* Complementarias (tomadas de docs/ui) */
+    -vy-etiqueta: #334155;
+    -vy-separador: #F1F5F9;
+    -vy-fila-hover: #F8FAFC;
+    -vy-deshabilitado: #E2E8F0;
+    -vy-halo: rgba(20, 184, 166, 0.18);
+    -vy-halo-error: rgba(220, 38, 38, 0.15);
+    -vy-sidebar-sub: #8FA3B0;
+    -vy-sidebar-tarjeta: #10293A;
+    -vy-login-subtitulo: #A9BCC8;
+    -vy-login-claro: #DCE6EC;
+
+    /* Píldoras de estado (fondo / texto) */
+    -vy-pill-pendiente-fondo: #FEF3C7;   -vy-pill-pendiente-texto: #92400E;
+    -vy-pill-confirmada-fondo: #DBEAFE;  -vy-pill-confirmada-texto: #1E40AF;
+    -vy-pill-atendida-fondo: #D1FAE5;    -vy-pill-atendida-texto: #065F46;
+    -vy-pill-cancelada-fondo: #FEE2E2;   -vy-pill-cancelada-texto: #991B1B;
+    -vy-pill-alergia-fondo: #FFEDD5;     -vy-pill-alergia-texto: #9A3412;
+
+    /* Avisos (fondo / borde / texto) */
+    -vy-aviso-info-fondo: #F0FDFA;        -vy-aviso-info-borde: #99F6E4;        -vy-aviso-info-texto: #134E4A;
+    -vy-aviso-exito-fondo: #ECFDF5;       -vy-aviso-exito-borde: #A7F3D0;       -vy-aviso-exito-texto: #065F46;
+    -vy-aviso-advertencia-fondo: #FFF7ED; -vy-aviso-advertencia-borde: #FED7AA; -vy-aviso-advertencia-texto: #9A3412;
+    -vy-aviso-error-fondo: #FEF2F2;       -vy-aviso-error-borde: #FECACA;       -vy-aviso-error-texto: #991B1B;
+
+    -fx-font-family: "Inter";
+    -fx-font-size: 14px;
+    -fx-accent: -vy-primario;
+    -fx-focus-color: -vy-primario;
+    -fx-faint-focus-color: -vy-halo;
+    -fx-background-color: -vy-fondo;
+}
+
+.label {
+    -fx-text-fill: -vy-tinta;
+}
+
+/* ===== 2. Tipografía ===== */
+.titulo-pagina {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+}
+
+.kpi-valor {
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+}
+
+.card-titulo {
+    -fx-font-family: "Inter SemiBold";
+    -fx-font-size: 16px;
+}
+
+.panel-titulo {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.campo-etiqueta {
+    -fx-font-family: "Inter SemiBold";
+    -fx-font-size: 13px;
+    -fx-text-fill: -vy-etiqueta;
+}
+
+.texto-secundario {
+    -fx-text-fill: -vy-texto-2;
+}
+
+.texto-apoyo {
+    -fx-font-family: "Inter Medium";
+    -fx-font-size: 12px;
+    -fx-text-fill: -vy-texto-3;
+}
+
+.texto-centrado {
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+}
+
+.mensaje-error {
+    -fx-font-size: 12px;
+    -fx-text-fill: -vy-error-texto;
+}
+
+/* ===== 3. Íconos (ui.Icono): color y grosor según dónde están ===== */
+.icono {
+    -fx-stroke: -vy-texto-3;
+    -fx-fill: transparent;
+}
+
+/* ===== 4. Marco principal (MainView) ===== */
+.app-shell {
+    -fx-background-color: -vy-fondo;
+}
+
+.sidebar {
+    -fx-background-color: -vy-sidebar;
+    -fx-pref-width: 240px;
+    -fx-min-width: 240px;
+    -fx-max-width: 240px;
+    -fx-padding: 24px 16px;
+    -fx-spacing: 28px;
+}
+
+.logo {
+    -fx-alignment: center-left;
+    -fx-spacing: 12px;
+    -fx-padding: 0 8px;
+}
+
+.logo-marca {
+    -fx-background-color: -vy-acento;
+    -fx-background-radius: 11px;
+    -fx-min-width: 38px;
+    -fx-min-height: 38px;
+    -fx-max-width: 38px;
+    -fx-max-height: 38px;
+}
+
+.logo-marca .icono {
+    -fx-stroke: -vy-sidebar;
+}
+
+.logo-textos {
+    -fx-spacing: 2px;
+}
+
+.logo-nombre {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.logo-sub {
+    -fx-font-size: 12px;
+    -fx-text-fill: -vy-sidebar-sub;
+}
+
+.menu {
+    -fx-spacing: 22px;
+}
+
+.nav-bloque {
+    -fx-spacing: 2px;
+}
+
+.nav-grupo {
+    -fx-font-family: "Inter SemiBold";
+    -fx-font-size: 11px;
+    -fx-text-fill: -vy-sidebar-tenue;
+    -fx-padding: 0 12px 6px 12px;
+}
+
+.nav-item {
+    -fx-background-color: transparent;
+    -fx-background-radius: 10px;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-border-radius: 10px;
+    -fx-pref-height: 40px;
+    -fx-min-height: 40px;
+    -fx-padding: 0 12px;
+    -fx-graphic-text-gap: 12px;
+    -fx-font-family: "Inter Medium";
+    -fx-font-size: 14px;
+    -fx-text-fill: -vy-sidebar-texto;
+    -fx-cursor: hand;
+}
+
+.nav-item .icono {
+    -fx-stroke: -vy-sidebar-texto;
+}
+
+.nav-item:hover {
+    -fx-background-color: -vy-sidebar-hover;
+    -fx-text-fill: white;
+}
+
+.nav-item:hover .icono {
+    -fx-stroke: white;
+}
+
+.nav-item:selected {
+    -fx-background-color: -vy-sidebar-activo;
+    -fx-text-fill: white;
+    -fx-font-family: "Inter SemiBold";
+}
+
+.nav-item:selected .icono {
+    -fx-stroke: -vy-acento;
+}
+
+.nav-item:focus-visible {
+    -fx-border-color: -vy-acento;
+}
+
+.nav-badge {
+    -fx-background-color: -vy-acento;
+    -fx-background-radius: 999px;
+    -fx-text-fill: -vy-sidebar;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 2px 8px;
+}
+
+.tarjeta-usuario {
+    -fx-background-color: -vy-sidebar-tarjeta;
+    -fx-background-radius: 12px;
+    /* 10 px (no 12 como en el HTML) para que "Administrador" quepa sin cortarse */
+    -fx-padding: 10px;
+    -fx-spacing: 10px;
+    -fx-alignment: center-left;
+}
+
+.tarjeta-usuario-textos {
+    -fx-spacing: 2px;
+    -fx-alignment: center-left;
+}
+
+.usuario-nombre {
+    -fx-font-family: "Inter SemiBold";
+    -fx-font-size: 13px;
+    -fx-text-fill: white;
+}
+
+.usuario-rol {
+    -fx-font-size: 12px;
+    -fx-text-fill: -vy-sidebar-sub;
+}
+
+.btn-salir {
+    -fx-background-color: transparent;
+    -fx-background-radius: 9px;
+    -fx-border-color: transparent;
+    -fx-border-radius: 9px;
+    -fx-min-width: 36px;
+    -fx-min-height: 36px;
+    -fx-max-width: 36px;
+    -fx-max-height: 36px;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+}
+
+.btn-salir .icono {
+    -fx-stroke: -vy-sidebar-texto;
+}
+
+.btn-salir:hover {
+    -fx-background-color: -vy-sidebar-hover;
+}
+
+.btn-salir:hover .icono {
+    -fx-stroke: white;
+}
+
+.btn-salir:focus-visible {
+    -fx-border-color: -vy-acento;
+}
+
+.topbar {
+    -fx-background-color: -vy-superficie;
+    -fx-border-color: transparent transparent -vy-borde transparent;
+    -fx-border-width: 0 0 1px 0;
+    -fx-padding: 14px 32px;
+    -fx-spacing: 16px;
+    -fx-alignment: center-left;
+    -fx-min-height: 69px;
+}
+
+.topbar-ruta {
+    -fx-font-family: "Inter SemiBold";
+    -fx-font-size: 14px;
+    -fx-text-fill: -vy-texto-2;
+}
+
+.topbar-fecha {
+    -fx-font-size: 13px;
+    -fx-text-fill: -vy-texto-2;
+}
+
+.btn-icono-borde {
+    -fx-background-color: -vy-borde, -vy-superficie;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 10px, 9px;
+    -fx-min-width: 40px;
+    -fx-min-height: 40px;
+    -fx-max-width: 40px;
+    -fx-max-height: 40px;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+}
+
+.btn-icono-borde .icono {
+    -fx-stroke: -vy-etiqueta;
+}
+
+.btn-icono-borde:hover {
+    -fx-background-color: -vy-borde, -vy-fila-hover;
+}
+
+.btn-icono-borde:focus-visible {
+    -fx-background-color: -vy-halo, -vy-primario, -vy-superficie;
+    -fx-background-insets: -3, 0, 1;
+    -fx-background-radius: 13px, 10px, 9px;
+}
+
+.contenido {
+    -fx-background-color: -vy-fondo;
+}
+
+.contenido-scroll,
+.contenido-scroll:focused {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background: -vy-fondo;
+    -fx-padding: 0;
+}
+
+.contenido-scroll > .viewport {
+    -fx-background-color: -vy-fondo;
+}
+
+.pagina {
+    -fx-padding: 28px 32px;
+    -fx-spacing: 20px;
+}
+
+/* ===== 5. Tarjetas y estados vacíos ===== */
+.card,
+.kpi,
+.panel-form {
+    -fx-background-color: -vy-superficie;
+    -fx-background-radius: 14px;
+    -fx-border-color: -vy-borde;
+    -fx-border-radius: 14px;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.05), 4, 0, 0, 1);
+}
+
+.kpi {
+    -fx-padding: 18px 20px;
+}
+
+.panel-form {
+    -fx-padding: 24px;
+    -fx-spacing: 16px;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.08), 16, 0, 0, 4);
+}
+
+.estado-vacio {
+    -fx-padding: 48px 24px;
+    -fx-spacing: 12px;
+}
+
+.estado-vacio-icono {
+    -fx-background-color: -vy-primario-suave;
+    -fx-background-radius: 999px;
+    -fx-min-width: 64px;
+    -fx-min-height: 64px;
+    -fx-max-width: 64px;
+    -fx-max-height: 64px;
+}
+
+.estado-vacio-icono .icono {
+    -fx-stroke: -vy-primario;
+}
+
+/* ===== 6. Botones ===== */
+.btn-primario,
+.btn-secundario,
+.btn-peligro {
+    -fx-background-radius: 10px;
+    -fx-background-insets: 0;
+    -fx-border-radius: 10px;
+    -fx-pref-height: 40px;
+    -fx-min-height: 40px;
+    -fx-padding: 0 16px;
+    -fx-graphic-text-gap: 8px;
+    -fx-font-family: "Inter SemiBold";
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+
+.btn-primario {
+    -fx-background-color: -vy-primario;
+    -fx-text-fill: white;
+}
+
+.btn-primario .icono {
+    -fx-stroke: white;
+}
+
+.btn-primario:hover {
+    -fx-background-color: -vy-primario-hover;
+}
+
+.btn-primario:focus-visible {
+    -fx-background-color: -vy-primario-borde, -vy-primario;
+    -fx-background-insets: -3, 0;
+    -fx-background-radius: 13px, 10px;
+}
+
+.btn-primario:disabled {
+    -fx-background-color: -vy-deshabilitado;
+    -fx-text-fill: -vy-texto-3;
+    -fx-opacity: 1;
+}
+
+.btn-primario:disabled .icono {
+    -fx-stroke: -vy-texto-3;
+}
+
+.btn-secundario {
+    -fx-background-color: -vy-borde-campo, -vy-superficie;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 10px, 9px;
+    -fx-text-fill: -vy-tinta;
+}
+
+.btn-secundario .icono {
+    -fx-stroke: -vy-tinta;
+}
+
+.btn-secundario:hover {
+    -fx-background-color: -vy-borde-campo, -vy-fila-hover;
+}
+
+.btn-peligro {
+    -fx-background-color: -vy-aviso-error-borde, -vy-superficie;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 10px, 9px;
+    -fx-text-fill: -vy-error-texto;
+}
+
+.btn-peligro .icono {
+    -fx-stroke: -vy-error-texto;
+}
+
+.btn-peligro:hover {
+    -fx-background-color: -vy-aviso-error-borde, -vy-aviso-error-fondo;
+}
+
+.btn-secundario:focus-visible,
+.btn-peligro:focus-visible {
+    -fx-background-color: -vy-halo, -vy-primario, -vy-superficie;
+    -fx-background-insets: -3, 0, 1;
+    -fx-background-radius: 13px, 10px, 9px;
+}
+
+.btn-icono {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8px;
+    -fx-min-width: 36px;
+    -fx-min-height: 36px;
+    -fx-max-width: 36px;
+    -fx-max-height: 36px;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+}
+
+.btn-icono:hover {
+    -fx-background-color: -vy-separador;
+}
+
+.enlace,
+.enlace:visited,
+.enlace:hover {
+    -fx-font-family: "Inter Medium";
+    -fx-font-size: 13px;
+    -fx-text-fill: -vy-primario;
+    -fx-padding: 0;
+    -fx-border-width: 0;
+    -fx-underline: false;
+}
+
+.enlace:hover {
+    -fx-text-fill: -vy-primario-hover;
+    -fx-underline: true;
+}
+
+.enlace:focus-visible {
+    -fx-underline: true;
+}
+
+/* Filtros tipo píldora */
+.chip {
+    -fx-background-color: -vy-borde-campo, -vy-superficie;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 999px;
+    -fx-pref-height: 32px;
+    -fx-padding: 0 14px;
+    -fx-font-family: "Inter Medium";
+    -fx-font-size: 13px;
+    -fx-text-fill: -vy-texto-2;
+    -fx-cursor: hand;
+}
+
+.chip:selected {
+    -fx-background-color: -vy-primario, -vy-primario-suave;
+    -fx-text-fill: -vy-primario;
+}
+
+/* Día / Semana / Lista */
+.segmentado {
+    -fx-background-color: #E9EEF3;
+    -fx-background-radius: 10px;
+    -fx-padding: 3px;
+    -fx-spacing: 2px;
+}
+
+.segmentado .toggle-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8px;
+    -fx-pref-height: 32px;
+    -fx-padding: 0 14px;
+    -fx-font-family: "Inter Medium";
+    -fx-font-size: 13px;
+    -fx-text-fill: -vy-texto-2;
+}
+
+.segmentado .toggle-button:selected {
+    -fx-background-color: -vy-superficie;
+    -fx-text-fill: -vy-tinta;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.10), 3, 0, 0, 1);
+}
+
+/* ===== 7. Campos ===== */
+.text-field,
+.text-area,
+.combo-box,
+.date-picker {
+    -fx-background-color: -vy-borde-campo, -vy-superficie;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 9px, 8px;
+    -fx-font-size: 14px;
+    -fx-text-fill: -vy-tinta;
+    -fx-prompt-text-fill: -vy-texto-3;
+    -fx-highlight-fill: -vy-primario-borde;
+    -fx-highlight-text-fill: -vy-tinta;
+}
+
+.text-field,
+.combo-box,
+.date-picker {
+    -fx-pref-height: 40px;
+}
+
+.text-field {
+    -fx-padding: 0 12px;
+}
+
+.text-field:focused,
+.text-area:focused,
+.combo-box:focused,
+.date-picker:focused {
+    -fx-background-color: -vy-halo, -vy-primario, -vy-superficie;
+    -fx-background-insets: -3, 0, 1;
+    -fx-background-radius: 12px, 9px, 8px;
+}
+
+.text-area .content {
+    -fx-background-color: transparent;
+    -fx-padding: 8px 12px;
+}
+
+.campo-error,
+.campo-error:focused {
+    -fx-background-color: -vy-error, -vy-superficie;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 9px, 8px;
+}
+
+.campo-error:focused {
+    -fx-background-color: -vy-halo-error, -vy-error, -vy-superficie;
+    -fx-background-insets: -3, 0, 1;
+    -fx-background-radius: 12px, 9px, 8px;
+}
+
+.campo-formulario {
+    -fx-spacing: 8px;
+}
+
+.fila-etiqueta {
+    -fx-alignment: baseline-left;
+}
+
+/* Campo con ícono a la izquierda (login): el borde lo dibuja el HBox */
+.campo-icono {
+    -fx-background-color: -vy-borde-campo, -vy-superficie;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 10px, 9px;
+    -fx-pref-height: 46px;
+    -fx-min-height: 46px;
+    -fx-padding: 0 14px;
+    -fx-spacing: 10px;
+    -fx-alignment: center-left;
+}
+
+.campo-icono-con-boton {
+    -fx-padding: 0 6px 0 14px;
+}
+
+.campo-icono:focus-within {
+    -fx-background-color: -vy-halo, -vy-primario, -vy-superficie;
+    -fx-background-insets: -3, 0, 1;
+    -fx-background-radius: 13px, 10px, 9px;
+}
+
+.campo-icono .text-field,
+.campo-icono .text-field:focused {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-font-size: 15px;
+}
+
+.check-box {
+    -fx-text-fill: -vy-etiqueta;
+    -fx-label-padding: 0 0 0 10px;
+    -fx-cursor: hand;
+}
+
+.check-box > .box {
+    -fx-background-color: -vy-borde-campo, -vy-superficie;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 5px, 4px;
+    -fx-padding: 3px;
+}
+
+.check-box:selected > .box {
+    -fx-background-color: -vy-primario;
+    -fx-background-insets: 0;
+    -fx-background-radius: 5px;
+}
+
+.check-box:selected > .box > .mark {
+    -fx-background-color: white;
+}
+
+.check-box:focus-visible > .box {
+    -fx-background-color: -vy-halo, -vy-primario, -vy-superficie;
+    -fx-background-insets: -3, 0, 1;
+    -fx-background-radius: 8px, 5px, 4px;
+}
+
+.check-box:selected:focus-visible > .box {
+    -fx-background-color: -vy-halo, -vy-primario;
+    -fx-background-insets: -3, 0;
+    -fx-background-radius: 8px, 5px;
+}
+
+.tooltip {
+    -fx-background-color: -vy-tinta;
+    -fx-background-radius: 6px;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-padding: 6px 8px;
+}
+
+/* ===== 8. Píldoras ===== */
+.pill {
+    -fx-font-family: "Inter SemiBold";
+    -fx-font-size: 12px;
+    -fx-padding: 4px 10px;
+    -fx-background-radius: 999px;
+}
+
+.pill-pendiente  { -fx-background-color: -vy-pill-pendiente-fondo;  -fx-text-fill: -vy-pill-pendiente-texto; }
+.pill-confirmada { -fx-background-color: -vy-pill-confirmada-fondo; -fx-text-fill: -vy-pill-confirmada-texto; }
+.pill-atendida   { -fx-background-color: -vy-pill-atendida-fondo;   -fx-text-fill: -vy-pill-atendida-texto; }
+.pill-cancelada  { -fx-background-color: -vy-pill-cancelada-fondo;  -fx-text-fill: -vy-pill-cancelada-texto; }
+.pill-alergia    { -fx-background-color: -vy-pill-alergia-fondo;    -fx-text-fill: -vy-pill-alergia-texto; }
+.pill-neutra     { -fx-background-color: -vy-separador;             -fx-text-fill: -vy-etiqueta; }
+
+/* ===== 9. Avatares (color según id % 7) ===== */
+.avatar {
+    -fx-background-radius: 999px;
+    -fx-min-width: 38px;
+    -fx-min-height: 38px;
+    -fx-max-width: 38px;
+    -fx-max-height: 38px;
+}
+
+.avatar-chico {
+    -fx-min-width: 36px;
+    -fx-min-height: 36px;
+    -fx-max-width: 36px;
+    -fx-max-height: 36px;
+}
+
+.avatar-grande {
+    -fx-min-width: 52px;
+    -fx-min-height: 52px;
+    -fx-max-width: 52px;
+    -fx-max-height: 52px;
+}
+
+.avatar-iniciales {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.avatar-grande .avatar-iniciales {
+    -fx-font-size: 18px;
+}
+
+.avatar-0 { -fx-background-color: #CCFBF1; } .avatar-0 .avatar-iniciales { -fx-text-fill: #115E59; }
+.avatar-1 { -fx-background-color: #DBEAFE; } .avatar-1 .avatar-iniciales { -fx-text-fill: #1E40AF; }
+.avatar-2 { -fx-background-color: #EDE9FE; } .avatar-2 .avatar-iniciales { -fx-text-fill: #5B21B6; }
+.avatar-3 { -fx-background-color: #FEF3C7; } .avatar-3 .avatar-iniciales { -fx-text-fill: #92400E; }
+.avatar-4 { -fx-background-color: #FFE4E6; } .avatar-4 .avatar-iniciales { -fx-text-fill: #9F1239; }
+.avatar-5 { -fx-background-color: #E0F2FE; } .avatar-5 .avatar-iniciales { -fx-text-fill: #075985; }
+.avatar-6 { -fx-background-color: #FCE7F3; } .avatar-6 .avatar-iniciales { -fx-text-fill: #9D174D; }
+
+/* ===== 10. Avisos y notificación ===== */
+.aviso {
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-padding: 12px 14px;
+    -fx-spacing: 10px;
+}
+
+.aviso-texto {
+    -fx-font-family: "Inter Medium";
+    -fx-font-size: 13px;
+}
+
+.aviso-info        { -fx-background-color: -vy-aviso-info-fondo;        -fx-border-color: -vy-aviso-info-borde; }
+.aviso-exito       { -fx-background-color: -vy-aviso-exito-fondo;       -fx-border-color: -vy-aviso-exito-borde; }
+.aviso-advertencia { -fx-background-color: -vy-aviso-advertencia-fondo; -fx-border-color: -vy-aviso-advertencia-borde; }
+.aviso-error       { -fx-background-color: -vy-aviso-error-fondo;       -fx-border-color: -vy-aviso-error-borde; }
+
+.aviso-info .aviso-texto        { -fx-text-fill: -vy-aviso-info-texto; }
+.aviso-exito .aviso-texto       { -fx-text-fill: -vy-aviso-exito-texto; }
+.aviso-advertencia .aviso-texto { -fx-text-fill: -vy-aviso-advertencia-texto; }
+.aviso-error .aviso-texto       { -fx-text-fill: -vy-aviso-error-texto; }
+
+.aviso-info .icono        { -fx-stroke: -vy-aviso-info-texto; }
+.aviso-exito .icono       { -fx-stroke: -vy-aviso-exito-texto; }
+.aviso-advertencia .icono { -fx-stroke: -vy-aviso-advertencia-texto; }
+.aviso-error .icono       { -fx-stroke: -vy-aviso-error-texto; }
+
+.notificacion {
+    -fx-background-color: -vy-tinta;
+    -fx-background-radius: 10px;
+    -fx-padding: 12px 16px;
+    -fx-alignment: center-left;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.25), 16, 0, 0, 4);
+}
+
+.notificacion .icono {
+    -fx-stroke: -vy-acento;
+}
+
+.notificacion-texto {
+    -fx-font-family: "Inter Medium";
+    -fx-text-fill: white;
+}
+
+/* ===== 11. Tablas ===== */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-table-cell-border-color: transparent;
+    -fx-selection-bar: -vy-primario-suave;
+    -fx-selection-bar-non-focused: -vy-primario-suave;
+}
+
+.table-view:focused {
+    -fx-background-color: transparent;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent -vy-borde transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.table-view .column-header,
+.table-view .filler {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 10px 12px;
+}
+
+.table-view .column-header .label {
+    -fx-font-family: "Inter SemiBold";
+    -fx-font-size: 12px;
+    -fx-text-fill: -vy-texto-2;
+    -fx-alignment: center-left;
+}
+
+.table-row-cell {
+    -fx-background-color: -vy-superficie;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent transparent -vy-separador transparent;
+    -fx-border-width: 0 0 1px 0;
+    -fx-cell-size: 58px;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: -vy-fila-hover;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: -vy-primario-suave;
+}
+
+.table-row-cell .table-cell {
+    -fx-text-fill: -vy-tinta;
+    -fx-padding: 0 12px;
+    -fx-alignment: center-left;
+}
+
+.table-row-cell:empty {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+/* ===== 12. Odontograma (docs/08-guia-frontend.md §2, piezas) ===== */
+.pieza {
+    -fx-background-color: -vy-superficie;
+    -fx-background-radius: 12px;
+    -fx-border-color: transparent;
+    -fx-border-radius: 12px;
+    -fx-pref-width: 54px;
+    -fx-pref-height: 88px;
+    -fx-cursor: hand;
+}
+
+.pieza:hover {
+    -fx-background-color: -vy-fila-hover;
+}
+
+.pieza:selected {
+    -fx-background-color: -vy-primario-suave;
+    -fx-border-color: -vy-primario;
+    -fx-border-width: 2px;
+}
+
+.pieza-sana .icono           { -fx-fill: #FFFFFF; -fx-stroke: #64748B; }
+.pieza-cariada .icono        { -fx-fill: #FCA5A5; -fx-stroke: #B91C1C; }
+.pieza-obturada .icono       { -fx-fill: #93C5FD; -fx-stroke: #1D4ED8; }
+.pieza-en-tratamiento .icono { -fx-fill: #FCD34D; -fx-stroke: #B45309; }
+.pieza-extraida .icono       { -fx-fill: #F1F5F9; -fx-stroke: #64748B; -fx-stroke-dash-array: 2 2; }
+
+/* ===== 13. Inicio de sesión (LoginView) ===== */
+.login {
+    -fx-background-color: -vy-superficie;
+}
+
+.login-panel {
+    -fx-background-color: -vy-sidebar;
+}
+
+.login-deco .icono {
+    -fx-stroke: -vy-sidebar-activo;
+    -fx-stroke-width: 0.6;
+}
+
+.login-panel-contenido {
+    -fx-padding: 48px 56px;
+    -fx-spacing: 40px;
+}
+
+.login-logo {
+    -fx-alignment: center-left;
+    -fx-spacing: 12px;
+}
+
+.logo-marca-grande {
+    -fx-background-radius: 12px;
+    -fx-min-width: 44px;
+    -fx-min-height: 44px;
+    -fx-max-width: 44px;
+    -fx-max-height: 44px;
+}
+
+.login-logo-nombre {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.login-titular-bloque {
+    -fx-spacing: 18px;
+    -fx-max-width: 460px;
+}
+
+.login-titular {
+    -fx-font-size: 44px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-line-spacing: -4px;
+}
+
+.login-subtitulo {
+    -fx-font-size: 16px;
+    -fx-text-fill: -vy-login-subtitulo;
+    -fx-line-spacing: 4px;
+}
+
+.login-beneficios {
+    -fx-spacing: 14px;
+}
+
+.login-beneficio {
+    -fx-alignment: center-left;
+    -fx-spacing: 12px;
+}
+
+.login-beneficio .label {
+    -fx-text-fill: -vy-login-claro;
+}
+
+.login-check {
+    -fx-background-color: -vy-sidebar-activo;
+    -fx-background-radius: 8px;
+    -fx-min-width: 28px;
+    -fx-min-height: 28px;
+    -fx-max-width: 28px;
+    -fx-max-height: 28px;
+}
+
+.login-check .icono {
+    -fx-stroke: -vy-acento;
+    -fx-stroke-width: 2.2;
+}
+
+.login-version {
+    -fx-font-size: 12px;
+    -fx-text-fill: -vy-sidebar-tenue;
+}
+
+.login-lado-formulario {
+    -fx-background-color: -vy-superficie;
+    -fx-padding: 48px 24px;
+}
+
+.login-formulario {
+    -fx-spacing: 22px;
+}
+
+.login-encabezado {
+    -fx-spacing: 8px;
+}
+
+.login-titulo {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+}
+
+.btn-ingresar {
+    -fx-pref-height: 48px;
+    -fx-min-height: 48px;
+    -fx-font-size: 15px;
+}

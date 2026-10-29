@@ -60,7 +60,7 @@ src/main/java/
     ├── dao/                     interfaces: PacienteDAO, CitaDAO...
     │   ├── impl/                implementaciones SQLite: PacienteDAOSqlite...
     │   └── memoria/             implementaciones en memoria (para pruebas)
-    ├── service/                 CitaService, PagoService, AuthService, Sesion, ReglaNegocioException...
+    ├── service/                 CitaService, PagoService, AuthService, Sesion, Servicios, ReglaNegocioException...
     ├── controller/              un controller por pantalla FXML
     ├── ui/                      componentes reutilizables: Icono, Avatar, Pill, PiezaDental...
     ├── util/                    ConexionBD, Validador, HashUtil, DatosIniciales, Formatos
@@ -85,7 +85,9 @@ exports com.vyra.dental.service;
 exports com.vyra.dental.ui;
 ```
 
-Java no permite `exports`/`opens` de un paquete sin clases, por eso estas líneas están comentadas en `module-info.java` hasta que cada paquete tenga su primera clase ([`09-plan-implementacion.md`](./09-plan-implementacion.md), fases 1 y 2).
+Java no permite `exports`/`opens` de un paquete sin clases; por eso estas líneas se fueron activando en `module-info.java` a medida que cada paquete tuvo su primera clase (fases 1 y 2 del [plan](./09-plan-implementacion.md)). `module-info` también requiere `java.prefs` ("Recordar mi usuario" del login).
+
+**Cómo obtiene un controlador sus servicios:** con `service.Servicios` (por ejemplo `Servicios.auth()`), que crea cada servicio una sola vez con sus DAO SQLite. Así los controladores nunca crean ni llaman DAO, y las pruebas crean los servicios directamente con los `DAOMemoria`.
 
 ## 4. Navegación entre pantallas
 
@@ -120,7 +122,9 @@ La única clase `util.ConexionBD` abre la conexión JDBC a SQLite (`jdbc:sqlite:
 
 1. Ejecuta `PRAGMA foreign_keys = ON;` (SQLite no verifica las claves foráneas si no se activa).
 2. Ejecuta `schema.sql` (crea las tablas si no existen).
-3. `App` llama luego a `DatosIniciales.crearAdminSiNoExiste()`.
+3. `App` llama luego a `DatosIniciales.crearAdminSiNoExiste(new UsuarioDAOSqlite())`.
+
+La URL se puede cambiar con la propiedad `-Dvyra.bd.url`. Las pruebas (`mvn test`) usan `jdbc:sqlite::memory:` (configurado en el `maven-surefire-plugin` del `pom.xml`), así nunca tocan el `vyra.db` de desarrollo.
 
 Los DAO nunca abren su propia conexión: así se evitan bloqueos del archivo `.db`.
 

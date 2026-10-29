@@ -228,6 +228,8 @@ classDiagram
     }
 ```
 
+`UsuarioDAO` conserva además `eliminar(int)` porque lo usa el demo de usuarios; la pantalla real desactiva usuarios (RN-14) en lugar de borrarlos.
+
 Reglas para los `DAOSqlite`:
 - Piden la conexión a `ConexionBD.obtenerConexion()` y **no la cierran** (es compartida). Sí cierran sus `PreparedStatement` y `ResultSet` con try-with-resources.
 - Siempre `PreparedStatement` con `?`. Nunca concatenar texto del usuario en el SQL.
@@ -335,8 +337,8 @@ Las filas del modelo (de `Usuario` a `Pago`) quedaron corregidas en la fase 1 de
 | `OdontogramaPieza` | ✔ Corregido (fase 1) | Agregar |
 | `Tratamiento` | ✔ Corregido (fase 1) | Agregar |
 | `Pago` | ✔ Corregido (fase 1) | Agregar campos; `metodoPago` pasa a enum `MetodoPago` |
-| DAO | Solo Usuario, Paciente, Tratamiento y Pago, en memoria (`dao/memoria/*DAOMemoria`) | Las 8 interfaces de la sección 2, con implementación SQLite |
-| Servicios | No existen | Los de la sección 3 |
+| DAO | Usuario y Profesional completos (SQLite y memoria, fase 2); Paciente, Tratamiento y Pago solo en memoria | Las 8 interfaces de la sección 2, con implementación SQLite |
+| Servicios | `AuthService` y `Sesion` (fase 2) | Los de la sección 3 |
 | `demo/*CrudDemoApp` | CRUD de prueba con `Alert` | Se mantienen hasta tener las pantallas reales; luego se borran |
 
 ---

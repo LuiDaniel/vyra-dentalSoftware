@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.vyra.dental.ui.Aviso?>
+<?import com.vyra.dental.ui.Icono?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- Inicio de sesión: docs/08-guia-frontend.md §7.1, referencia docs/ui/Login.html -->
+<HBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.vyra.dental.controller.LoginController"
+      styleClass="login">
+
+    <!-- Mitad izquierda: marca -->
+    <StackPane fx:id="panelMarca" styleClass="login-panel" HBox.hgrow="ALWAYS" prefWidth="550">
+        <Pane fx:id="capaDecorativa" mouseTransparent="true">
+            <Icono nombre="diente" tamano="520" styleClass="login-deco"/>
+        </Pane>
+        <VBox styleClass="login-panel-contenido">
+            <HBox styleClass="login-logo">
+                <StackPane styleClass="logo-marca,logo-marca-grande">
+                    <Icono nombre="diente" tamano="24"/>
+                </StackPane>
+                <Label text="Vyra" styleClass="login-logo-nombre"/>
+            </HBox>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <VBox styleClass="login-titular-bloque">
+                <Label text="Tu consultorio,&#10;en orden." styleClass="login-titular"/>
+                <Label text="Pacientes, citas, historias clínicas y pagos en un solo lugar, pensado para el día a día de recepción y del odontólogo."
+                       styleClass="login-subtitulo" wrapText="true"/>
+            </VBox>
+
+            <VBox styleClass="login-beneficios">
+                <HBox styleClass="login-beneficio">
+                    <StackPane styleClass="login-check"><Icono nombre="check" tamano="16"/></StackPane>
+                    <Label text="Agenda sin cruces de horario entre odontólogos"/>
+                </HBox>
+                <HBox styleClass="login-beneficio">
+                    <StackPane styleClass="login-check"><Icono nombre="check" tamano="16"/></StackPane>
+                    <Label text="Odontograma con historial de cambios por fecha"/>
+                </HBox>
+                <HBox styleClass="login-beneficio">
+                    <StackPane styleClass="login-check"><Icono nombre="check" tamano="16"/></StackPane>
+                    <Label text="Pagos y reportes del consultorio al día"/>
+                </HBox>
+            </VBox>
+
+            <Label text="Versión 1.0 · Uso interno del consultorio" styleClass="login-version"/>
+        </VBox>
+    </StackPane>
+
+    <!-- Mitad derecha: formulario -->
+    <StackPane styleClass="login-lado-formulario" HBox.hgrow="ALWAYS" prefWidth="550">
+        <VBox styleClass="login-formulario" maxWidth="380" maxHeight="-Infinity">
+            <VBox styleClass="login-encabezado">
+                <Label text="Iniciar sesión" styleClass="login-titulo"/>
+                <Label text="Ingresa con tu usuario del consultorio." styleClass="texto-secundario"/>
+            </VBox>
+
+            <VBox styleClass="campo-formulario">
+                <Label text="Usuario" styleClass="campo-etiqueta"/>
+                <HBox styleClass="campo-icono">
+                    <Icono nombre="usuario" tamano="18"/>
+                    <TextField fx:id="campoUsuario" styleClass="campo-sin-borde" promptText="Tu usuario"
+                               HBox.hgrow="ALWAYS" accessibleText="Usuario"/>
+                </HBox>
+            </VBox>
+
+            <VBox styleClass="campo-formulario">
+                <HBox styleClass="fila-etiqueta">
+                    <Label text="Contraseña" styleClass="campo-etiqueta"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Hyperlink text="¿La olvidaste?" styleClass="enlace" onAction="#olvideContrasena"
+                               focusTraversable="false"/>
+                </HBox>
+                <HBox styleClass="campo-icono,campo-icono-con-boton">
+                    <Icono nombre="candado" tamano="18"/>
+                    <StackPane HBox.hgrow="ALWAYS">
+                        <PasswordField fx:id="campoContrasena" styleClass="campo-sin-borde" promptText="Tu contraseña"
+                                       accessibleText="Contraseña"/>
+                        <TextField fx:id="campoContrasenaVisible" styleClass="campo-sin-borde" promptText="Tu contraseña"
+                                   accessibleText="Contraseña"/>
+                    </StackPane>
+                    <Button fx:id="botonVer" styleClass="btn-icono" onAction="#alternarContrasena" focusTraversable="false"/>
+                </HBox>
+            </VBox>
+
+            <CheckBox fx:id="recordar" text="Recordar mi usuario"/>
+
+            <Button text="Ingresar" styleClass="btn-primario,btn-ingresar" maxWidth="Infinity"
+                    defaultButton="true" contentDisplay="RIGHT" onAction="#ingresar">
+                <graphic>
+                    <Icono nombre="flecha" tamano="18"/>
+                </graphic>
+            </Button>
+
+            <Aviso fx:id="aviso"/>
+
+            <Label text="El acceso depende de tu rol: Administrador, Recepción u Odontólogo."
+                   styleClass="texto-apoyo,texto-centrado" wrapText="true" maxWidth="Infinity"/>
+        </VBox>
+    </StackPane>
+</HBox>

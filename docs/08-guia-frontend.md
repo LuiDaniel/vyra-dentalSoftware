@@ -48,6 +48,8 @@ Se declaran una sola vez en `.root` de `vyra.css`. JavaFX permite usarlas en cua
 | `-vy-error-texto` | `#B91C1C` | Mensaje de error bajo el campo, botón de peligro |
 | `-vy-alerta-naranja` | `#EA580C` | Punto de notificación, línea de "hora actual" en la agenda |
 
+`vyra.css` define además variables complementarias tomadas de `docs/ui` (`-vy-etiqueta` `#334155`, `-vy-separador` `#F1F5F9`, `-vy-fila-hover` `#F8FAFC`, `-vy-halo`, `-vy-sidebar-sub` `#8FA3B0`, `-vy-sidebar-tarjeta` `#10293A`...) y una variable por color de píldora y de aviso (`-vy-pill-*`, `-vy-aviso-*`).
+
 **Estados** (fondo de píldora / texto):
 
 | Estado | Fondo | Texto | Clase CSS |
@@ -74,7 +76,8 @@ Se declaran una sola vez en `.root` de `vyra.css`. JavaFX permite usarlas en cua
 
 ## 3. Tipografía, espacios y formas
 
-- **Fuente:** Inter (Regular 400, Medium 500, SemiBold 600, Bold 700), en `resources/com/vyra/fonts/`. Se carga en `App.start()` con `Font.loadFont(getClass().getResourceAsStream("/com/vyra/fonts/Inter-Regular.ttf"), 14)` (una vez por archivo). Si falla, `vyra.css` usa `"Segoe UI"` como respaldo.
+- **Fuente:** Inter (Regular 400, Medium 500, SemiBold 600, Bold 700), en `resources/com/vyra/fonts/`. Se carga en `App.start()` con `Font.loadFont(getClass().getResourceAsStream("/com/vyra/fonts/Inter-Regular.ttf"), 14)` (una vez por archivo). Si falla, JavaFX usa la fuente del sistema.
+- **Importante (pesos en JavaFX):** JavaFX registra Medium y SemiBold como familias aparte ("Inter Medium", "Inter SemiBold"), así que `-fx-font-weight: 600` sobre "Inter" se ve Regular. En `vyra.css`: 500 → `-fx-font-family: "Inter Medium"`, 600 → `-fx-font-family: "Inter SemiBold"`, 700 → `-fx-font-weight: bold` (con la familia "Inter").
 
 | Uso | Tamaño / peso | Clase |
 |---|---|---|
@@ -113,7 +116,9 @@ Se declaran una sola vez en `.root` de `vyra.css`. JavaFX permite usarlas en cua
 | `.text-field`, `.combo-box`, `.date-picker`, `.text-area` | campos | Borde `-vy-borde-campo`, radio 9, alto 40; `:focused` borde `-vy-primario` y halo `rgba(20,184,166,0.18)` |
 | `.campo-error` | campo con error (se agrega por código) | Borde `-vy-error` |
 | `.mensaje-error` | `Label` bajo el campo | 12 px, `-vy-error-texto` |
-| `.pill` + `.pill-*` | `Label` de estado | 12 px SemiBold, padding 4/10, radio 999 |
+| `.pill` + `.pill-*` | `Label` de estado | 12 px SemiBold, padding 4/10, radio 999. `.pill-neutra` (gris) para el método de pago |
+| `.icono` | `SVGPath` de `ui.Icono` | Color con `-fx-stroke` según el contenedor (`.nav-item:selected .icono`, `.btn-primario .icono`...) |
+| `.campo-icono` | `HBox` con ícono + `TextField` (login) | Dibuja el borde del campo; `:focus-within` muestra el halo |
 | `.avatar` | `StackPane` con `Label` | Círculo de 38 px (52 px en encabezados), iniciales 13 px Bold |
 | `.aviso-info`, `.aviso-exito`, `.aviso-advertencia`, `.aviso-error` | `HBox` de aviso | Ver colores en la pantalla Sistema del diseño |
 | `.kpi` | tarjeta de indicador | `.card` con padding 18/20 |

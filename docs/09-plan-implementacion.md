@@ -5,18 +5,19 @@
 
 Este documento ordena el trabajo de programación en fases cortas. Cada fase deja la aplicación **compilando y ejecutable**, termina con un commit y tiene criterios claros para saber que está lista. Está pensado para seguirse en orden, ya sea a mano o pidiéndole cada fase a Claude Code (ver la sección 4).
 
-## 1. Estado actual del código (2026-10-29, después de la fase 1)
+## 1. Estado actual del código (2026-10-29, después de la fase 2)
 
 | Parte | Estado |
 |---|---|
 | `pom.xml` | JavaFX 21, SQLite JDBC, Lombok, Hibernate Validator, JUnit 5 + Surefire. Compila con `release 21` (fase 0). |
 | `model/` | 8 clases y 5 enums, alineados con la BD (fase 1). Los enums tienen `getEtiqueta()`; `EstadoPieza` además `getCodigo()` y los estados `getClaseCss()`. |
-| `dao/` | Interfaces de Usuario, Paciente, Tratamiento y Pago, con implementación **en memoria** en `dao/memoria/` (`*DAOMemoria`). Faltan Cita, Profesional, Historia clínica y Odontograma, los métodos nuevos de [`04` §2](./04-diagrama-clases.md#2-acceso-a-datos-comvyradentaldao-y-daoimpl) y todas las versiones SQLite (`dao/impl/` está vacío). |
-| `util/` | `ConexionBD` (abre SQLite, activa claves foráneas y ejecuta `schema.sql`), `Validador` (Jakarta), `HashUtil` (PBKDF2) y `Formatos`. `schema.sql` es el de [`03` §3](./03-modelo-base-datos.md#3-script-sql-sqlite). |
-| `service/` | Solo `ReglaNegocioException` (fase 1). |
-| `controller/`, `ui/` | Paquetes creados (solo `package-info.java`, fase 0). |
-| Vistas FXML, CSS | Carpetas `views/` y `styles/` creadas, vacías. Fuente Inter en `fonts/` (fase 0). |
-| `App.java` | Abre la BD (crea `vyra.db` y las tablas) y muestra una ventana vacía con una etiqueta. |
+| `dao/` | Usuario y Profesional completos ([`04` §2](./04-diagrama-clases.md#2-acceso-a-datos-comvyradentaldao-y-daoimpl)), en SQLite (`dao/impl/`) y en memoria (`dao/memoria/`). Paciente, Tratamiento y Pago solo en memoria y sin los métodos nuevos. Faltan Cita, Historia clínica y Odontograma. |
+| `util/` | `ConexionBD` (abre SQLite, activa claves foráneas y ejecuta `schema.sql`), `Validador` (Jakarta), `HashUtil` (PBKDF2), `Formatos` y `DatosIniciales` (admin inicial). `schema.sql` es el de [`03` §3](./03-modelo-base-datos.md#3-script-sql-sqlite). |
+| `service/` | `ReglaNegocioException`, `AuthService`, `Sesion` y `Servicios` (crea los servicios con sus DAO SQLite). |
+| `controller/` | `LoginController`, `MainController` (menú por rol y navegación), enum `Pantalla` e interfaz `RecibeParametro`. |
+| `ui/` | `Icono`, `Avatar`, `Pill`, `Aviso`, `Notificacion`, `CampoFormulario`. |
+| Vistas FXML, CSS | `LoginView.fxml`, `MainView.fxml` y `styles/vyra.css` completo (§2–4 de la guía). Las demás pantallas muestran "En construcción" hasta que exista su FXML. |
+| `App.java` | Carga Inter, abre la BD, crea el admin si no hay usuarios y muestra el login; `mostrarLogin()`/`mostrarPrincipal()` cambian la escena de la ventana. |
 | `demo/` | 4 CRUDs de prueba + lanzador, hechos con código Java (sin FXML). |
 | Diseño | Listo: [`docs/ui/`](./ui) y [`08-guia-frontend.md`](./08-guia-frontend.md). |
 

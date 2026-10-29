@@ -31,8 +31,18 @@ public class UsuarioDAOMemoria implements UsuarioDAO {
     }
 
     @Override
+    public Optional<Usuario> buscarPorNombreUsuario(String nombreUsuario) {
+        return usuarios.stream().filter(u -> u.getNombreUsuario().equals(nombreUsuario)).findFirst();
+    }
+
+    @Override
     public List<Usuario> listarTodos() {
         return new ArrayList<>(usuarios);
+    }
+
+    @Override
+    public int contar() {
+        return usuarios.size();
     }
 
     @Override

@@ -96,6 +96,12 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.2</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <!-- Las pruebas usan una base en memoria, nunca vyra.db -->
+                        <vyra.bd.url>jdbc:sqlite::memory:</vyra.bd.url>
+                    </systemPropertyVariables>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.openjfx</groupId>

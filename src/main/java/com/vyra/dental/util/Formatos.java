@@ -89,6 +89,15 @@ public final class Formatos {
         return primeraLetra(nombres) + primeraLetra(apellidos);
     }
 
+    /** "MQ" a partir de un nombre completo ("María Quispe"); "D" si es una sola palabra. */
+    public static String iniciales(String nombreCompleto) {
+        if (nombreCompleto == null || nombreCompleto.isBlank()) {
+            return "";
+        }
+        String[] palabras = nombreCompleto.strip().split("\\s+");
+        return primeraLetra(palabras[0]) + (palabras.length > 1 ? primeraLetra(palabras[1]) : "");
+    }
+
     private static String primeraLetra(String texto) {
         if (texto == null || texto.isBlank()) {
             return "";

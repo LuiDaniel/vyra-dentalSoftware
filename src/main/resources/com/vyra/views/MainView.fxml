@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.vyra.dental.ui.Avatar?>
+<?import com.vyra.dental.ui.Icono?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- Marco común: docs/08-guia-frontend.md §6, referencia docs/ui/Inicio.html -->
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.vyra.dental.controller.MainController"
+            styleClass="app-shell">
+
+    <left>
+        <VBox styleClass="sidebar">
+            <HBox styleClass="logo">
+                <StackPane styleClass="logo-marca">
+                    <Icono nombre="diente" tamano="22"/>
+                </StackPane>
+                <VBox styleClass="logo-textos">
+                    <Label text="Vyra" styleClass="logo-nombre"/>
+                    <Label text="Consultorio dental" styleClass="logo-sub"/>
+                </VBox>
+            </HBox>
+
+            <!-- MainController agrega aquí los grupos e ítems que permite el rol -->
+            <VBox fx:id="menu" styleClass="menu"/>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <HBox styleClass="tarjeta-usuario">
+                <Avatar fx:id="avatar" styleClass="avatar-chico"/>
+                <VBox styleClass="tarjeta-usuario-textos" HBox.hgrow="ALWAYS">
+                    <Label fx:id="nombreUsuario" styleClass="usuario-nombre"/>
+                    <Label fx:id="rolUsuario" styleClass="usuario-rol"/>
+                </VBox>
+                <Button styleClass="btn-salir" onAction="#salir" accessibleText="Cerrar sesión">
+                    <graphic>
+                        <Icono nombre="salir" tamano="18"/>
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Cerrar sesión"/>
+                    </tooltip>
+                </Button>
+            </HBox>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox>
+            <HBox styleClass="topbar">
+                <Label fx:id="ruta" styleClass="topbar-ruta"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="fecha" styleClass="topbar-fecha"/>
+                <Button styleClass="btn-icono-borde" accessibleText="Notificaciones">
+                    <graphic>
+                        <Icono nombre="campana" tamano="18"/>
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Notificaciones"/>
+                    </tooltip>
+                </Button>
+            </HBox>
+            <StackPane fx:id="contenido" styleClass="contenido" VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </center>
+</BorderPane>

@@ -15,7 +15,9 @@ import com.vyra.dental.model.Usuario;
 public interface UsuarioDAO {
     Usuario crear(Usuario usuario);
     Optional<Usuario> buscarPorId(int idUsuario);
+    Optional<Usuario> buscarPorNombreUsuario(String nombreUsuario);
     List<Usuario> listarTodos();
+    int contar();
     boolean actualizar(Usuario usuario);
     boolean eliminar(int idUsuario);
 }
