@@ -2,14 +2,17 @@ package com.vyra.dental.controller;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
+import com.vyra.dental.model.Cita;
 import com.vyra.dental.model.FiltroPaciente;
 import com.vyra.dental.model.Paciente;
+import com.vyra.dental.service.CitaService;
 import com.vyra.dental.service.PacienteService;
 import com.vyra.dental.service.ReglaNegocioException;
 import com.vyra.dental.service.Servicios;
@@ -17,8 +20,11 @@ import com.vyra.dental.service.Sesion;
 import com.vyra.dental.ui.Avatar;
 import com.vyra.dental.ui.Aviso;
 import com.vyra.dental.ui.CampoFormulario;
+import com.vyra.dental.ui.Dialogos;
+import com.vyra.dental.ui.EstadoVacio;
 import com.vyra.dental.ui.Icono;
 import com.vyra.dental.ui.Notificacion;
+import com.vyra.dental.ui.Pill;
 import com.vyra.dental.util.Formatos;
 import com.vyra.dental.util.ValidacionException;
 
@@ -28,12 +34,8 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -47,7 +49,7 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
@@ -98,8 +100,15 @@ public class PacientesController {
     @FXML private HBox pie;
     @FXML private Button botonBaja;
     @FXML private Button botonGuardar;
+    @FXML private ToggleButton pestanaDatos;
+    @FXML private ToggleButton pestanaCitas;
+    @FXML private VBox contenidoDatos;
+    @FXML private VBox contenidoCitas;
 
     private final PacienteService servicio = Servicios.pacientes();
+    private final CitaService citas = Servicios.citas();
+    /** Última visita de cada paciente de la página (se consulta al cargar la lista). */
+    private final Map<Integer, LocalDate> ultimasVisitas = new HashMap<>();
     private final ObservableList<Paciente> filas = FXCollections.observableArrayList();
     private final ToggleGroup grupoFiltros = new ToggleGroup();
     private final PauseTransition esperaBusqueda = new PauseTransition(Duration.millis(300));
@@ -145,6 +154,7 @@ public class PacientesController {
             e.consume();
         });
 
+        configurarPestanas();
         aplicarPermisos();
         cargar();
         if (!filas.isEmpty()) {
@@ -193,8 +203,8 @@ public class PacientesController {
                 p -> p.getTelefono() == null ? "—" : Formatos.telefono(p.getTelefono()));
         TableColumn<Paciente, Paciente> edad = columnaTexto("EDAD", 80,
                 p -> p.getFechaNacimiento() == null ? "—" : Formatos.edad(p.getFechaNacimiento()));
-        // Se llena cuando existan las citas (fase 4 del plan)
-        TableColumn<Paciente, Paciente> ultimaVisita = columnaTexto("ÚLTIMA VISITA", 110, p -> "—");
+        TableColumn<Paciente, Paciente> ultimaVisita = columnaTexto("ÚLTIMA VISITA", 110,
+                p -> Optional.ofNullable(ultimasVisitas.get(p.getIdPaciente())).map(Formatos::fechaCorta).orElse("—"));
 
         TableColumn<Paciente, Paciente> alergias = columna("ALERGIAS", 130);
         alergias.setCellFactory(c -> new CeldaAlergias());
@@ -218,7 +228,13 @@ public class PacientesController {
             int total = servicio.contar(texto, filtro);
             int ultimaPagina = Math.max(0, (total - 1) / PacienteService.TAMANO_PAGINA);
             pagina = Math.min(pagina, ultimaPagina);
-            filas.setAll(servicio.buscar(texto, filtro, pagina));
+            List<Paciente> encontrados = servicio.buscar(texto, filtro, pagina);
+            ultimasVisitas.clear();
+            for (Paciente paciente : encontrados) {
+                citas.ultimaVisita(paciente.getIdPaciente())
+                        .ifPresent(fecha -> ultimasVisitas.put(paciente.getIdPaciente(), fecha));
+            }
+            filas.setAll(encontrados);
 
             int registrados = servicio.contar("", FiltroPaciente.TODOS);
             String accion = editable ? "ver o editar su ficha" : "ver su ficha";
@@ -235,7 +251,7 @@ public class PacientesController {
         } catch (RuntimeException e) {
             filas.clear();
             rango.setText("");
-            tabla.setPlaceholder(mensajeVacio("No se pudo cargar la lista de pacientes", e.getMessage(), null));
+            tabla.setPlaceholder(new EstadoVacio("No se pudo cargar la lista de pacientes", e.getMessage()));
         }
     }
 
@@ -275,25 +291,10 @@ public class PacientesController {
                 primero.getStyleClass().add("btn-primario");
                 primero.setOnAction(e -> prepararNuevo());
             }
-            return mensajeVacio("Aún no hay pacientes registrados",
+            return new EstadoVacio("Aún no hay pacientes registrados",
                     "Cuando registres uno aparecerá en esta lista.", primero);
         }
-        return mensajeVacio("No se encontraron pacientes",
-                "Prueba con otro nombre o DNI, o cambia el filtro.", null);
-    }
-
-    private static Node mensajeVacio(String titulo, String detalle, Button accion) {
-        Label tituloLabel = new Label(titulo);
-        tituloLabel.getStyleClass().add("card-titulo");
-        Label detalleLabel = new Label(detalle);
-        detalleLabel.getStyleClass().add("texto-secundario");
-        VBox caja = new VBox(tituloLabel, detalleLabel);
-        if (accion != null) {
-            caja.getChildren().add(accion);
-        }
-        caja.getStyleClass().add("estado-vacio");
-        caja.setAlignment(Pos.CENTER);
-        return caja;
+        return new EstadoVacio("No se encontraron pacientes", "Prueba con otro nombre o DNI, o cambia el filtro.");
     }
 
     // ===== Ficha =====
@@ -320,6 +321,9 @@ public class PacientesController {
         tituloFicha.setText("Nuevo paciente");
         subtituloFicha.setText("Completa sus datos. Los campos con * son obligatorios.");
         botonGuardar.setText("Registrar paciente");
+        pestanaCitas.setDisable(true);
+        pestanaDatos.setSelected(true);
+        mostrarPestana();
         alternar(botonBaja, false);
         campoNombres.requestFocus();
     }
@@ -345,6 +349,8 @@ public class PacientesController {
         subtituloFicha.setText("DNI " + paciente.getDni() + desde);
         botonGuardar.setText("Guardar cambios");
         alternar(botonBaja, editable);
+        pestanaCitas.setDisable(false);
+        mostrarPestana();
     }
 
     @FXML
@@ -395,28 +401,10 @@ public class PacientesController {
         if (seleccionado == null) {
             return;
         }
-        ButtonType confirmar = new ButtonType("Dar de baja", ButtonBar.ButtonData.OK_DONE);
-        ButtonType cancelar = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
-        Alert alerta = new Alert(Alert.AlertType.CONFIRMATION, "", confirmar, cancelar);
-        alerta.initOwner(tabla.getScene().getWindow());
-        alerta.setTitle("Dar de baja");
-        alerta.setHeaderText("¿Dar de baja a " + seleccionado.getNombreCompleto() + "?");
-        alerta.setContentText("Dejará de aparecer en las búsquedas, pero su historial se conserva.");
-        alerta.setGraphic(null);
-        // Ancho fijo y alto según el texto, para que el mensaje no se corte
-        alerta.getDialogPane().setPrefWidth(480);
-        alerta.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-        alerta.getDialogPane().getStylesheets().addAll(tabla.getScene().getStylesheets());
-        alerta.getDialogPane().getStyleClass().add("dialogo");
-        Button botonConfirmar = (Button) alerta.getDialogPane().lookupButton(confirmar);
-        Button botonCancelar = (Button) alerta.getDialogPane().lookupButton(cancelar);
-        botonConfirmar.getStyleClass().add("btn-peligro");
-        botonCancelar.getStyleClass().add("btn-secundario");
-        // Acción destructiva: Enter cancela; para dar de baja hay que elegirlo a propósito
-        botonConfirmar.setDefaultButton(false);
-        botonCancelar.setDefaultButton(true);
-
-        if (alerta.showAndWait().orElse(cancelar) != confirmar) {
+        boolean confirmado = Dialogos.confirmar(tabla.getScene().getWindow(), "Dar de baja",
+                "¿Dar de baja a " + seleccionado.getNombreCompleto() + "?",
+                "Dejará de aparecer en las búsquedas, pero su historial se conserva.", "Dar de baja");
+        if (!confirmado) {
             return;
         }
         try {
@@ -567,6 +555,73 @@ public class PacientesController {
 
     private void notificar(String mensaje) {
         Notificacion.mostrar(tabla.getScene().getWindow(), mensaje);
+    }
+
+    // ===== Pestañas de la ficha =====
+
+    private void configurarPestanas() {
+        ToggleGroup pestanas = new ToggleGroup();
+        pestanaDatos.setToggleGroup(pestanas);
+        pestanaCitas.setToggleGroup(pestanas);
+        pestanas.selectedToggleProperty().addListener((obs, anterior, nueva) -> {
+            if (nueva == null) {
+                anterior.setSelected(true);
+            } else {
+                mostrarPestana();
+            }
+        });
+        alternar(contenidoCitas, false);
+    }
+
+    private void mostrarPestana() {
+        boolean datos = pestanaDatos.isSelected();
+        alternar(contenidoDatos, datos);
+        alternar(pie, datos && editable);
+        alternar(contenidoCitas, !datos);
+        if (!datos) {
+            cargarCitasDelPaciente();
+        }
+    }
+
+    /** Pestaña Citas: fecha, horario, profesional, motivo y estado de cada cita. */
+    private void cargarCitasDelPaciente() {
+        contenidoCitas.getChildren().clear();
+        if (seleccionado == null) {
+            return;
+        }
+        List<Cita> lista;
+        try {
+            lista = citas.citasDePaciente(seleccionado.getIdPaciente());
+        } catch (RuntimeException e) {
+            contenidoCitas.getChildren().add(new EstadoVacio("No se pudo cargar las citas", e.getMessage()));
+            return;
+        }
+        if (lista.isEmpty()) {
+            Button agendar = null;
+            if (editable) {
+                agendar = new Button("Agendar cita", new Icono("agenda", 16));
+                agendar.getStyleClass().add("btn-primario");
+                Paciente paciente = seleccionado;
+                agendar.setOnAction(e -> MainController.actual().navegar(Pantalla.AGENDA, paciente));
+            }
+            contenidoCitas.getChildren().add(new EstadoVacio("Sin citas registradas",
+                    "Las citas de este paciente aparecerán aquí.", agendar));
+            return;
+        }
+        for (Cita cita : lista) {
+            Label cuando = new Label(Formatos.diaCorto(cita.getFecha()) + " " + Formatos.fechaCorta(cita.getFecha())
+                    + " · " + Formatos.rangoHoras(cita.getHoraInicio(), cita.getHoraFin()));
+            cuando.getStyleClass().add("celda-titulo");
+            Label quien = new Label(cita.getProfesional().getNombreCompleto()
+                    + (cita.getMotivo() == null ? "" : " · " + cita.getMotivo()));
+            quien.getStyleClass().add("celda-sub");
+            quien.setWrapText(true);
+            VBox textos = new VBox(2, cuando, quien);
+            HBox.setHgrow(textos, Priority.ALWAYS);
+            HBox fila = new HBox(12, textos, new Pill(cita.getEstado()));
+            fila.getStyleClass().add("fila-cita");
+            contenidoCitas.getChildren().add(fila);
+        }
     }
 
     // ===== Columnas =====

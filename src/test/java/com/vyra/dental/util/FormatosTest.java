@@ -23,6 +23,21 @@ class FormatosTest {
     }
 
     @Test
+    void formatosDeLaAgenda() {
+        assertEquals("Jueves 29 de octubre", Formatos.diaYMes(FECHA));
+        assertEquals("Jue", Formatos.diaCorto(FECHA));
+        assertEquals("Mié", Formatos.diaCorto(FECHA.minusDays(1)));
+        assertEquals("Sáb", Formatos.diaCorto(FECHA.plusDays(2)));
+        assertEquals("09:00–10:00", Formatos.rangoHoras(LocalTime.of(9, 0), LocalTime.of(10, 0)));
+    }
+
+    @Test
+    void busquedaSinTildes() {
+        assertEquals("maria pena", Busqueda.normalizar("  María PEÑA "));
+        assertEquals("", Busqueda.normalizar(null));
+    }
+
+    @Test
     void mesYAnio() {
         assertEquals("marzo 2024", Formatos.mesAnio(LocalDate.of(2024, 3, 5)));
         assertEquals("", Formatos.mesAnio(null));

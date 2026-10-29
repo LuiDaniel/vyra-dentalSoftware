@@ -50,6 +50,13 @@
     -vy-pill-cancelada-fondo: #FEE2E2;   -vy-pill-cancelada-texto: #991B1B;
     -vy-pill-alergia-fondo: #FFEDD5;     -vy-pill-alergia-texto: #9A3412;
 
+    /* Bloques de la agenda (fondo / borde / texto), guía §2 */
+    -vy-cita-pendiente-fondo: #FFFBEB;  -vy-cita-pendiente-borde: #FDE68A;  -vy-cita-pendiente-texto: #78350F;
+    -vy-cita-confirmada-fondo: #EFF6FF; -vy-cita-confirmada-borde: #BFDBFE; -vy-cita-confirmada-texto: #1E3A8A;
+    -vy-cita-atendida-fondo: #ECFDF5;   -vy-cita-atendida-borde: #A7F3D0;   -vy-cita-atendida-texto: #064E3B;
+    -vy-cita-cancelada-fondo: #F8FAFC;  -vy-cita-cancelada-borde: #E2E8F0;  -vy-cita-cancelada-texto: #64748B;
+    -vy-segmentado-fondo: #E9EEF3;
+
     /* Avisos (fondo / borde / texto) */
     -vy-aviso-info-fondo: #F0FDFA;        -vy-aviso-info-borde: #99F6E4;        -vy-aviso-info-texto: #134E4A;
     -vy-aviso-exito-fondo: #ECFDF5;       -vy-aviso-exito-borde: #A7F3D0;       -vy-aviso-exito-texto: #065F46;
@@ -728,7 +735,7 @@
 
 /* Día / Semana / Lista */
 .segmentado {
-    -fx-background-color: #E9EEF3;
+    -fx-background-color: -vy-segmentado-fondo;
     -fx-background-radius: 10px;
     -fx-padding: 3px;
     -fx-spacing: 2px;
@@ -1261,4 +1268,381 @@
 
 .dialogo > .button-bar > .container {
     -fx-padding: 8px 16px 12px 16px;
+}
+
+/* ===== 15. Agenda (docs/08-guia-frontend.md §7.3) ===== */
+.pagina-agenda {
+    -fx-spacing: 18px;
+    -fx-padding: 24px 32px 40px 32px;
+}
+
+.agenda-barra {
+    -fx-spacing: 12px;
+    -fx-alignment: center-left;
+}
+
+.agenda-barra .titulo-pagina {
+    -fx-padding: 0 12px 0 0;
+}
+
+.agenda-navegacion {
+    -fx-spacing: 4px;
+    -fx-alignment: center-left;
+}
+
+.btn-cuadrado-36 {
+    -fx-min-width: 36px;
+    -fx-min-height: 36px;
+    -fx-max-width: 36px;
+    -fx-max-height: 36px;
+}
+
+.agenda-fecha {
+    -fx-font-family: "Inter SemiBold";
+    -fx-font-size: 15px;
+    -fx-text-fill: -vy-etiqueta;
+}
+
+.combo-chico {
+    -fx-pref-height: 36px;
+    -fx-pref-width: 300px;
+}
+
+.segmentado-ancho {
+    -fx-alignment: center;
+}
+
+.segmentado .estado-pendiente:selected {
+    -fx-text-fill: -vy-pill-pendiente-texto;
+    -fx-font-family: "Inter SemiBold";
+}
+
+.segmentado .estado-confirmada:selected {
+    -fx-text-fill: -vy-pill-confirmada-texto;
+    -fx-font-family: "Inter SemiBold";
+}
+
+/* Tira de la semana */
+.tira-semana {
+    -fx-spacing: 10px;
+}
+
+.dia-boton {
+    -fx-background-color: -vy-borde, -vy-superficie;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 12px, 11px;
+    -fx-padding: 10px 14px;
+    -fx-alignment: top-left;
+    -fx-cursor: hand;
+}
+
+.dia-boton:hover {
+    -fx-background-color: -vy-borde-campo, -vy-fila-hover;
+}
+
+.dia-boton:selected {
+    -fx-background-color: -vy-primario;
+}
+
+.dia-boton:focus-visible {
+    -fx-background-color: -vy-halo, -vy-primario, -vy-superficie;
+    -fx-background-insets: -3, 0, 1;
+    -fx-background-radius: 15px, 12px, 11px;
+}
+
+.dia-boton:selected:focus-visible {
+    -fx-background-color: -vy-halo, -vy-primario;
+    -fx-background-insets: -3, 0;
+}
+
+.dia-boton .label {
+    -fx-text-fill: -vy-tinta;
+}
+
+.dia-boton:selected .label {
+    -fx-text-fill: white;
+}
+
+.dia-nombre {
+    -fx-font-family: "Inter Medium";
+    -fx-font-size: 12px;
+}
+
+.dia-numero {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.dia-citas {
+    -fx-font-size: 12px;
+}
+
+.dia-hoy .dia-nombre {
+    -fx-underline: true;
+}
+
+/* Cuadrícula */
+.agenda-card {
+    -fx-padding: 0;
+}
+
+.agenda-encabezado {
+    -fx-border-color: transparent transparent -vy-borde-suave transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.agenda-col-encabezado {
+    -fx-padding: 12px 14px;
+    -fx-spacing: 10px;
+    -fx-alignment: center-left;
+    -fx-border-color: transparent transparent transparent -vy-borde-suave;
+    -fx-border-width: 0 0 0 1px;
+}
+
+.agenda-col-hoy {
+    -fx-background-color: -vy-primario-suave;
+}
+
+.agenda-col-nombre {
+    -fx-font-family: "Inter SemiBold";
+    -fx-font-size: 13px;
+}
+
+.agenda-hora {
+    -fx-font-size: 12px;
+    -fx-text-fill: -vy-texto-3;
+    -fx-padding: 6px 0 0 14px;
+}
+
+.agenda-linea {
+    -fx-border-color: -vy-separador transparent transparent transparent;
+    -fx-border-width: 1px 0 0 0;
+}
+
+.agenda-linea-hora {
+    -fx-border-color: -vy-borde transparent transparent transparent;
+    -fx-border-width: 1px 0 0 0;
+}
+
+.agenda-columna {
+    -fx-border-color: transparent transparent transparent -vy-borde-suave;
+    -fx-border-width: 0 0 0 1px;
+}
+
+.agenda-celda {
+    -fx-cursor: hand;
+}
+
+.agenda-celda:hover {
+    -fx-background-color: -vy-primario-suave;
+}
+
+.avatar-mini {
+    -fx-min-width: 32px;
+    -fx-min-height: 32px;
+    -fx-max-width: 32px;
+    -fx-max-height: 32px;
+}
+
+.avatar-mini .avatar-iniciales {
+    -fx-font-size: 12px;
+}
+
+.cita-bloque {
+    -fx-padding: 8px 10px;
+    -fx-spacing: 3px;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+    -fx-cursor: hand;
+}
+
+.cita-bloque:hover {
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.12), 6, 0, 0, 2);
+}
+
+.cita-seleccionada {
+    -fx-border-color: -vy-primario;
+    -fx-border-width: 2px;
+}
+
+.cita-nombre {
+    -fx-font-family: "Inter SemiBold";
+    -fx-font-size: 13px;
+}
+
+.cita-estado {
+    -fx-font-family: "Inter SemiBold";
+    -fx-font-size: 11px;
+}
+
+.cita-detalle {
+    -fx-font-size: 12px;
+    -fx-text-fill: -vy-texto-2;
+}
+
+.cita-pendiente  { -fx-background-color: -vy-cita-pendiente-fondo;  -fx-border-color: -vy-cita-pendiente-borde; }
+.cita-confirmada { -fx-background-color: -vy-cita-confirmada-fondo; -fx-border-color: -vy-cita-confirmada-borde; }
+.cita-atendida   { -fx-background-color: -vy-cita-atendida-fondo;   -fx-border-color: -vy-cita-atendida-borde; }
+.cita-cancelada  { -fx-background-color: -vy-cita-cancelada-fondo;  -fx-border-color: -vy-cita-cancelada-borde; }
+
+.cita-pendiente .cita-nombre,  .cita-pendiente .cita-estado  { -fx-text-fill: -vy-cita-pendiente-texto; }
+.cita-confirmada .cita-nombre, .cita-confirmada .cita-estado { -fx-text-fill: -vy-cita-confirmada-texto; }
+.cita-atendida .cita-nombre,   .cita-atendida .cita-estado   { -fx-text-fill: -vy-cita-atendida-texto; }
+.cita-cancelada .cita-nombre,  .cita-cancelada .cita-estado  { -fx-text-fill: -vy-cita-cancelada-texto; }
+
+/* El nombre de una cita cancelada va tachado */
+.cita-cancelada .cita-nombre .text {
+    -fx-strikethrough: true;
+}
+
+.cita-bloque.cita-seleccionada {
+    -fx-border-color: -vy-primario;
+}
+
+.hora-actual-linea {
+    -fx-background-color: -vy-alerta-naranja;
+    -fx-pref-height: 2px;
+    -fx-max-height: 2px;
+}
+
+.hora-actual-etiqueta {
+    -fx-background-color: -vy-alerta-naranja;
+    -fx-background-radius: 6px;
+    -fx-padding: 2px 6px;
+    -fx-text-fill: white;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.leyenda {
+    -fx-spacing: 18px;
+}
+
+.leyenda-item {
+    -fx-font-size: 12px;
+    -fx-text-fill: -vy-texto-2;
+    -fx-graphic-text-gap: 8px;
+}
+
+.leyenda-color {
+    -fx-min-width: 14px;
+    -fx-min-height: 14px;
+    -fx-max-width: 14px;
+    -fx-max-height: 14px;
+    -fx-background-radius: 4px;
+    -fx-border-radius: 4px;
+    -fx-border-width: 1px;
+}
+
+/* Panel derecho: nueva cita y detalle */
+.panel-encabezado {
+    -fx-padding: 18px 20px;
+    -fx-spacing: 4px;
+    -fx-border-color: transparent transparent -vy-borde-suave transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.panel-encabezado .texto-secundario {
+    -fx-font-size: 13px;
+}
+
+.panel-encabezado-fila {
+    -fx-padding: 18px 20px;
+    -fx-spacing: 12px;
+    -fx-alignment: center-left;
+    -fx-border-color: transparent transparent -vy-borde-suave transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.panel-encabezado-textos {
+    -fx-spacing: 4px;
+}
+
+.tarjeta-paciente {
+    -fx-background-color: -vy-borde-campo, -vy-superficie;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 10px, 9px;
+    -fx-padding: 8px 10px;
+    -fx-spacing: 10px;
+    -fx-alignment: center-left;
+}
+
+.horarios-libres {
+    -fx-hgap: 6px;
+    -fx-vgap: 6px;
+    -fx-alignment: center-left;
+    -fx-padding: -4px 0 0 0;
+}
+
+.horarios-titulo {
+    -fx-font-family: "Inter SemiBold";
+    -fx-font-size: 12px;
+    -fx-text-fill: -vy-aviso-error-texto;
+}
+
+.chip-hora {
+    -fx-background-color: -vy-primario-borde, -vy-primario-suave;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 999px;
+    -fx-pref-height: 30px;
+    -fx-min-height: 30px;
+    -fx-padding: 0 12px;
+    -fx-font-family: "Inter SemiBold";
+    -fx-font-size: 12px;
+    -fx-text-fill: -vy-primario;
+    -fx-cursor: hand;
+}
+
+.chip-hora:hover {
+    -fx-background-color: -vy-primario, -vy-primario-suave;
+}
+
+.detalle-dato {
+    -fx-spacing: 4px;
+}
+
+.detalle-etiqueta {
+    -fx-font-family: "Inter SemiBold";
+    -fx-font-size: 12px;
+    -fx-text-fill: -vy-texto-3;
+}
+
+.acciones-detalle {
+    -fx-spacing: 8px;
+    -fx-padding: 4px 0 0 0;
+}
+
+.sugerencias {
+    -fx-background-color: -vy-borde, -vy-superficie;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 10px, 9px;
+    -fx-padding: 6px;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.12), 16, 0, 0, 4);
+}
+
+.sugerencias .menu-item {
+    -fx-background-radius: 8px;
+    -fx-padding: 6px 8px;
+}
+
+.sugerencias .menu-item:focused {
+    -fx-background-color: -vy-primario-suave;
+}
+
+.sugerencias .menu-item:focused .label {
+    -fx-text-fill: -vy-tinta;
+}
+
+/* Pestaña Citas de la ficha del paciente */
+.ficha-citas {
+    -fx-padding: 12px 20px 20px 20px;
+    -fx-spacing: 0;
+}
+
+.fila-cita {
+    -fx-padding: 12px 0;
+    -fx-alignment: center-left;
+    -fx-border-color: transparent transparent -vy-separador transparent;
+    -fx-border-width: 0 0 1px 0;
 }

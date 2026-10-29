@@ -35,6 +35,9 @@ public final class Formatos {
 
     private static final DateTimeFormatter HORA = DateTimeFormatter.ofPattern("HH:mm");
     private static final DateTimeFormatter MES_ANIO = DateTimeFormatter.ofPattern("MMMM yyyy", ES_PE);
+    private static final DateTimeFormatter DIA_Y_MES = DateTimeFormatter.ofPattern("EEEE d 'de' MMMM", ES_PE);
+    // Propias, como en FECHA_CORTA: el JDK escribe "lun." con punto
+    private static final String[] DIAS_CORTOS = { "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom" };
     private static final DateTimeFormatter FECHA_CAMPO = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private Formatos() {
@@ -52,6 +55,25 @@ public final class Formatos {
     /** "29 oct 2026". */
     public static String fechaCorta(LocalDate fecha) {
         return fecha == null ? "" : FECHA_CORTA.format(fecha);
+    }
+
+    /** "Jueves 29 de octubre" (título de la agenda). */
+    public static String diaYMes(LocalDate fecha) {
+        if (fecha == null) {
+            return "";
+        }
+        String texto = DIA_Y_MES.format(fecha);
+        return Character.toUpperCase(texto.charAt(0)) + texto.substring(1);
+    }
+
+    /** "Lun", "Mié", "Sáb" (tira de la semana de la agenda). */
+    public static String diaCorto(LocalDate fecha) {
+        return fecha == null ? "" : DIAS_CORTOS[fecha.getDayOfWeek().getValue() - 1];
+    }
+
+    /** "09:00–10:00". */
+    public static String rangoHoras(LocalTime inicio, LocalTime fin) {
+        return hora(inicio) + "–" + hora(fin);
     }
 
     /** "marzo 2024" (para "Paciente desde marzo 2024"). */

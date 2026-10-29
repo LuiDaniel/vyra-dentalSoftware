@@ -130,6 +130,7 @@ class PacienteServiceTest {
         servicio.registrar(paciente("Jorge", "Mamani Condori", "45812307"));
 
         assertEquals(1, servicio.buscar("maría fernanda quispe", FiltroPaciente.TODOS, 0).size());
+        assertEquals(1, servicio.buscar("MARIA fernanda QUISPE huaman", FiltroPaciente.TODOS, 0).size());
         assertEquals("Jorge", servicio.buscar("4581", FiltroPaciente.TODOS, 0).get(0).getNombres());
         assertEquals(2, servicio.contar("", FiltroPaciente.TODOS));
     }

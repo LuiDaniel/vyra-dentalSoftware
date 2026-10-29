@@ -1,10 +1,16 @@
 package com.vyra.dental.util;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
+import com.vyra.dental.dao.CitaDAO;
 import com.vyra.dental.dao.PacienteDAO;
+import com.vyra.dental.dao.ProfesionalDAO;
 import com.vyra.dental.dao.UsuarioDAO;
+import com.vyra.dental.model.Cita;
+import com.vyra.dental.model.EstadoCita;
 import com.vyra.dental.model.Paciente;
+import com.vyra.dental.model.Profesional;
 import com.vyra.dental.model.Rol;
 import com.vyra.dental.model.Usuario;
 
@@ -70,6 +76,46 @@ public final class DatosIniciales {
             if (pacienteDAO.buscarPorDni(ejemplo.getDni()).isEmpty()) {
                 pacienteDAO.crear(ejemplo);
             }
+        }
+    }
+
+    /**
+     * Profesionales y citas ficticios del diseño (docs/ui/Citas.html). Las citas
+     * se crean para hoy y mañana, y solo la primera vez (si ningún profesional
+     * de ejemplo existía).
+     */
+    public static void cargarEjemplosAgenda(PacienteDAO pacienteDAO, ProfesionalDAO profesionalDAO, CitaDAO citaDAO) {
+        boolean yaExistian = profesionalDAO.listarTodos().stream()
+                .anyMatch(p -> p.getApellidos().equals("Núñez Paredes"));
+        if (yaExistian) {
+            return;
+        }
+        Profesional nunez = profesionalDAO.crear(new Profesional(0, null, "Patricia", "Núñez Paredes", "Ortodoncia",
+                "951444210", "Lun-Sáb 08:00-14:00"));
+        Profesional salinas = profesionalDAO.crear(new Profesional(0, null, "Marco", "Salinas Vega", "Endodoncia",
+                "987111203", "Lun-Vie 08:00-16:00"));
+        Profesional rios = profesionalDAO.crear(new Profesional(0, null, "Claudia", "Ríos Mendoza", "Odontopediatría",
+                "912600318", "Lun-Vie 09:00-18:00"));
+
+        LocalDate hoy = LocalDate.now();
+        LocalDate manana = hoy.plusDays(1);
+        Object[][] citas = {
+            { nunez, "29874561", hoy, "08:00", "08:30", "Control de prótesis", EstadoCita.ATENDIDA },
+            { nunez, "45812307", hoy, "09:30", "10:00", "Limpieza dental", EstadoCita.CONFIRMADA },
+            { nunez, "70356219", hoy, "10:00", "10:30", "Ajuste de brackets", EstadoCita.PENDIENTE },
+            { nunez, "76104352", hoy, "11:30", "12:30", "Control de ortodoncia", EstadoCita.CONFIRMADA },
+            { salinas, "72481935", hoy, "09:00", "10:00", "Endodoncia pieza 36", EstadoCita.CONFIRMADA },
+            { salinas, "43920185", hoy, "11:00", "11:30", "Evaluación general", EstadoCita.CANCELADA },
+            { salinas, "29874561", hoy, "12:00", "13:00", "Corona provisional", EstadoCita.PENDIENTE },
+            { rios, "71592846", hoy, "08:30", "09:30", "Primera visita", EstadoCita.ATENDIDA },
+            { rios, "71592846", hoy, "10:30", "11:00", "Sellantes", EstadoCita.PENDIENTE },
+            { salinas, "45812307", manana, "10:00", "10:30", "Control", EstadoCita.PENDIENTE },
+            { rios, "76104352", manana, "15:00", "15:30", "Evaluación", EstadoCita.CONFIRMADA },
+        };
+        for (Object[] datos : citas) {
+            pacienteDAO.buscarPorDni((String) datos[1]).ifPresent(paciente -> citaDAO.crear(new Cita(0, paciente,
+                    (Profesional) datos[0], (LocalDate) datos[2], LocalTime.parse((String) datos[3]),
+                    LocalTime.parse((String) datos[4]), (String) datos[5], (EstadoCita) datos[6])));
         }
     }
 

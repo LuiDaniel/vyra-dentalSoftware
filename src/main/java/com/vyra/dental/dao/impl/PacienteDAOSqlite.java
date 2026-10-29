@@ -13,6 +13,7 @@ import java.util.Optional;
 import com.vyra.dental.dao.PacienteDAO;
 import com.vyra.dental.model.FiltroPaciente;
 import com.vyra.dental.model.Paciente;
+import com.vyra.dental.util.Busqueda;
 import com.vyra.dental.util.ConexionBD;
 
 /**
@@ -23,10 +24,11 @@ public class PacienteDAOSqlite implements PacienteDAO {
     private static final String COLUMNAS = "id_paciente, nombres, apellidos, dni, fecha_nacimiento, telefono, "
             + "direccion, contacto_emergencia, alergias, antecedentes, activo, fecha_registro";
 
-    // Busqueda de docs/03-modelo-base-datos.md §5.6. El filtro se agrega con un
-    // fragmento fijo de SQL (nunca con texto del usuario)
+    // Busqueda de docs/03-modelo-base-datos.md §5.6, sin distinguir tildes ni mayusculas.
+    // El filtro se agrega con un fragmento fijo de SQL (nunca con texto del usuario)
     private static final String CONDICION_BUSQUEDA = "activo = 1 "
-            + "AND (dni LIKE ? ESCAPE '\\' OR (nombres || ' ' || apellidos) LIKE ? ESCAPE '\\')";
+            + "AND (dni LIKE ? ESCAPE '\\' OR " + Busqueda.sinTildesSql("nombres || ' ' || apellidos")
+            + " LIKE ? ESCAPE '\\')";
 
     @Override
     public Paciente crear(Paciente paciente) {
@@ -147,7 +149,7 @@ public class PacienteDAOSqlite implements PacienteDAO {
 
     /** Parametros 1 y 2 de la busqueda: "%texto%", con % y _ escapados para que se busquen tal cual. */
     private static void escribirTexto(PreparedStatement ps, String texto) throws SQLException {
-        String limpio = texto == null ? "" : texto.strip()
+        String limpio = Busqueda.normalizar(texto)
                 .replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
         String patron = "%" + limpio + "%";
         ps.setString(1, patron);

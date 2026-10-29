@@ -14,6 +14,8 @@ public class Pill extends Label {
     public Pill(String texto, String claseCss) {
         super(texto);
         getStyleClass().addAll("pill", claseCss);
+        // El estado se lee completo: la píldora nunca se recorta con "..."
+        setMinWidth(USE_PREF_SIZE);
     }
 
     public Pill(EstadoCita estado) {

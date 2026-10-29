@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.vyra.dental.ui.Avatar?>
+<?import com.vyra.dental.ui.Aviso?>
+<?import com.vyra.dental.ui.CampoFormulario?>
+<?import com.vyra.dental.ui.Icono?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- Agenda: docs/08-guia-frontend.md §7.3, referencia docs/ui/Citas.html -->
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.vyra.dental.controller.AgendaController"
+      styleClass="pagina,pagina-agenda">
+
+    <!-- Barra: título, navegación por fechas y vista -->
+    <HBox styleClass="agenda-barra">
+        <Label text="Agenda" styleClass="titulo-pagina"/>
+        <HBox styleClass="agenda-navegacion">
+            <Button styleClass="btn-icono-borde,btn-cuadrado-36" onAction="#anterior" accessibleText="Anterior">
+                <graphic><Icono nombre="anterior" tamano="16"/></graphic>
+            </Button>
+            <Button text="Hoy" styleClass="btn-secundario,btn-chico" onAction="#hoy" minWidth="-Infinity"/>
+            <Button styleClass="btn-icono-borde,btn-cuadrado-36" onAction="#siguiente" accessibleText="Siguiente">
+                <graphic><Icono nombre="siguiente" tamano="16"/></graphic>
+            </Button>
+        </HBox>
+        <Label fx:id="tituloFecha" styleClass="agenda-fecha"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <ComboBox fx:id="profesionalSemana" promptText="Profesional" styleClass="combo-chico"/>
+        <HBox fx:id="selectorVista" styleClass="segmentado"/>
+    </HBox>
+
+    <!-- Lunes a sábado de la semana elegida, con su cantidad de citas -->
+    <HBox fx:id="tiraSemana" styleClass="tira-semana"/>
+
+    <HBox styleClass="lista-y-panel" fillHeight="false">
+        <StackPane fx:id="areaVista" styleClass="card,agenda-card" HBox.hgrow="ALWAYS" minWidth="520"/>
+
+        <VBox fx:id="panel" styleClass="panel-form,panel-ficha" prefWidth="380" minWidth="360" maxWidth="400">
+
+            <!-- Modo 1: nueva cita / reprogramar -->
+            <VBox fx:id="panelFormulario">
+                <VBox styleClass="panel-encabezado">
+                    <Label fx:id="tituloFormulario" text="Nueva cita" styleClass="panel-titulo"/>
+                    <Label text="Se valida que el profesional no tenga otra cita a la misma hora."
+                           styleClass="texto-secundario" wrapText="true"/>
+                </VBox>
+                <VBox styleClass="ficha-formulario">
+                    <CampoFormulario fx:id="cfPaciente" etiqueta="Paciente" obligatorio="true">
+                        <StackPane>
+                            <HBox fx:id="buscadorPaciente" styleClass="buscador">
+                                <Icono nombre="buscar" tamano="16"/>
+                                <TextField fx:id="campoPaciente" promptText="Buscar por nombre o DNI" HBox.hgrow="ALWAYS"
+                                           accessibleText="Buscar paciente"/>
+                            </HBox>
+                            <HBox fx:id="tarjetaPaciente" styleClass="tarjeta-paciente">
+                                <Avatar fx:id="avatarPaciente" styleClass="avatar-mini"/>
+                                <VBox HBox.hgrow="ALWAYS">
+                                    <Label fx:id="nombrePaciente" styleClass="celda-titulo"/>
+                                    <Label fx:id="dniPaciente" styleClass="celda-sub"/>
+                                </VBox>
+                                <Button styleClass="btn-icono" onAction="#quitarPaciente" accessibleText="Cambiar paciente">
+                                    <graphic><Icono nombre="cerrar" tamano="16"/></graphic>
+                                </Button>
+                            </HBox>
+                        </StackPane>
+                    </CampoFormulario>
+
+                    <CampoFormulario fx:id="cfProfesional" etiqueta="Profesional" obligatorio="true">
+                        <ComboBox fx:id="campoProfesional" maxWidth="Infinity" promptText="Elige un profesional"/>
+                    </CampoFormulario>
+
+                    <CampoFormulario fx:id="cfFecha" etiqueta="Fecha" obligatorio="true">
+                        <DatePicker fx:id="campoFecha" maxWidth="Infinity" promptText="dd/mm/aaaa"/>
+                    </CampoFormulario>
+                    <GridPane styleClass="rejilla-formulario">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50"/>
+                            <ColumnConstraints percentWidth="50"/>
+                        </columnConstraints>
+                        <CampoFormulario fx:id="cfInicio" etiqueta="Inicio" obligatorio="true" GridPane.columnIndex="0">
+                            <ComboBox fx:id="campoInicio" maxWidth="Infinity" promptText="Hora"/>
+                        </CampoFormulario>
+                        <CampoFormulario fx:id="cfFin" etiqueta="Fin" obligatorio="true" GridPane.columnIndex="1">
+                            <ComboBox fx:id="campoFin" maxWidth="Infinity" promptText="Hora"/>
+                        </CampoFormulario>
+                    </GridPane>
+
+                    <!-- Validación de cruce en vivo (CU-03) -->
+                    <Aviso fx:id="avisoDisponibilidad"/>
+                    <FlowPane fx:id="horariosLibres" styleClass="horarios-libres"/>
+
+                    <CampoFormulario fx:id="cfMotivo" etiqueta="Motivo">
+                        <TextArea fx:id="campoMotivo" promptText="Ej. Dolor en molar inferior derecho" prefRowCount="2" wrapText="true"/>
+                    </CampoFormulario>
+
+                    <VBox fx:id="bloqueEstado" styleClass="campo-formulario">
+                        <Label text="Estado inicial" styleClass="campo-etiqueta"/>
+                        <HBox styleClass="segmentado,segmentado-ancho">
+                            <ToggleButton fx:id="estadoPendiente" text="Pendiente" styleClass="estado-pendiente"
+                                          selected="true" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                            <ToggleButton fx:id="estadoConfirmada" text="Confirmada" styleClass="estado-confirmada"
+                                          HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                        </HBox>
+                    </VBox>
+
+                    <Aviso fx:id="avisoFormulario"/>
+                </VBox>
+                <HBox styleClass="panel-pie">
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="Cancelar" styleClass="btn-secundario" onAction="#cancelarFormulario" minWidth="-Infinity"/>
+                    <Button fx:id="botonAgendar" text="Agendar cita" styleClass="btn-primario" onAction="#guardarCita"
+                            minWidth="-Infinity"/>
+                </HBox>
+            </VBox>
+
+            <!-- Modo 2: detalle de la cita elegida -->
+            <VBox fx:id="panelDetalle">
+                <HBox styleClass="panel-encabezado-fila">
+                    <VBox HBox.hgrow="ALWAYS" styleClass="panel-encabezado-textos">
+                        <Label text="Detalle de la cita" styleClass="panel-titulo"/>
+                        <Label fx:id="detalleFechaHora" styleClass="texto-secundario" wrapText="true"/>
+                    </VBox>
+                    <StackPane fx:id="detalleEstado" minWidth="-Infinity"/>
+                </HBox>
+                <VBox styleClass="ficha-formulario">
+                    <HBox styleClass="tarjeta-paciente">
+                        <Avatar fx:id="detalleAvatar" styleClass="avatar-mini"/>
+                        <VBox HBox.hgrow="ALWAYS">
+                            <Label fx:id="detallePaciente" styleClass="celda-titulo"/>
+                            <Label fx:id="detalleDni" styleClass="celda-sub"/>
+                        </VBox>
+                    </HBox>
+                    <VBox styleClass="detalle-dato">
+                        <Label text="Profesional" styleClass="detalle-etiqueta"/>
+                        <Label fx:id="detalleProfesional" wrapText="true"/>
+                    </VBox>
+                    <VBox styleClass="detalle-dato">
+                        <Label text="Motivo" styleClass="detalle-etiqueta"/>
+                        <Label fx:id="detalleMotivo" wrapText="true"/>
+                    </VBox>
+                    <Aviso fx:id="avisoDetalle"/>
+                    <VBox fx:id="accionesDetalle" styleClass="acciones-detalle"/>
+                </VBox>
+                <HBox fx:id="pieDetalle" styleClass="panel-pie">
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="Nueva cita" styleClass="btn-secundario" onAction="#nuevaCita" minWidth="-Infinity">
+                        <graphic><Icono nombre="mas" tamano="16"/></graphic>
+                    </Button>
+                </HBox>
+            </VBox>
+
+            <!-- Modo 3: nada elegido (odontólogo) -->
+            <VBox fx:id="panelVacio" styleClass="estado-vacio">
+                <Label text="Selecciona una cita" styleClass="card-titulo"/>
+                <Label text="Haz clic en una cita de la agenda para ver su detalle." styleClass="texto-secundario" wrapText="true"/>
+            </VBox>
+        </VBox>
+    </HBox>
+
+    <HBox fx:id="leyenda" styleClass="leyenda"/>
+</VBox>

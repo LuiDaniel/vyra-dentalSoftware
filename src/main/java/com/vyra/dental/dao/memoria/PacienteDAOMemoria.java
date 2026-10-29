@@ -3,13 +3,13 @@ package com.vyra.dental.dao.memoria;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Predicate;
 
 import com.vyra.dental.dao.PacienteDAO;
 import com.vyra.dental.model.FiltroPaciente;
 import com.vyra.dental.model.Paciente;
+import com.vyra.dental.util.Busqueda;
 import com.vyra.dental.util.Validador;
 
 /**
@@ -75,10 +75,10 @@ public class PacienteDAOMemoria implements PacienteDAO {
 
     /** Mismo criterio que PacienteDAOSqlite.buscar(). */
     private Predicate<Paciente> coincide(String texto, FiltroPaciente filtro) {
-        String buscado = texto == null ? "" : texto.strip().toLowerCase(Locale.ROOT);
+        String buscado = Busqueda.normalizar(texto);
         return p -> p.isActivo()
                 && (p.getDni().contains(buscado)
-                    || p.getNombreCompleto().toLowerCase(Locale.ROOT).contains(buscado))
+                    || Busqueda.normalizar(p.getNombreCompleto()).contains(buscado))
                 && switch (filtro) {
                     case TODOS -> true;
                     case CON_ALERGIAS -> p.tieneAlergias();

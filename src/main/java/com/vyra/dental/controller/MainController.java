@@ -18,6 +18,7 @@ import com.vyra.dental.util.Formatos;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -45,6 +46,7 @@ public class MainController {
 
     private final ToggleGroup grupoMenu = new ToggleGroup();
     private final Map<Pantalla, ToggleButton> botonesMenu = new EnumMap<>(Pantalla.class);
+    private final Label contadorAgenda = new Label();
     private Rol rol;
 
     /**
@@ -118,7 +120,7 @@ public class MainController {
         }
     }
 
-    private ToggleButton crearItem(Pantalla pantalla) {
+    private Node crearItem(Pantalla pantalla) {
         ToggleButton item = new ToggleButton(pantalla.getTitulo(), new Icono(pantalla.getIcono(), 18));
         item.getStyleClass().add("nav-item");
         item.setMaxWidth(Double.MAX_VALUE);
@@ -126,7 +128,29 @@ public class MainController {
         item.setToggleGroup(grupoMenu);
         item.setOnAction(e -> navegar(pantalla));
         botonesMenu.put(pantalla, item);
-        return item;
+        if (pantalla != Pantalla.AGENDA) {
+            return item;
+        }
+        // Contador de citas de hoy, encima del ítem y sin capturar los clics
+        contadorAgenda.getStyleClass().add("nav-badge");
+        contadorAgenda.setMouseTransparent(true);
+        StackPane.setAlignment(contadorAgenda, Pos.CENTER_RIGHT);
+        StackPane.setMargin(contadorAgenda, new Insets(0, 12, 0, 0));
+        actualizarContadorAgenda();
+        return new StackPane(item, contadorAgenda);
+    }
+
+    /** Cantidad de citas de hoy (sin las canceladas) junto a "Agenda"; se oculta si es 0. */
+    public void actualizarContadorAgenda() {
+        int citasDeHoy;
+        try {
+            citasDeHoy = Servicios.citas().citasActivasDeHoy();
+        } catch (RuntimeException e) {
+            citasDeHoy = 0;
+        }
+        contadorAgenda.setText(String.valueOf(citasDeHoy));
+        contadorAgenda.setVisible(citasDeHoy > 0);
+        botonesMenu.get(Pantalla.AGENDA).setAccessibleText("Agenda, " + citasDeHoy + " citas hoy");
     }
 
     private Node cargarVista(Pantalla destino, Object parametro) {

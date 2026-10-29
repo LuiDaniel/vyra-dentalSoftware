@@ -68,10 +68,14 @@
             </HBox>
 
             <HBox styleClass="pestanas">
-                <ToggleButton text="Datos" styleClass="pestana" selected="true" focusTraversable="false" mouseTransparent="true"/>
+                <ToggleButton fx:id="pestanaDatos" text="Datos" styleClass="pestana" selected="true"/>
+                <ToggleButton fx:id="pestanaCitas" text="Citas" styleClass="pestana"/>
             </HBox>
 
-            <VBox styleClass="ficha-formulario">
+            <!-- Pestaña Citas: las citas del paciente, de la más reciente a la más antigua -->
+            <VBox fx:id="contenidoCitas" styleClass="ficha-citas"/>
+
+            <VBox fx:id="contenidoDatos" styleClass="ficha-formulario">
                 <Label text="DATOS PERSONALES" styleClass="seccion-titulo"/>
                 <GridPane styleClass="rejilla-formulario">
                     <columnConstraints>

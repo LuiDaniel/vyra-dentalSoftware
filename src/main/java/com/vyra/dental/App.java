@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 
+import com.vyra.dental.dao.impl.CitaDAOSqlite;
 import com.vyra.dental.dao.impl.PacienteDAOSqlite;
+import com.vyra.dental.dao.impl.ProfesionalDAOSqlite;
 import com.vyra.dental.dao.impl.UsuarioDAOSqlite;
 import com.vyra.dental.util.ConexionBD;
 import com.vyra.dental.util.DatosIniciales;
@@ -37,6 +39,7 @@ public class App extends Application {
         DatosIniciales.crearAdminSiNoExiste(new UsuarioDAOSqlite());
         if (DatosIniciales.demoActivada()) {
             DatosIniciales.cargarEjemplos(new PacienteDAOSqlite());
+            DatosIniciales.cargarEjemplosAgenda(new PacienteDAOSqlite(), new ProfesionalDAOSqlite(), new CitaDAOSqlite());
         }
 
         ventana = stage;

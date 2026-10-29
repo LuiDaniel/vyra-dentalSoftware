@@ -55,6 +55,15 @@ class PacienteDAOSqliteTest {
     }
 
     @Test
+    void ignoraTildesYMayusculas() {
+        dao.crear(paciente("Lucía", "Peña Ñahui", "80000071"));
+
+        assertEquals(1, dao.contarActivos("lucia pena", FiltroPaciente.TODOS));
+        assertEquals(1, dao.contarActivos("LUCÍA", FiltroPaciente.TODOS));
+        assertEquals(1, dao.contarActivos("nahui", FiltroPaciente.TODOS));
+    }
+
+    @Test
     void losComodinesDelUsuarioSeBuscanTalCual() {
         dao.crear(paciente("Raro", "Comodin_Test", "80000021"));
         dao.crear(paciente("Raro", "ComodinXTest", "80000022"));
