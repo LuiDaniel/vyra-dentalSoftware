@@ -13,16 +13,15 @@ module com.vyra.dental {
     exports com.vyra.dental;
     exports com.vyra.dental.model;
     exports com.vyra.dental.dao;
-    exports com.vyra.dental.dao.impl;
+    exports com.vyra.dental.dao.memoria;
+    exports com.vyra.dental.service;
     exports com.vyra.dental.util;
     exports com.vyra.dental.demo;
 
     // Java no permite exportar ni abrir un paquete sin clases: descomentar cada línea
     // al crear la primera clase del paquete (ver docs/09-plan-implementacion.md).
-    // Fase 1:
-    // exports com.vyra.dental.dao.memoria;
-    // exports com.vyra.dental.service;
-    // Fase 2 (FXMLLoader crea los controladores y componentes por reflexión):
+    // Fase 2 (UsuarioDAOSqlite; FXMLLoader crea los controladores y componentes por reflexión):
+    // exports com.vyra.dental.dao.impl;
     // opens com.vyra.dental.controller to javafx.fxml;
     // opens com.vyra.dental.ui to javafx.fxml;
     // exports com.vyra.dental.controller;

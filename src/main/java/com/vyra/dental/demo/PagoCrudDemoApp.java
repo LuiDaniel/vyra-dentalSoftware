@@ -3,7 +3,8 @@ package com.vyra.dental.demo;
 import java.util.List;
 
 import com.vyra.dental.dao.PagoDAO;
-import com.vyra.dental.dao.impl.PagoDAOImpl;
+import com.vyra.dental.dao.memoria.PagoDAOMemoria;
+import com.vyra.dental.model.MetodoPago;
 import com.vyra.dental.model.Pago;
 
 import javafx.application.Application;
@@ -14,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -31,14 +33,15 @@ import javafx.stage.Stage;
  */
 public class PagoCrudDemoApp extends Application {
 
-    private final PagoDAO pagoDAO = new PagoDAOImpl();
+    private final PagoDAO pagoDAO = new PagoDAOMemoria();
     private final ObservableList<Pago> datos = FXCollections.observableArrayList();
     private final TableView<Pago> tabla = new TableView<>(datos);
 
     private final TextField campoId = new TextField();
     private final TextField campoMonto = new TextField();
     private final DatePicker campoFecha = new DatePicker();
-    private final TextField campoMetodo = new TextField();
+    private final ComboBox<MetodoPago> campoMetodo =
+            new ComboBox<>(FXCollections.observableArrayList(MetodoPago.values()));
 
     @Override
     public void start(Stage stage) {
@@ -46,7 +49,7 @@ public class PagoCrudDemoApp extends Application {
         campoId.setPromptText("Id (autogenerado)");
         campoMonto.setPromptText("monto (ej. 150.0)");
         campoFecha.setPromptText("AAAA-MM-DD");
-        campoMetodo.setPromptText("metodo de pago (ej. Efectivo)");
+        campoMetodo.setPromptText("método de pago");
 
         tabla.getColumns().addAll(construirColumnas());
         tabla.getSelectionModel().selectedItemProperty().addListener((obs, anterior, seleccionado) -> {
@@ -62,7 +65,7 @@ public class PagoCrudDemoApp extends Application {
         formulario.addRow(0, new Label("Id:"), campoId);
         formulario.addRow(1, new Label("Monto:"), campoMonto);
         formulario.addRow(2, new Label("Fecha de pago:"), campoFecha);
-        formulario.addRow(3, new Label("Metodo de pago:"), campoMetodo);
+        formulario.addRow(3, new Label("Método de pago:"), campoMetodo);
 
         Button botonCrear = new Button("Crear");
         Button botonActualizar = new Button("Actualizar");
@@ -100,7 +103,7 @@ public class PagoCrudDemoApp extends Application {
         TableColumn<Pago, Object> colFecha = new TableColumn<>("Fecha");
         colFecha.setCellValueFactory(new PropertyValueFactory<>("fechaPago"));
 
-        TableColumn<Pago, String> colMetodo = new TableColumn<>("Metodo");
+        TableColumn<Pago, MetodoPago> colMetodo = new TableColumn<>("Método");
         colMetodo.setCellValueFactory(new PropertyValueFactory<>("metodoPago"));
 
         return new TableColumn[] { colId, colMonto, colFecha, colMetodo };
@@ -111,7 +114,7 @@ public class PagoCrudDemoApp extends Application {
             Pago pago = new Pago();
             pago.setMonto(Double.parseDouble(campoMonto.getText()));
             pago.setFechaPago(campoFecha.getValue());
-            pago.setMetodoPago(campoMetodo.getText());
+            pago.setMetodoPago(campoMetodo.getValue());
             pagoDAO.crear(pago);
             limpiarFormulario();
             recargarTabla();
@@ -129,7 +132,7 @@ public class PagoCrudDemoApp extends Application {
         try {
             seleccionado.setMonto(Double.parseDouble(campoMonto.getText()));
             seleccionado.setFechaPago(campoFecha.getValue());
-            seleccionado.setMetodoPago(campoMetodo.getText());
+            seleccionado.setMetodoPago(campoMetodo.getValue());
             pagoDAO.actualizar(seleccionado);
             limpiarFormulario();
             recargarTabla();
@@ -166,7 +169,7 @@ public class PagoCrudDemoApp extends Application {
         campoId.setText(String.valueOf(pago.getIdPago()));
         campoMonto.setText(String.valueOf(pago.getMonto()));
         campoFecha.setValue(pago.getFechaPago());
-        campoMetodo.setText(pago.getMetodoPago());
+        campoMetodo.setValue(pago.getMetodoPago());
     }
 
     private void limpiarFormulario() {
@@ -174,7 +177,7 @@ public class PagoCrudDemoApp extends Application {
         campoId.clear();
         campoMonto.clear();
         campoFecha.setValue(null);
-        campoMetodo.clear();
+        campoMetodo.setValue(null);
     }
 
     private void mostrarAviso(String mensaje) {

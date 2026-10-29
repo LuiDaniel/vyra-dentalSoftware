@@ -3,9 +3,10 @@ package com.vyra.dental.demo;
 import java.util.List;
 
 import com.vyra.dental.dao.UsuarioDAO;
-import com.vyra.dental.dao.impl.UsuarioDAOImpl;
+import com.vyra.dental.dao.memoria.UsuarioDAOMemoria;
 import com.vyra.dental.model.Rol;
 import com.vyra.dental.model.Usuario;
+import com.vyra.dental.util.HashUtil;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -17,6 +18,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -38,13 +40,14 @@ import javafx.stage.Stage;
  */
 public class UsuarioCrudDemoApp extends Application {
 
-    private final UsuarioDAO usuarioDAO = new UsuarioDAOImpl();
+    private final UsuarioDAO usuarioDAO = new UsuarioDAOMemoria();
     private final ObservableList<Usuario> datos = FXCollections.observableArrayList();
     private final TableView<Usuario> tabla = new TableView<>(datos);
 
     private final TextField campoId = new TextField();
     private final TextField campoNombreUsuario = new TextField();
-    private final TextField campoContrasena = new TextField();
+    private final TextField campoNombreCompleto = new TextField();
+    private final PasswordField campoContrasena = new PasswordField();
     private final ComboBox<Rol> campoRol = new ComboBox<>(FXCollections.observableArrayList(Rol.values()));
 
     @Override
@@ -52,7 +55,8 @@ public class UsuarioCrudDemoApp extends Application {
         campoId.setEditable(false);
         campoId.setPromptText("Id (autogenerado)");
         campoNombreUsuario.setPromptText("nombre_usuario");
-        campoContrasena.setPromptText("contrasena (texto plano, se guarda tal cual en esta prueba)");
+        campoNombreCompleto.setPromptText("nombre completo");
+        campoContrasena.setPromptText("contraseña (se guarda con HashUtil)");
         campoRol.setPromptText("rol");
 
         tabla.getColumns().addAll(construirColumnas());
@@ -68,8 +72,9 @@ public class UsuarioCrudDemoApp extends Application {
         formulario.setPadding(new Insets(10));
         formulario.addRow(0, new Label("Id:"), campoId);
         formulario.addRow(1, new Label("Usuario:"), campoNombreUsuario);
-        formulario.addRow(2, new Label("Contrasena:"), campoContrasena);
-        formulario.addRow(3, new Label("Rol:"), campoRol);
+        formulario.addRow(2, new Label("Nombre completo:"), campoNombreCompleto);
+        formulario.addRow(3, new Label("Contraseña:"), campoContrasena);
+        formulario.addRow(4, new Label("Rol:"), campoRol);
 
         Button botonCrear = new Button("Crear");
         Button botonActualizar = new Button("Actualizar");
@@ -90,7 +95,7 @@ public class UsuarioCrudDemoApp extends Application {
         raiz.setBottom(botones);
 
         stage.setTitle("Prueba CRUD - Usuario (ejemplo)");
-        stage.setScene(new Scene(raiz, 640, 480));
+        stage.setScene(new Scene(raiz, 640, 520));
         stage.show();
 
         recargarTabla();
@@ -114,7 +119,8 @@ public class UsuarioCrudDemoApp extends Application {
         try {
             Usuario usuario = new Usuario();
             usuario.setNombreUsuario(campoNombreUsuario.getText());
-            usuario.setContrasenaHash(campoContrasena.getText());
+            usuario.setNombreCompleto(campoNombreCompleto.getText());
+            usuario.setContrasenaHash(hashearSiHayTexto(campoContrasena.getText()));
             usuario.setRol(campoRol.getValue());
             usuarioDAO.crear(usuario);
             limpiarFormulario();
@@ -132,7 +138,11 @@ public class UsuarioCrudDemoApp extends Application {
         }
         try {
             seleccionado.setNombreUsuario(campoNombreUsuario.getText());
-            seleccionado.setContrasenaHash(campoContrasena.getText());
+            seleccionado.setNombreCompleto(campoNombreCompleto.getText());
+            // Contraseña vacía = mantener la actual
+            if (!campoContrasena.getText().isEmpty()) {
+                seleccionado.setContrasenaHash(HashUtil.hashear(campoContrasena.getText()));
+            }
             seleccionado.setRol(campoRol.getValue());
             usuarioDAO.actualizar(seleccionado);
             limpiarFormulario();
@@ -169,7 +179,9 @@ public class UsuarioCrudDemoApp extends Application {
     private void cargarFormulario(Usuario usuario) {
         campoId.setText(String.valueOf(usuario.getIdUsuario()));
         campoNombreUsuario.setText(usuario.getNombreUsuario());
-        campoContrasena.setText(usuario.getContrasenaHash());
+        campoNombreCompleto.setText(usuario.getNombreCompleto());
+        // El hash nunca se muestra: el campo queda vacío para no cambiar la contraseña
+        campoContrasena.clear();
         campoRol.setValue(usuario.getRol());
     }
 
@@ -177,8 +189,14 @@ public class UsuarioCrudDemoApp extends Application {
         tabla.getSelectionModel().clearSelection();
         campoId.clear();
         campoNombreUsuario.clear();
+        campoNombreCompleto.clear();
         campoContrasena.clear();
         campoRol.setValue(null);
+    }
+
+    /** Vacío se deja vacío para que la validación diga que la contraseña es obligatoria. */
+    private String hashearSiHayTexto(String contrasena) {
+        return contrasena.isEmpty() ? "" : HashUtil.hashear(contrasena);
     }
 
     private void mostrarAviso(String mensaje) {

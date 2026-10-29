@@ -1,5 +1,7 @@
 package com.vyra.dental;
 
+import com.vyra.dental.util.ConexionBD;
+
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -10,6 +12,9 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) {
+        // Crea vyra.db y sus tablas (schema.sql) si todavía no existen
+        ConexionBD.obtenerConexion();
+
         StackPane root = new StackPane(new Label("Vyra Dental Software"));
         Scene scene = new Scene(root, 800, 600);
 

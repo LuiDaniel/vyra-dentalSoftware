@@ -144,7 +144,8 @@ classDiagram
 - Los enums tienen un método `getEtiqueta()` con el texto que ve el usuario (`EN_TRATAMIENTO` → "En tratamiento", `YAPE_PLIN` → "Yape / Plin"). La UI nunca muestra `name()` directamente.
 - `EstadoPieza` además tiene `getCodigo()` (`""`, `"C"`, `"O"`, `"X"`, `"T"`) para el odontograma, y `EstadoCita`/`EstadoTratamiento` tienen `getClaseCss()` (`"pill-confirmada"`...). Ver [`08-guia-frontend.md`](./08-guia-frontend.md).
 - `Usuario` **no** calcula hashes. Hoy existe `Usuario.autenticar()` con SHA-256 sin sal; eso se mueve a `util.HashUtil` y a `AuthService` (RN-13).
-- Validaciones nuevas: `Cita` (`@NotNull` en paciente, profesional, fecha, horaInicio, horaFin y estado), `Profesional` (`@NotBlank` en nombres y apellidos, teléfono de 9 dígitos), `Usuario.nombreCompleto` (`@NotBlank`), `Pago.metodoPago` (`@NotNull`), `HistoriaClinicaEntrada.fecha` (`@NotNull`).
+- Validaciones nuevas: `Cita` (`@NotNull` en paciente, profesional, fecha, horaInicio, horaFin y estado), `Profesional` (`@NotBlank` en nombres y apellidos, teléfono de 9 dígitos), `Usuario.nombreCompleto` (`@NotBlank`), `Pago.metodoPago` (`@NotNull`), `HistoriaClinicaEntrada.fecha` (`@NotNull`), `OdontogramaPieza` (`@NotNull` en estado) y número de pieza entre 11 y 48 en `OdontogramaPieza` y `Tratamiento.piezasDentales` (RN-10; el `CHECK` de la BD rechaza además 19, 20, 29...).
+- `Usuario.contrasenaHash` ya no tiene `@Size(min = 4)`: valida un hash, no la contraseña. El largo mínimo de la contraseña lo revisará `UsuarioService`.
 
 ## 2. Acceso a datos (`com.vyra.dental.dao` y `dao.impl`)
 
@@ -322,17 +323,19 @@ El detalle de cada pantalla y de cada componente está en [`08-guia-frontend.md`
 
 ## 5. Diferencias con el código actual (a corregir)
 
+Las filas del modelo (de `Usuario` a `Pago`) quedaron corregidas en la fase 1 del [plan](./09-plan-implementacion.md).
+
 | Clase | Hoy | Debe quedar |
 |---|---|---|
-| `Usuario` | Sin `nombreCompleto` ni `activo`; hashea SHA-256 sin sal dentro del modelo | Agregar campos; mover el hash a `HashUtil` (PBKDF2) |
-| `Profesional` | Sin `idUsuario`, `telefono` ni validaciones | Agregar campos y validaciones |
-| `Paciente` | Sin `antecedentes`, `activo`, `fechaRegistro` | Agregar campos y métodos `getEdad()`, `getIniciales()`, `tieneAlergias()` |
-| `Cita` | Sin validaciones | Agregar `@NotNull` |
-| `HistoriaClinicaEntrada` | Sin `idPaciente`, `idCita` | Agregar |
-| `OdontogramaPieza` | Sin `idRegistro`, `idPaciente`, `observacion` | Agregar |
-| `Tratamiento` | Sin `idCita`, `fecha` | Agregar |
-| `Pago` | Sin `idTratamiento`, `numeroOperacion`; `metodoPago` es `String` | Agregar campos; `metodoPago` pasa a enum `MetodoPago` |
-| DAO | Solo Usuario, Paciente, Tratamiento y Pago, en memoria | Las 8 interfaces de la sección 2, con implementación SQLite |
+| `Usuario` | ✔ Corregido (fase 1) | Agregar campos; mover el hash a `HashUtil` (PBKDF2) |
+| `Profesional` | ✔ Corregido (fase 1) | Agregar campos y validaciones |
+| `Paciente` | ✔ Corregido (fase 1) | Agregar campos y métodos `getEdad()`, `getIniciales()`, `tieneAlergias()` |
+| `Cita` | ✔ Corregido (fase 1) | Agregar `@NotNull` |
+| `HistoriaClinicaEntrada` | ✔ Corregido (fase 1) | Agregar |
+| `OdontogramaPieza` | ✔ Corregido (fase 1) | Agregar |
+| `Tratamiento` | ✔ Corregido (fase 1) | Agregar |
+| `Pago` | ✔ Corregido (fase 1) | Agregar campos; `metodoPago` pasa a enum `MetodoPago` |
+| DAO | Solo Usuario, Paciente, Tratamiento y Pago, en memoria (`dao/memoria/*DAOMemoria`) | Las 8 interfaces de la sección 2, con implementación SQLite |
 | Servicios | No existen | Los de la sección 3 |
 | `demo/*CrudDemoApp` | CRUD de prueba con `Alert` | Se mantienen hasta tener las pantallas reales; luego se borran |
 

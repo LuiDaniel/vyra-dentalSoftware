@@ -1,4 +1,4 @@
-package com.vyra.dental.dao.impl;
+package com.vyra.dental.dao.memoria;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,9 +10,9 @@ import com.vyra.dental.util.Validador;
 
 /**
  * Implementacion en memoria (ArrayList) de PacienteDAO.
- * Solo para pruebas: los datos se pierden al cerrar la aplicacion.
+ * Para las pruebas de los servicios y los demos: los datos se pierden al cerrar la aplicacion.
  */
-public class PacienteDAOImpl implements PacienteDAO {
+public class PacienteDAOMemoria implements PacienteDAO {
 
     private final List<Paciente> pacientes = new ArrayList<>();
     private int siguienteId = 1;

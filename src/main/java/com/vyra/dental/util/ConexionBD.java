@@ -29,12 +29,22 @@ public class ConexionBD {
         try {
             if (conexion == null || conexion.isClosed()) {
                 conexion = DriverManager.getConnection(URL);
+                activarClavesForaneas(conexion);
                 inicializarEsquema(conexion);
             }
         } catch (SQLException e) {
             throw new RuntimeException("No se pudo conectar a la base de datos", e);
         }
         return conexion;
+    }
+
+    /**
+     * SQLite no verifica las claves foraneas si no se activa en cada conexion.
+     */
+    private static void activarClavesForaneas(Connection conexion) throws SQLException {
+        try (Statement statement = conexion.createStatement()) {
+            statement.execute("PRAGMA foreign_keys = ON");
+        }
     }
 
     /**

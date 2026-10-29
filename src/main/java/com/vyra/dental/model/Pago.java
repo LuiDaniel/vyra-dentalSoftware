@@ -2,7 +2,6 @@ package com.vyra.dental.model;
 
 import java.time.LocalDate;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
@@ -15,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Pago {
     private int idPago;
+    private int idTratamiento;
 
     @Positive(message = "El monto debe ser mayor a 0")
     private double monto;
@@ -23,6 +23,9 @@ public class Pago {
     @PastOrPresent(message = "La fecha de pago no puede ser futura")
     private LocalDate fechaPago;
 
-    @NotBlank(message = "El metodo de pago es obligatorio")
-    private String metodoPago;
+    @NotNull(message = "Debes seleccionar un método de pago")
+    private MetodoPago metodoPago;
+
+    /** Opcional: número de operación de Yape/Plin, tarjeta o transferencia. */
+    private String numeroOperacion;
 }

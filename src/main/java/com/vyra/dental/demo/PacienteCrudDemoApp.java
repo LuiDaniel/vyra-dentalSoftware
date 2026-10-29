@@ -1,7 +1,7 @@
 package com.vyra.dental.demo;
 
 import com.vyra.dental.dao.PacienteDAO;
-import com.vyra.dental.dao.impl.PacienteDAOImpl;
+import com.vyra.dental.dao.memoria.PacienteDAOMemoria;
 import com.vyra.dental.model.Paciente;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -20,7 +20,7 @@ import java.util.List;
 
 public class PacienteCrudDemoApp extends Application {
 
-    private final PacienteDAO pacienteDAO = new PacienteDAOImpl();
+    private final PacienteDAO pacienteDAO = new PacienteDAOMemoria();
 
     private final ObservableList<Paciente> datos =
             FXCollections.observableArrayList();

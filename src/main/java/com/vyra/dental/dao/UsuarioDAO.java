@@ -9,7 +9,8 @@ import com.vyra.dental.model.Usuario;
  * Contrato de acceso a datos para Usuario.
  * Cada entidad principal (Paciente, Cita, Tratamiento, ...) debe tener su
  * propio DAO siguiendo este mismo patron: interfaz aqui en dao/,
- * implementacion concreta con JDBC en dao/impl/.
+ * implementacion con JDBC en dao/impl/ (XxxDAOSqlite) y en memoria
+ * en dao/memoria/ (XxxDAOMemoria, para pruebas).
  */
 public interface UsuarioDAO {
     Usuario crear(Usuario usuario);

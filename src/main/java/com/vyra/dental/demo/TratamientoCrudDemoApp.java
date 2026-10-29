@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.vyra.dental.dao.TratamientoDAO;
-import com.vyra.dental.dao.impl.TratamientoDAOImpl;
+import com.vyra.dental.dao.memoria.TratamientoDAOMemoria;
 import com.vyra.dental.model.EstadoTratamiento;
 import com.vyra.dental.model.Tratamiento;
 
@@ -35,7 +35,7 @@ import javafx.stage.Stage;
  */
 public class TratamientoCrudDemoApp extends Application {
 
-    private final TratamientoDAO tratamientoDAO = new TratamientoDAOImpl();
+    private final TratamientoDAO tratamientoDAO = new TratamientoDAOMemoria();
     private final ObservableList<Tratamiento> datos = FXCollections.observableArrayList();
     private final TableView<Tratamiento> tabla = new TableView<>(datos);
 

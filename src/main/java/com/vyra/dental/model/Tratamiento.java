@@ -1,5 +1,6 @@
 package com.vyra.dental.model;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.validation.constraints.Max;
@@ -17,7 +18,10 @@ import lombok.NoArgsConstructor;
 public class Tratamiento {
     private int idTratamiento;
 
-    @NotBlank(message = "La descripcion es obligatoria")
+    /** Cita en la que se realizó; el paciente se obtiene a través de ella. */
+    private int idCita;
+
+    @NotBlank(message = "La descripción es obligatoria")
     private String descripcion;
 
     @Positive(message = "El costo debe ser mayor a 0")
@@ -26,6 +30,9 @@ public class Tratamiento {
     @NotNull(message = "Debes seleccionar un estado")
     private EstadoTratamiento estado;
 
-    private List<@Min(value = 11, message = "Pieza dental invalida (minimo 11)")
-                 @Max(value = 85, message = "Pieza dental invalida (maximo 85)") Integer> piezasDentales;
+    private LocalDate fecha;
+
+    // Notación FDI de piezas permanentes (RN-10); las temporales (51-85) quedan para una versión futura
+    private List<@Min(value = 11, message = "Pieza dental inválida (notación FDI de 11 a 48)")
+                 @Max(value = 48, message = "Pieza dental inválida (notación FDI de 11 a 48)") Integer> piezasDentales;
 }

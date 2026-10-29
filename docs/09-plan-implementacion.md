@@ -5,17 +5,18 @@
 
 Este documento ordena el trabajo de programación en fases cortas. Cada fase deja la aplicación **compilando y ejecutable**, termina con un commit y tiene criterios claros para saber que está lista. Está pensado para seguirse en orden, ya sea a mano o pidiéndole cada fase a Claude Code (ver la sección 4).
 
-## 1. Estado actual del código (2026-10-29)
+## 1. Estado actual del código (2026-10-29, después de la fase 1)
 
 | Parte | Estado |
 |---|---|
 | `pom.xml` | JavaFX 21, SQLite JDBC, Lombok, Hibernate Validator, JUnit 5 + Surefire. Compila con `release 21` (fase 0). |
-| `model/` | 8 clases y 4 enums. Faltan campos respecto a la BD (ver [`04-diagrama-clases.md` §5](./04-diagrama-clases.md#5-diferencias-con-el-código-actual-a-corregir)). |
-| `dao/` | Interfaces de Usuario, Paciente, Tratamiento y Pago, con implementación **en memoria** (`*DAOImpl`). Faltan Cita, Profesional, Historia clínica y Odontograma, y todas las versiones SQLite. |
-| `util/` | `ConexionBD` (abre SQLite y ejecuta `schema.sql`) y `Validador` (Jakarta). |
-| `service/`, `controller/`, `ui/`, `dao/memoria/` | Paquetes creados (solo `package-info.java`, fase 0). |
+| `model/` | 8 clases y 5 enums, alineados con la BD (fase 1). Los enums tienen `getEtiqueta()`; `EstadoPieza` además `getCodigo()` y los estados `getClaseCss()`. |
+| `dao/` | Interfaces de Usuario, Paciente, Tratamiento y Pago, con implementación **en memoria** en `dao/memoria/` (`*DAOMemoria`). Faltan Cita, Profesional, Historia clínica y Odontograma, los métodos nuevos de [`04` §2](./04-diagrama-clases.md#2-acceso-a-datos-comvyradentaldao-y-daoimpl) y todas las versiones SQLite (`dao/impl/` está vacío). |
+| `util/` | `ConexionBD` (abre SQLite, activa claves foráneas y ejecuta `schema.sql`), `Validador` (Jakarta), `HashUtil` (PBKDF2) y `Formatos`. `schema.sql` es el de [`03` §3](./03-modelo-base-datos.md#3-script-sql-sqlite). |
+| `service/` | Solo `ReglaNegocioException` (fase 1). |
+| `controller/`, `ui/` | Paquetes creados (solo `package-info.java`, fase 0). |
 | Vistas FXML, CSS | Carpetas `views/` y `styles/` creadas, vacías. Fuente Inter en `fonts/` (fase 0). |
-| `App.java` | Ventana vacía con una etiqueta. |
+| `App.java` | Abre la BD (crea `vyra.db` y las tablas) y muestra una ventana vacía con una etiqueta. |
 | `demo/` | 4 CRUDs de prueba + lanzador, hechos con código Java (sin FXML). |
 | Diseño | Listo: [`docs/ui/`](./ui) y [`08-guia-frontend.md`](./08-guia-frontend.md). |
 
@@ -59,7 +60,7 @@ Este documento ordena el trabajo de programación en fases cortas. Cada fase dej
 
 1. `styles/vyra.css` con las variables y clases de la [guía §2–4](./08-guia-frontend.md#2-colores-variables-css). Cargar las fuentes en `App`.
 2. Componentes `ui/`: `Icono`, `Avatar`, `Pill`, `Aviso`, `Notificacion`, `CampoFormulario`. Descomentar en `module-info.java` los `opens`/`exports` de `ui` y `controller` al crear sus primeras clases.
-3. `UsuarioDAOSqlite`, `ProfesionalDAOSqlite`, `AuthService`, `Sesion`, `util.DatosIniciales.crearAdminSiNoExiste()`.
+3. `UsuarioDAOSqlite`, `ProfesionalDAOSqlite`, `AuthService`, `Sesion`, `util.DatosIniciales.crearAdminSiNoExiste()`. Descomentar `exports com.vyra.dental.dao.impl` (el paquete queda vacío en la fase 1, al mover los DAO en memoria).
 4. `LoginView.fxml` + `LoginController` ([guía §7.1](./08-guia-frontend.md#71-inicio-de-sesión--loginviewfxml--logincontroller)).
 5. `MainView.fxml` + `MainController` con menú por rol, barra superior y navegación ([guía §6](./08-guia-frontend.md#6-estructura-común-mainviewfxml--maincontroller), [arquitectura §4](./05-arquitectura.md#4-navegación-entre-pantallas)). Enum `Pantalla`. Cada pantalla todavía no hecha muestra un marcador "En construcción".
 6. `App.start()` abre el login.
