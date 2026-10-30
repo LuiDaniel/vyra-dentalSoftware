@@ -1117,6 +1117,8 @@ public class AgendaController implements RecibeParametro {
     }
 
     private void mostrarFormulario() {
+        // Enter agenda la cita, pero solo mientras se ve el formulario (no con el detalle o el panel vacío)
+        botonAgendar.defaultButtonProperty().bind(panelFormulario.visibleProperty());
         mostrarPanel(panelFormulario);
     }
 

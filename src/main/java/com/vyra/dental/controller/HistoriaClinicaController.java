@@ -8,6 +8,7 @@ import java.util.Optional;
 import com.vyra.dental.model.Cita;
 import com.vyra.dental.model.HistoriaClinicaEntrada;
 import com.vyra.dental.model.Paciente;
+import com.vyra.dental.service.ExportacionPdfService;
 import com.vyra.dental.service.HistoriaClinicaService;
 import com.vyra.dental.service.ReglaNegocioException;
 import com.vyra.dental.service.Servicios;
@@ -117,7 +118,15 @@ public class HistoriaClinicaController {
         botonNueva.getStyleClass().addAll("btn-primario", "btn-chico");
         botonNueva.setOnAction(e -> abrirFormulario());
         alternar(botonNueva, puedeEscribir);
-        HBox encabezadoLinea = new HBox(tituloLinea, espacio, botonNueva);
+        Button botonExportar = new Button("Exportar PDF", new Icono("descargar", 16));
+        botonExportar.getStyleClass().addAll("btn-secundario", "btn-chico");
+        botonExportar.setOnAction(e -> {
+            var pdf = Servicios.exportacionPdf();
+            ExportarPdf.ejecutar(botonExportar, ExportacionPdfService.nombreDeArchivo("historia-clinica", paciente),
+                    salida -> pdf.exportarHistoria(paciente, salida));
+        });
+        alternar(botonExportar, Servicios.exportacionPdf().puedeExportar());
+        HBox encabezadoLinea = new HBox(8, tituloLinea, espacio, botonExportar, botonNueva);
         encabezadoLinea.getStyleClass().add("hc-encabezado");
 
         construirFormulario();
@@ -152,6 +161,8 @@ public class HistoriaClinicaController {
         Button guardar = new Button("Guardar entrada");
         guardar.getStyleClass().addAll("btn-primario", "btn-chico");
         guardar.setOnAction(e -> guardarEntrada());
+        // Enter guarda la entrada solo mientras se ve el formulario
+        guardar.defaultButtonProperty().bind(formulario.visibleProperty());
         Region espacio = new Region();
         HBox.setHgrow(espacio, Priority.ALWAYS);
         HBox pie = new HBox(8, espacio, cancelar, guardar);

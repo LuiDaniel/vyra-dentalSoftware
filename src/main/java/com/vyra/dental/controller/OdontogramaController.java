@@ -10,6 +10,7 @@ import com.vyra.dental.model.EstadoPieza;
 import com.vyra.dental.model.FiltroPaciente;
 import com.vyra.dental.model.OdontogramaPieza;
 import com.vyra.dental.model.Paciente;
+import com.vyra.dental.service.ExportacionPdfService;
 import com.vyra.dental.service.OdontogramaService;
 import com.vyra.dental.service.ReglaNegocioException;
 import com.vyra.dental.service.Servicios;
@@ -206,8 +207,12 @@ public class OdontogramaController implements RecibeParametro, ConfirmaSalida {
         });
         Button exportar = new Button("Exportar PDF", new Icono("descargar", 16));
         exportar.getStyleClass().add("btn-secundario");
-        exportar.setDisable(true);
-        exportar.setTooltip(new Tooltip("Disponible en la fase 8"));
+        exportar.setTooltip(new Tooltip("Exporta el estado guardado del odontograma"));
+        exportar.setOnAction(e -> {
+            var pdf = Servicios.exportacionPdf();
+            ExportarPdf.ejecutar(exportar, ExportacionPdfService.nombreDeArchivo("odontograma", paciente),
+                    salida -> pdf.exportarOdontograma(paciente, salida));
+        });
 
         botonGuardar.getStyleClass().add("btn-primario");
         botonGuardar.setOnAction(e -> guardar());

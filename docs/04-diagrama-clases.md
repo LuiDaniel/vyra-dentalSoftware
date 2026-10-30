@@ -366,7 +366,6 @@ Las filas del modelo (de `Usuario` a `Pago`) quedaron corregidas en la fase 1 de
 | `Pago` | ✔ Corregido (fase 1) | Agregar campos; `metodoPago` pasa a enum `MetodoPago` |
 | DAO | Usuario, Profesional, Paciente y Cita completos (SQLite y memoria, fases 2 a 4); Tratamiento y Pago solo en memoria | Las 8 interfaces de la sección 2, con implementación SQLite |
 | Servicios | `AuthService`, `Sesion` (fase 2), `PacienteService` (fase 3), `CitaService` y `ProfesionalService` (fase 4) | Los de la sección 3 |
-| `demo/*CrudDemoApp` | CRUD de prueba con `Alert` | Se mantienen hasta tener las pantallas reales; luego se borran |
 
 ---
 

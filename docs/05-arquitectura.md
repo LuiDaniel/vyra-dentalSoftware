@@ -64,7 +64,6 @@ src/main/java/
     ├── controller/              un controller por pantalla FXML
     ├── ui/                      componentes reutilizables: Icono, Avatar, Pill, PiezaDental...
     ├── util/                    ConexionBD, Validador, HashUtil, DatosIniciales, Formatos
-    └── demo/                    CRUDs de prueba (temporales, se borran al terminar la UI)
 
 src/main/resources/com/vyra/
 ├── schema.sql                   script de tablas (ver 03-modelo-base-datos.md)

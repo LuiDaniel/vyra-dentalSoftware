@@ -56,7 +56,6 @@ public class ReportesController {
     private enum Tipo { CITAS, HISTORIAL, INGRESOS }
 
     @FXML private HBox tipos;
-    @FXML private Button botonExportar;
     @FXML private VBox filtros;
     @FXML private Label mensaje;
     @FXML private VBox resultado;

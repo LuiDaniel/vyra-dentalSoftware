@@ -26,6 +26,7 @@ public final class Servicios {
     private static PagoService pagos;
     private static ReporteService reportes;
     private static UsuarioService usuarios;
+    private static ExportacionPdfService exportacionPdf;
 
     private Servicios() {
     }
@@ -92,6 +93,13 @@ public final class Servicios {
             usuarios = new UsuarioService(new UsuarioDAOSqlite(), new ProfesionalDAOSqlite());
         }
         return usuarios;
+    }
+
+    public static synchronized ExportacionPdfService exportacionPdf() {
+        if (exportacionPdf == null) {
+            exportacionPdf = new ExportacionPdfService(historiaClinica(), odontograma());
+        }
+        return exportacionPdf;
     }
 
     public static synchronized ProfesionalService profesionales() {

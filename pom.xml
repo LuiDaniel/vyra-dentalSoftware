@@ -67,6 +67,13 @@
             <version>5.0.0</version>
         </dependency>
 
+        <!-- Exportación a PDF (historia clínica y odontograma) -->
+        <dependency>
+            <groupId>com.github.librepdf</groupId>
+            <artifactId>openpdf</artifactId>
+            <version>2.0.3</version>
+        </dependency>
+
         <!-- Pruebas unitarias (JUnit 5) -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

@@ -28,7 +28,6 @@
             <HBox styleClass="lista-barra">
                 <Label text="Pagos del periodo" styleClass="card-titulo"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button fx:id="botonExportar" text="Exportar" styleClass="btn-secundario,btn-chico" disable="true"/>
             </HBox>
             <TableView fx:id="tabla"/>
         </VBox>

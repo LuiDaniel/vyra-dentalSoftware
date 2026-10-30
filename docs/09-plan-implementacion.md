@@ -5,7 +5,7 @@
 
 Este documento ordena el trabajo de programación en fases cortas. Cada fase deja la aplicación **compilando y ejecutable**, termina con un commit y tiene criterios claros para saber que está lista. Está pensado para seguirse en orden, ya sea a mano o pidiéndole cada fase a Claude Code (ver la sección 4).
 
-## 1. Estado actual del código (2026-10-29, fase 7 terminada: Inicio, Reportes y Usuarios)
+## 1. Estado actual del código (2026-10-30, fase 8 terminada: PDF, limpieza y empaquetado; falta el manual con capturas reales)
 
 | Parte | Estado |
 |---|---|
@@ -13,12 +13,12 @@ Este documento ordena el trabajo de programación en fases cortas. Cada fase dej
 | `model/` | 8 clases y 5 enums, alineados con la BD (fase 1). Los enums tienen `getEtiqueta()`; `EstadoPieza` además `getCodigo()` y los estados `getClaseCss()`. |
 | `dao/` | Usuario, Profesional, Paciente y Cita completos ([`04` §2](./04-diagrama-clases.md#2-acceso-a-datos-comvyradentaldao-y-daoimpl)), en SQLite (`dao/impl/`) y en memoria (`dao/memoria/`). Historia clínica también (`HistoriaClinicaDAO`, solo `crear`, `buscarPorId` y `listarPorPaciente`: RN-09). Odontograma también (`OdontogramaDAO`: `registrar`, `estadoActual`, `historialPieza`; RN-09). Tratamiento y Pago también, con los métodos nuevos (`listarPorCita`, `listarPorEstado`, `listarPorTratamiento`, `listarPorPeriodo`, `totalPagado`); `TratamientoDAOSqlite` guarda el tratamiento y sus piezas en una transacción. |
 | `util/` | `ConexionBD` (abre SQLite, activa claves foráneas y ejecuta `schema.sql`), `Validador` (Jakarta), `HashUtil` (PBKDF2), `Formatos`, `Busqueda` (sin tildes) y `DatosIniciales` (admin inicial y datos de ejemplo). `schema.sql` es el de [`03` §3](./03-modelo-base-datos.md#3-script-sql-sqlite). |
-| `service/` | `ReglaNegocioException`, `AuthService`, `Sesion`, `PacienteService`, `CitaService`, `ProfesionalService`, `HistoriaClinicaService`, `OdontogramaService`, `TratamientoService`, `PagoService`, `ReporteService`, `UsuarioService` (más los registros `TratamientoResumen` y `PagoDetalle`) y `Servicios` (crea los servicios con sus DAO SQLite). |
+| `service/` | `ReglaNegocioException`, `AuthService`, `Sesion`, `PacienteService`, `CitaService`, `ProfesionalService`, `HistoriaClinicaService`, `OdontogramaService`, `ExportacionPdfService` (OpenPDF), `TratamientoService`, `PagoService`, `ReporteService`, `UsuarioService` (más los registros `TratamientoResumen` y `PagoDetalle`) y `Servicios` (crea los servicios con sus DAO SQLite). |
 | `controller/` | `LoginController`, `MainController` (menú por rol, navegación y contador de citas de hoy), `PacientesController`, `HistoriaClinicaController` (pestaña de la ficha), `OdontogramaController`, `TratamientosController`, `PagosController`, `InicioController`, `ReportesController`, `UsuariosController`, interfaz `ConfirmaSalida`, `ProfesionalesController`, `AgendaController`, enum `Pantalla` e interfaz `RecibeParametro`. |
 | `ui/` | `Icono`, `Avatar`, `Pill`, `PiezaDental`, `Aviso`, `Notificacion`, `CampoFormulario`, `Dialogos` (confirmación) y `EstadoVacio`. |
 | Vistas FXML, CSS | `LoginView`, `MainView`, `PacientesView` (pestañas Datos, Historia clínica, Citas y Pagos), `ProfesionalesView`, `OdontogramaView`, `TratamientosView`, `PagosView`, `InicioView`, `ReportesView`, `UsuariosView`, `AgendaView` (Día, Semana y Lista) y `styles/vyra.css`. Las demás pantallas muestran "En construcción" hasta que exista su FXML. |
 | `App.java` | Carga Inter, abre la BD, crea el admin si no hay usuarios y muestra el login; `mostrarLogin()`/`mostrarPrincipal()` cambian la escena de la ventana. |
-| `demo/` | 4 CRUDs de prueba + lanzador, hechos con código Java (sin FXML). |
+| `Launcher` y `scripts/empaquetar.ps1` | `Launcher` es la clase principal de la app empaquetada (guarda la BD en `%APPDATA%\Vyra`); el script arma la carpeta ejecutable con `jpackage` (el instalador `.exe` requiere WiX 3). |
 | Diseño | Listo: [`docs/ui/`](./ui) y [`08-guia-frontend.md`](./08-guia-frontend.md). |
 
 ## 2. Convenciones
@@ -108,11 +108,11 @@ Este documento ordena el trabajo de programación en fases cortas. Cada fase dej
 **Listo cuando:** Inicio coincide con `docs/ui/Inicio.html` usando datos reales; cada rol ve exactamente lo que dice la matriz.
 
 ### Fase 8 — PDF, limpieza y entrega
-1. Exportación a PDF de la historia clínica y del odontograma (RF-11) con OpenPDF (agregar la dependencia `com.github.librepdf:openpdf`), dentro de un `Task`.
-2. Borrar el paquete `demo/` y su `exports` en `module-info`.
-3. Recorrer la lista de verificación de la [guía §10](./08-guia-frontend.md#10-lista-de-verificación-por-pantalla) en cada pantalla.
-4. Empaquetar con `jpackage` (instalador para Windows).
-5. Completar [`06-manual-usuario.md`](./06-manual-usuario.md) con capturas reales y [`07-memoria-descriptiva.md`](./07-memoria-descriptiva.md).
+1. ✔ *Hecho.* Exportación a PDF de la historia clínica y del odontograma (RF-11) con OpenPDF, dentro de un `Task` (`ExportarPdf` + `ExportacionPdfService`). Los botones "Exportar" de Pagos y Reportes se quitaron: RF-11 solo cubre estos dos documentos.
+2. ✔ *Hecho.* Paquete `demo/` y su `exports` borrados (los datos de ejemplo `-Dvyra.demo=true` siguen existiendo).
+3. ✔ *Hecho (revisión automática).* Recorrer la lista de verificación de la [guía §10](./08-guia-frontend.md#10-lista-de-verificación-por-pantalla) en cada pantalla: sin colores en FXML, estados vacíos en todas las listas y Enter en todos los formularios (se agregó a Agenda e Historia clínica). **Pendiente a mano:** comparar el aspecto con `docs/ui` y probar a 1280×800 viendo la ventana.
+4. ✔ *Hecho (carpeta ejecutable).* `scripts/empaquetar.ps1` genera `target/instalador/Vyra/Vyra.exe` (se comprobó que arranca y crea su BD). El instalador `.exe` con `-Instalador` necesita WiX 3, que no está instalado.
+5. Manual: [`06-manual-usuario.md`](./06-manual-usuario.md) escrito con el contenido real; **faltan las capturas** (marcadas en el texto). La memoria [`07-memoria-descriptiva.md`](./07-memoria-descriptiva.md) sigue pendiente de los datos de los autores y las fechas. Antes: completar [`06-manual-usuario.md`](./06-manual-usuario.md) con capturas reales y [`07-memoria-descriptiva.md`](./07-memoria-descriptiva.md).
 
 ## 4. Cómo trabajar cada fase con Claude Code
 

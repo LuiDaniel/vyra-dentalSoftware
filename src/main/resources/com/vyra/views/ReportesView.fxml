@@ -19,7 +19,6 @@
         </VBox>
         <Region HBox.hgrow="ALWAYS"/>
         <HBox fx:id="tipos" styleClass="segmentado"/>
-        <Button fx:id="botonExportar" text="Exportar PDF" styleClass="btn-secundario" disable="true"/>
     </HBox>
 
     <VBox fx:id="filtros" styleClass="card,reporte-filtros"/>
