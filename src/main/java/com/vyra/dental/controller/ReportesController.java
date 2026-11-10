@@ -27,6 +27,7 @@ import com.vyra.dental.service.Servicios;
 import com.vyra.dental.ui.Aviso;
 import com.vyra.dental.ui.CampoFormulario;
 import com.vyra.dental.ui.EstadoVacio;
+import com.vyra.dental.ui.ExportarPdf;
 import com.vyra.dental.ui.GraficoBarras;
 import com.vyra.dental.ui.Kpi;
 import com.vyra.dental.ui.Pill;
@@ -40,6 +41,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
@@ -97,6 +99,7 @@ public class ReportesController {
 
     @FXML private Label subtitulo;
     @FXML private HBox selectorTipo;
+    @FXML private Button botonPdf;
     @FXML private HBox filtroFechas;
     @FXML private CampoFormulario cfDesde;
     @FXML private DatePicker campoDesde;
@@ -367,6 +370,30 @@ public class ReportesController {
         actualizar();
     }
 
+    // ===== Exportar =====
+
+    /** El reporte que está en pantalla, con los mismos filtros, en PDF. */
+    @FXML
+    private void exportarPdf() {
+        LocalDate desde = campoDesde.getValue();
+        LocalDate hasta = campoHasta.getValue();
+        Profesional elegido = campoProfesional.getValue() == TODOS ? null : campoProfesional.getValue();
+        Paciente delHistorial = paciente;
+        String nombre = switch (tipo) {
+            case CITAS -> Servicios.pdf().nombreArchivo("Reporte de citas", null);
+            case HISTORIAL -> Servicios.pdf().nombreArchivo("Historial", delHistorial.getDni());
+            case INGRESOS -> Servicios.pdf().nombreArchivo("Reporte de ingresos", null);
+        };
+        Tipo exportado = tipo;
+        ExportarPdf.exportar(botonPdf, nombre, salida -> {
+            switch (exportado) {
+                case CITAS -> Servicios.pdf().reporteCitas(desde, hasta, elegido, salida);
+                case HISTORIAL -> Servicios.pdf().reporteHistorial(delHistorial.getIdPaciente(), salida);
+                case INGRESOS -> Servicios.pdf().reporteIngresos(desde, hasta, salida);
+            }
+        }, mensaje -> avisoFiltros.mostrar(Aviso.Tipo.ERROR, mensaje));
+    }
+
     // ===== Reportes =====
 
     private void actualizar() {
@@ -375,6 +402,8 @@ public class ReportesController {
         }
         avisoFiltros.ocultar();
         cfHasta.limpiarError();
+        // Sin paciente elegido no hay historial que exportar
+        botonPdf.setDisable(tipo == Tipo.HISTORIAL && paciente == null);
         try {
             switch (tipo) {
                 case CITAS -> mostrarCitas();
@@ -384,6 +413,7 @@ public class ReportesController {
         } catch (ReglaNegocioException e) {
             kpis.getChildren().clear();
             vaciarTablas();
+            botonPdf.setDisable(true);
             if (e.getCampo().filter(c -> c.equals("hasta") || c.equals("desde")).isPresent()) {
                 cfHasta.mostrarError(e.getMessage());
             } else {

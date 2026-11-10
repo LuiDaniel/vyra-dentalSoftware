@@ -1,17 +1,18 @@
 # Vyra — Memoria Descriptiva
 ### (documento pensado para el eventual registro de derecho de autor en INDECOPI)
 
-**Versión:** 0.2 (secciones 3 a 6 completadas; el resto se completa al finalizar el desarrollo)
-**Fecha:** 2026-10-29
+**Versión:** 1.0 (desarrollo terminado; faltan los datos personales de los autores y del trámite)
+**Fecha:** 2026-11-10
 
-> Nota: este documento reutiliza y resume lo ya definido en `01-requerimientos.md` a `05-arquitectura.md`. Se deja aquí como plantilla para no partir de cero cuando llegue el momento de registrar el software; varias secciones ya se pueden completar ahora, otras solo cuando el sistema esté terminado.
+> Nota: este documento resume lo definido en `01-requerimientos.md` a `05-arquitectura.md`. Lo que queda entre *(paréntesis y cursiva)* lo completan los autores al presentar la solicitud.
 
 ## 1. Datos de la obra
 - **Nombre de la obra:** Vyra
 - **Tipo de obra:** Programa de ordenador (obra literaria, según la clasificación de INDECOPI)
-- **Fecha de creación (inicio del desarrollo):** *(completar)*
-- **Fecha de terminación:** *(completar)*
-- **¿Publicada o inédita?:** *(completar según corresponda al momento del registro)*
+- **Fecha de creación (inicio del desarrollo):** 15 de septiembre de 2026 (primer commit del repositorio)
+- **Fecha de terminación:** 10 de noviembre de 2026 (versión 1.0, fin de la fase 8 del plan de implementación)
+- **Versión:** 1.0
+- **¿Publicada o inédita?:** *(completar según corresponda al momento del registro; mientras solo se use en el curso y en el consultorio de prueba, es inédita)*
 
 ## 2. Autores
 *(Completar con nombre completo y DNI de cada uno de los 4 integrantes — INDECOPI permite y pide listar a todos los coautores reales de la obra, no solo a quien presenta el trámite)*
@@ -38,15 +39,21 @@ El sistema reemplaza el registro manual en papel o en hojas de cálculo: central
 - Registro de tratamientos asociados a citas y piezas dentales, con su costo y estado.
 - Registro de pagos (efectivo, Yape/Plin, tarjeta, transferencia) y cálculo del saldo pendiente.
 - Control de acceso con usuario, contraseña cifrada (PBKDF2) y tres roles: Administrador, Recepción y Odontólogo.
-- Reportes de citas del día y de la semana, historial de un paciente e ingresos por periodo.
-- Exportación a PDF de la historia clínica y del odontograma.
+- Pantalla de inicio con las citas de la próxima hora, indicadores del día y búsqueda rápida de pacientes.
+- Reportes de citas (con porcentaje de asistencia), historial de tratamientos de un paciente e ingresos por periodo y por método de pago.
+- Exportación a PDF de la historia clínica, del odontograma, de los reportes y de los pagos del periodo.
+- Gestión de usuarios: alta, desactivación (sin borrar) y restablecimiento de contraseñas.
 
 ## 5. Tecnologías utilizadas
 - Lenguaje: Java 21
 - Interfaz gráfica: JavaFX 21 (FXML + CSS)
 - Base de datos: SQLite (JDBC, driver xerial)
 - Validación: Jakarta Bean Validation (Hibernate Validator)
+- Generación de PDF: OpenPDF
+- Reducción de código repetitivo en el modelo: Lombok
+- Pruebas automáticas: JUnit 5
 - Gestor de dependencias: Maven
+- Empaquetado para Windows: jpackage (incluye su propio entorno de Java)
 - Control de versiones: Git / GitHub
 
 ## 6. Alcance y funcionalidades no incluidas
@@ -57,14 +64,17 @@ No forman parte de esta versión:
 - Telemedicina o videoconsulta.
 
 ## 7. Código fuente
+Estado del código en la versión 1.0: 104 archivos Java (unas 13 600 líneas) organizados en capas (`model`, `dao`, `service`, `controller`, `ui`, `util`; ver [`05-arquitectura.md`](./05-arquitectura.md)), 13 vistas FXML, una hoja de estilos y 23 archivos de pruebas automáticas.
+
 INDECOPI pide adjuntar el código fuente completo (comprimido en ZIP) junto con la solicitud. Preparar:
 - Exportación completa del repositorio (sin la carpeta `.git` si se prefiere, aunque no es obligatorio quitarla).
-- Verificar que no incluya credenciales ni datos reales de pacientes (usar datos de prueba/ficticios en cualquier base de datos de ejemplo que se adjunte).
+- Verificar que no incluya credenciales ni datos reales de pacientes (usar datos de prueba/ficticios en cualquier base de datos de ejemplo que se adjunte). El repositorio no incluye `vyra.db` (está en `.gitignore`) y los datos de ejemplo del código son ficticios.
+- No incluir la carpeta `target/` (se genera al compilar).
 
 ## 8. Documentación técnica anexa
-- Manual de usuario ([`06-manual-usuario.md`](./06-manual-usuario.md), ya con capturas reales)
+- Manual de usuario ([`06-manual-usuario.md`](./06-manual-usuario.md)), con capturas reales de cada pantalla
 - Este documento de memoria descriptiva
-- Capturas de pantalla de las funcionalidades principales
+- Capturas de pantalla de las funcionalidades principales: carpeta [`docs/manual/`](./manual)
 
 ## 9. Trámite (referencial, verificar montos y requisitos vigentes en la web de INDECOPI antes de pagar)
 - **Entidad:** Dirección de Derecho de Autor (DDA) - INDECOPI
@@ -75,4 +85,4 @@ INDECOPI pide adjuntar el código fuente completo (comprimido en ZIP) junto con 
 
 ---
 
-*A medida que avancen con el código, vuelvan a `06-manual-usuario.md` y a esta memoria para completarlos con capturas y datos reales. Para programar, los documentos de trabajo son [`08-guia-frontend.md`](./08-guia-frontend.md) y [`09-plan-implementacion.md`](./09-plan-implementacion.md).*
+*Pendiente antes de presentar: la tabla de autores (sección 2) y verificar los datos del trámite (sección 9) en la web de INDECOPI.*

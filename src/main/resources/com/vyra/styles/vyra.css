@@ -2485,3 +2485,12 @@
     -fx-spacing: 10px;
     -fx-alignment: center-left;
 }
+
+/* Indicador de "Exportando…" dentro de un botón (ui.ExportarPdf) */
+.progreso-boton {
+    -fx-progress-color: -vy-primario;
+    -fx-pref-width: 16px;
+    -fx-pref-height: 16px;
+    -fx-max-width: 16px;
+    -fx-max-height: 16px;
+}

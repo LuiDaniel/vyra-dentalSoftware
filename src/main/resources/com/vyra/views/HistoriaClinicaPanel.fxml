@@ -41,6 +41,12 @@
     <HBox styleClass="seccion-con-accion">
         <Label text="HISTORIA CLÍNICA" styleClass="seccion-titulo"/>
         <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="botonPdf" text="Exportar PDF" styleClass="btn-secundario,btn-chico" onAction="#exportarPdf"
+                minWidth="-Infinity">
+            <graphic>
+                <Icono nombre="descargar" tamano="16"/>
+            </graphic>
+        </Button>
         <Button fx:id="botonNuevaEntrada" text="Nueva entrada" styleClass="btn-primario,btn-chico"
                 onAction="#nuevaEntrada" minWidth="-Infinity">
             <graphic>

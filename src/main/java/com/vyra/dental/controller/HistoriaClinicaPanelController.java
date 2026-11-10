@@ -18,6 +18,7 @@ import com.vyra.dental.service.Servicios;
 import com.vyra.dental.ui.Aviso;
 import com.vyra.dental.ui.CampoFormulario;
 import com.vyra.dental.ui.EstadoVacio;
+import com.vyra.dental.ui.ExportarPdf;
 import com.vyra.dental.ui.LineaDeTiempo;
 import com.vyra.dental.ui.Notificacion;
 import com.vyra.dental.util.Formatos;
@@ -54,6 +55,7 @@ public class HistoriaClinicaPanelController {
     @FXML private HBox accionesDatos;
     @FXML private Button botonGuardarDatos;
     @FXML private Button botonNuevaEntrada;
+    @FXML private Button botonPdf;
     @FXML private VBox formularioEntrada;
     @FXML private TextField campoFecha;
     @FXML private CampoFormulario cfCita;
@@ -282,6 +284,16 @@ public class HistoriaClinicaPanelController {
                 : "Sin antecedentes registrados");
         alternar(accionesDatos, editable);
         alternar(botonNuevaEntrada, editable);
+        alternar(botonPdf, Servicios.pdf().puedeExportarClinica());
+    }
+
+    /** RF-11: la historia clínica completa del paciente en PDF. */
+    @FXML
+    private void exportarPdf() {
+        int idPaciente = paciente.getIdPaciente();
+        ExportarPdf.exportar(botonPdf, Servicios.pdf().nombreArchivo("Historia clínica", paciente.getDni()),
+                salida -> Servicios.pdf().historiaClinica(idPaciente, salida),
+                mensaje -> avisoDatos.mostrar(Aviso.Tipo.ERROR, mensaje));
     }
 
     private void notificar(String mensaje) {

@@ -22,6 +22,7 @@ import com.vyra.dental.ui.BuscadorPacientes;
 import com.vyra.dental.ui.CampoFormulario;
 import com.vyra.dental.ui.CeldaAlergias;
 import com.vyra.dental.ui.Dialogos;
+import com.vyra.dental.ui.ExportarPdf;
 import com.vyra.dental.ui.LineaDeTiempo;
 import com.vyra.dental.ui.Notificacion;
 import com.vyra.dental.ui.PiezaDental;
@@ -63,6 +64,7 @@ public class OdontogramaController implements RecibeParametro, ConfirmaSalida {
     @FXML private Label detallePaciente;
     @FXML private HBox contenedorAlergia;
     @FXML private Button botonGuardar;
+    @FXML private Button botonPdf;
     @FXML private Aviso avisoGuardar;
     @FXML private Label etiquetaHerramientas;
     @FXML private HBox herramientas;
@@ -432,6 +434,22 @@ public class OdontogramaController implements RecibeParametro, ConfirmaSalida {
         alternar(historialVacio, historial.estaVacia());
     }
 
+    /** RF-11: el odontograma guardado en PDF (los cambios pendientes no se incluyen). */
+    @FXML
+    private void exportarPdf() {
+        if (paciente == null) {
+            return;
+        }
+        if (!pendientes.isEmpty()) {
+            avisoGuardar.mostrar(Aviso.Tipo.INFO, "El PDF incluye solo los cambios guardados. "
+                    + "Guarda los pendientes si quieres que aparezcan.");
+        }
+        int idPaciente = paciente.getIdPaciente();
+        ExportarPdf.exportar(botonPdf, Servicios.pdf().nombreArchivo("Odontograma", paciente.getDni()),
+                salida -> Servicios.pdf().odontograma(idPaciente, salida),
+                mensaje -> avisoGuardar.mostrar(Aviso.Tipo.ERROR, mensaje));
+    }
+
     /** Abre Tratamientos con el formulario dirigido a este paciente y esta pieza (CU-06). */
     @FXML
     private void registrarTratamiento() {
@@ -477,6 +495,7 @@ public class OdontogramaController implements RecibeParametro, ConfirmaSalida {
     /** El administrador ve el odontograma, pero no puede cambiarlo. */
     private void aplicarPermisos() {
         etiquetaHerramientas.setText(editable ? "Marcar como:" : "Estados:");
+        alternar(botonPdf, Servicios.pdf().puedeExportarClinica());
         alternar(botonGuardar, editable);
     }
 

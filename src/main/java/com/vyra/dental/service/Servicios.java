@@ -26,6 +26,7 @@ public final class Servicios {
     private static PagoService pagos;
     private static UsuarioService usuarios;
     private static ReporteService reportes;
+    private static PdfService pdf;
 
     private Servicios() {
     }
@@ -100,5 +101,13 @@ public final class Servicios {
             reportes = new ReporteService(new CitaDAOSqlite(), new PagoDAOSqlite(), new TratamientoDAOSqlite());
         }
         return reportes;
+    }
+
+    public static synchronized PdfService pdf() {
+        if (pdf == null) {
+            pdf = new PdfService(new PacienteDAOSqlite(), new ProfesionalDAOSqlite(), historiaClinica(), odontograma(),
+                    reportes(), pagos());
+        }
+        return pdf;
     }
 }

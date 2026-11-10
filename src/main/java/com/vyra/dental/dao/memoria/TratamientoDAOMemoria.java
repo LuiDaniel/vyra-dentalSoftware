@@ -19,14 +19,14 @@ import com.vyra.dental.util.Validador;
 
 /**
  * Implementacion en memoria (ArrayList) de TratamientoDAO.
- * Para las pruebas de los servicios y los demos: los datos se pierden al cerrar la aplicacion.
+ * Para las pruebas de los servicios: los datos se pierden al terminar.
  * Guarda copias, como haria una base de datos. Para los resumenes (paciente y
  * lo pagado) necesita los DAO de citas y pagos; sin ellos, no devuelve resumenes.
  */
 public class TratamientoDAOMemoria implements TratamientoDAO {
 
     private static final Comparator<Tratamiento> MAS_RECIENTE_PRIMERO =
-            // El demo puede crear tratamientos sin fecha
+            // Un tratamiento sin fecha (solo en pruebas) no rompe el orden
             Comparator.comparing(Tratamiento::getFecha, Comparator.nullsFirst(Comparator.<LocalDate>naturalOrder()))
                     .thenComparingInt(Tratamiento::getIdTratamiento).reversed();
 

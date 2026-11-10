@@ -5,7 +5,7 @@
 
 Este documento ordena el trabajo de programación en fases cortas. Cada fase deja la aplicación **compilando y ejecutable**, termina con un commit y tiene criterios claros para saber que está lista. Está pensado para seguirse en orden, ya sea a mano o pidiéndole cada fase a Claude Code (ver la sección 4).
 
-## 1. Estado actual del código (2026-11-10, después de la fase 7)
+## 1. Estado actual del código (2026-11-10, después de la fase 8: versión 1.0)
 
 | Parte | Estado |
 |---|---|
@@ -13,12 +13,12 @@ Este documento ordena el trabajo de programación en fases cortas. Cada fase dej
 | `model/` | 8 clases y 5 enums, alineados con la BD (fase 1). Los enums tienen `getEtiqueta()`; `EstadoPieza` además `getCodigo()` y los estados `getClaseCss()`. `HistoriaClinicaEntrada` y `OdontogramaPieza` guardan además `idProfesional` (fase 5). `TratamientoResumen` y `PagoResumen` son clases de lectura para las listas (fase 6). |
 | `dao/` | Las 8 interfaces completas ([`04` §2](./04-diagrama-clases.md#2-acceso-a-datos-comvyradentaldao-y-daoimpl)), en SQLite (`dao/impl/`) y en memoria (`dao/memoria/`). |
 | `util/` | `ConexionBD` (abre SQLite, activa claves foráneas, ejecuta `schema.sql` y agrega las columnas nuevas a una BD vieja), `Validador` (Jakarta), `HashUtil` (PBKDF2), `Formatos`, `Busqueda` (sin tildes) y `DatosIniciales` (admin inicial, datos y usuarios de ejemplo). `schema.sql` es el de [`03` §3](./03-modelo-base-datos.md#3-script-sql-sqlite). |
-| `service/` | `ReglaNegocioException`, `AuthService`, `Sesion`, `PacienteService`, `CitaService`, `ProfesionalService`, `HistoriaClinicaService`, `OdontogramaService`, `TratamientoService`, `PagoService`, `ReporteService`, `UsuarioService` y `Servicios` (crea los servicios con sus DAO SQLite). |
+| `service/` | `ReglaNegocioException`, `AuthService`, `Sesion`, `PacienteService`, `CitaService`, `ProfesionalService`, `HistoriaClinicaService`, `OdontogramaService`, `TratamientoService`, `PagoService`, `ReporteService`, `UsuarioService`, `PdfService` y `Servicios` (crea los servicios con sus DAO SQLite). |
 | `controller/` | `LoginController`, `MainController` (menú por rol, navegación, contador de citas de hoy y confirmación al salir con cambios sin guardar), `PacientesController`, `ProfesionalesController`, `AgendaController`, `HistoriaClinicaController`, `HistoriaClinicaPanelController`, `OdontogramaController`, `TratamientosController`, `PagosController`, `InicioController`, `ReportesController`, `UsuariosController`, enum `Pantalla`, interfaces `RecibeParametro` y `ConfirmaSalida` y los parámetros `NuevoTratamiento` y `Solicitud`. Todas las pantallas del menú están hechas. |
-| `ui/` | `Icono`, `Avatar`, `Pill`, `Aviso`, `Notificacion`, `CampoFormulario`, `Dialogos` (confirmación), `EstadoVacio`, `PiezaDental`, `LineaDeTiempo`, `BuscadorPacientes`, `CeldaPaciente`, `CeldaAlergias`, `AvancePago`, `Kpi` y `GraficoBarras`. |
+| `ui/` | `Icono`, `Avatar`, `Pill`, `Aviso`, `Notificacion`, `CampoFormulario`, `Dialogos` (confirmación), `EstadoVacio`, `PiezaDental`, `LineaDeTiempo`, `BuscadorPacientes`, `CeldaPaciente`, `CeldaAlergias`, `AvancePago`, `Kpi`, `GraficoBarras` y `ExportarPdf`. |
 | Vistas FXML, CSS | `LoginView`, `MainView`, `PacientesView` (pestañas Datos, Historia clínica, Citas y Pagos), `ProfesionalesView`, `AgendaView` (Día, Semana y Lista), `HistoriaClinicaView`, `HistoriaClinicaPanel` (incluido en Pacientes y en Historia clínica), `OdontogramaView`, `TratamientosView`, `PagosView`, `InicioView`, `ReportesView`, `UsuariosView` y `styles/vyra.css`. |
 | `App.java` | Carga Inter, abre la BD, crea el admin si no hay usuarios y muestra el login; `mostrarLogin()`/`mostrarPrincipal()` cambian la escena de la ventana. |
-| `demo/` | 4 CRUDs de prueba + lanzador, hechos con código Java (sin FXML). |
+| Empaquetado | `Lanzador` + perfil Maven `instalador` (jpackage): `mvn -Pinstalador package` genera `target/instalador/Vyra/Vyra.exe`. El paquete `demo/` se borró en la fase 8. |
 | Diseño | Listo: [`docs/ui/`](./ui) y [`08-guia-frontend.md`](./08-guia-frontend.md). |
 
 ## 2. Convenciones
@@ -119,6 +119,15 @@ Este documento ordena el trabajo de programación en fases cortas. Cada fase dej
 3. Recorrer la lista de verificación de la [guía §10](./08-guia-frontend.md#10-lista-de-verificación-por-pantalla) en cada pantalla.
 4. Empaquetar con `jpackage` (instalador para Windows).
 5. Completar [`06-manual-usuario.md`](./06-manual-usuario.md) con capturas reales y [`07-memoria-descriptiva.md`](./07-memoria-descriptiva.md).
+
+*Hecho (2026-11-10):*
+1. PDF de historia clínica, odontograma, los tres reportes y los pagos del periodo (`PdfService`, `ui.ExportarPdf`), con pruebas que leen el texto generado.
+2. `demo/` borrado.
+3. Lista de la guía §10 revisada en todas las pantallas, a 1280×800 y a 1920×1040, con los tres roles.
+4. `jpackage` genera la versión portable; el `.msi` necesita WiX Toolset 3, que no estaba instalado.
+5. Manual con 13 capturas reales en `docs/manual/` y memoria completada salvo los datos de los autores.
+
+Además: en la versión instalada la base va en `%LOCALAPPDATA%\Vyra\vyra.db`.
 
 ## 4. Cómo trabajar cada fase con Claude Code
 

@@ -265,7 +265,7 @@ Cada pantalla indica: archivo FXML, controlador, requerimientos que cubre, roles
   - Alergias y antecedentes se guardan con un botón secundario propio ("Guardar alergias y antecedentes"), que solo se habilita si cambiaron. Al guardar desde la ficha de Pacientes, la pestaña Datos y la lista se actualizan.
   - En "Nueva entrada", la fecha es la de hoy (la pone el servicio) y el combo Cita ofrece las citas de hoy del paciente que no están canceladas (las del odontólogo, si es odontólogo) más "Sin cita"; por defecto elige la primera. Hay que escribir el diagnóstico o las observaciones. Enter en el diagnóstico guarda.
   - Cada entrada guarda el profesional de la sesión (`id_profesional`); la línea de tiempo muestra "16 oct 2026 · Marco Salinas Vega". Si no hay diagnóstico, las observaciones van como título.
-  - "Exportar PDF" se agrega en la fase 8.
+  - "Exportar PDF" (fase 8): botón secundario junto a "Nueva entrada", para Administrador y Odontólogo.
 
 ### 7.6 Odontograma — `OdontogramaView.fxml` / `OdontogramaController`
 **Referencia:** `docs/ui/Odontograma.html` (y la versión interactiva del lienzo) · **Cubre:** RF-05, CU-05, RF-11 · **Roles:** Odontólogo (completo); Admin (lectura)
@@ -291,7 +291,7 @@ Cada pantalla indica: archivo FXML, controlador, requerimientos que cubre, roles
   - Al cambiar de pantalla o cerrar sesión con cambios pendientes, `MainController` pregunta (interfaz `controller.ConfirmaSalida`); en el diálogo, Enter cancela.
   - El administrador ve la barra como leyenda con los conteos, sin botón Guardar ni campo de observación.
   - Para que las 16 piezas de cada fila entren a 1280 px sin desplazamiento horizontal, la separación entre piezas es de 2 px. Si la ayuda de la barra no entra, se parte en dos líneas.
-  - "Exportar PDF" se agrega en la fase 8. "Registrar tratamiento para esta pieza" (solo el odontólogo) abre Tratamientos con el formulario nuevo, la pieza escrita y la cita de hoy del paciente elegida (parámetro `controller.NuevoTratamiento`).
+  - "Exportar PDF" (fase 8) va en la tarjeta del paciente y exporta el odontograma guardado: si hay cambios pendientes, un aviso lo dice. El PDF tiene la arcada con el color y la letra de cada pieza, las piezas con hallazgos y el historial completo. "Registrar tratamiento para esta pieza" (solo el odontólogo) abre Tratamientos con el formulario nuevo, la pieza escrita y la cita de hoy del paciente elegida (parámetro `controller.NuevoTratamiento`).
 
 ### 7.7 Tratamientos — `TratamientosView.fxml` / `TratamientosController`
 **Referencia:** no tiene pantalla propia; seguir el patrón de `docs/ui/Pagos.html` (tabla + panel) · **Cubre:** RF-06, CU-06 · **Roles:** Odontólogo (completo); Admin y Recepción (lectura)
@@ -322,7 +322,7 @@ Cada pantalla indica: archivo FXML, controlador, requerimientos que cubre, roles
 - *Implementación (fase 6):*
   - El periodo "Semana" va de lunes a domingo y el mes es el calendario. El % compara con el periodo anterior completo (ayer, la semana pasada, el mes pasado); si ese no tuvo cobros, se indica en lugar del %.
   - "Saldo pendiente" suma lo que deben todos los tratamientos (también los finalizados que no se pagaron completos) y dice en cuántos.
-  - La tabla muestra los pagos del periodo elegido (no solo los recientes). El botón "Exportar" se agrega en la fase 8, con los PDF.
+  - La tabla muestra los pagos del periodo elegido (no solo los recientes). El botón "Exportar" (fase 8) guarda en PDF los pagos del periodo elegido.
   - Tratamiento: el buscador sugiere, al entrar o al escribir, los tratamientos que todavía deben algo ("Endodoncia pieza 36 · María Quispe Huamán · Saldo S/ 400.00"). "Cambiar" suelta el elegido. Desde Tratamientos o desde la pestaña Pagos de la ficha del paciente se llega con el tratamiento ya elegido.
   - El monto acepta "200", "200.50" o "1,250.00". Mientras se escribe, el pie muestra el saldo que quedará (en rojo si supera el saldo). Tras registrar, si el tratamiento ya no debe nada se suelta.
   - Colores de los métodos en la barra apilada: Efectivo `-vy-primario`, Yape / Plin `-vy-acento`, Tarjeta `-vy-celeste` (`#7DD3FC`), Transferencia `-vy-borde-campo`. Las píldoras usan `MetodoPago.getClaseCss()`.
@@ -341,7 +341,7 @@ Cada pantalla indica: archivo FXML, controlador, requerimientos que cubre, roles
   - Citas: KPI Citas, Atendidas, Canceladas y Asistencia. La asistencia es atendidas ÷ (atendidas + pendientes o confirmadas de días pasados); las canceladas y las futuras no cuentan. Si no hay nada que medir, se muestra "—".
   - Historial: KPI Tratamientos, Costo total, Pagado y Saldo, y tabla con fecha, tratamiento, piezas, costo, pagado, saldo y estado.
   - Ingresos: KPI Total, Pagos y Promedio por pago, tabla por método (pagos, total, %) y barras por día (por mes si el periodo pasa de 31 días). Con más de 12 barras el gráfico se compacta y el rango va en el título.
-  - "Exportar PDF" (y el "Exportar" de Pagos) se agregan en la fase 8, junto con el PDF de historia clínica y odontograma.
+  - "Exportar PDF" (fase 8, junto al selector de tipo) exporta el reporte que está en pantalla con los mismos filtros; sin paciente elegido, el del historial queda deshabilitado.
 
 ### 7.10 Profesionales — `ProfesionalesView.fxml` / `ProfesionalesController`
 **Cubre:** RF-07, CU-07 · **Roles:** Admin. Patrón lista + panel: tabla (avatar, nombre, especialidad, teléfono, horario, usuario asociado) y formulario (nombres*, apellidos*, especialidad, teléfono, horario de atención, `ComboBox` de usuario con rol Odontólogo).
@@ -362,6 +362,7 @@ Cada pantalla indica: archivo FXML, controlador, requerimientos que cubre, roles
 | `BuscadorPacientes` | Tarjeta con buscador (300 ms de espera) y tabla de pacientes; el controlador le pasa cómo buscar con `configurar()` | Historia clínica y Odontograma abiertos desde el menú |
 | `CeldaPaciente`, `CeldaAlergias` | Celdas de tabla: avatar + nombre + DNI (`CeldaPaciente<S>` sirve para cualquier tipo de fila que traiga al paciente), y píldora de alergia (`CeldaAlergias.pillAlergia()`) | Pacientes, `BuscadorPacientes`, Odontograma, Tratamientos |
 | `AvancePago` | Barra de lo pagado + "S/ 250.00 de S/ 650.00"; `mostrar(pagado, costo)` | Tratamientos, pestaña Pagos de la ficha |
+| `ExportarPdf` | `exportar(boton, nombreSugerido, generar, alFallar)`: pide dónde guardar, genera el PDF en un `Task` (el botón muestra "Exportando…") y lo abre con el visor del sistema (`App.abrirArchivo`) | Historia clínica, Odontograma, Reportes, Pagos |
 | `Kpi` | Tarjeta de indicador: título con ícono, cifra y detalle; `mostrar(cifra, detalle, tendencia)` pinta el detalle en verde o rojo | Inicio, Reportes |
 | `GraficoBarras` | Barras verticales con `Region` de alto proporcional; `mostrar(etiquetas, valores, textos, resaltada)`. Con más de 12 barras se compacta (`.grafico-denso`) | Inicio, Reportes |
 | `Aviso` | `HBox` con ícono y texto; tipos INFO, EXITO, ADVERTENCIA, ERROR | Formularios, Inicio |

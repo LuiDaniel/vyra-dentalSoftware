@@ -3,6 +3,7 @@ package com.vyra.dental;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.nio.file.Path;
 
 import com.vyra.dental.dao.impl.CitaDAOSqlite;
 import com.vyra.dental.dao.impl.HistoriaClinicaDAOSqlite;
@@ -34,9 +35,12 @@ public class App extends Application {
     private static final String[] FUENTES = { "Inter-Regular", "Inter-Medium", "Inter-SemiBold", "Inter-Bold" };
 
     private static Stage ventana;
+    /** La aplicación en marcha, para abrir archivos con los programas del sistema. */
+    private static App instancia;
 
     @Override
     public void start(Stage stage) {
+        instancia = this;
         cargarFuentes();
         // Crea vyra.db y sus tablas (schema.sql) si todavía no existen
         ConexionBD.obtenerConexion();
@@ -77,6 +81,13 @@ public class App extends Application {
         ventana.setMinHeight(Math.min(800, areaPantalla().getHeight()));
         ventana.setTitle("Vyra");
         ventana.setMaximized(true);
+    }
+
+    /** Abre el archivo con el programa predeterminado del sistema (el visor de PDF, por ejemplo). */
+    public static void abrirArchivo(Path archivo) {
+        if (instancia != null) {
+            instancia.getHostServices().showDocument(archivo.toUri().toString());
+        }
     }
 
     public static Stage getVentana() {

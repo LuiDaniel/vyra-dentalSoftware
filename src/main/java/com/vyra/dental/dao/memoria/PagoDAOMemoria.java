@@ -17,7 +17,7 @@ import com.vyra.dental.util.Validador;
 
 /**
  * Implementacion en memoria (ArrayList) de PagoDAO.
- * Para las pruebas de los servicios y los demos: los datos se pierden al cerrar la aplicacion.
+ * Para las pruebas de los servicios: los datos se pierden al terminar.
  * Guarda copias, como haria una base de datos. No arma resumenes (no conoce
  * los tratamientos ni los pacientes): resumenesEntre devuelve una lista vacía.
  */

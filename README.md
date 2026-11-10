@@ -11,7 +11,7 @@ Toda la documentación del proyecto vive en la carpeta [`docs/`](./docs), en ord
 3. [Modelo de base de datos](./docs/03-modelo-base-datos.md): diagrama entidad-relación, diccionario de datos, script SQL y consultas clave.
 4. [Diagrama de clases](./docs/04-diagrama-clases.md): modelo, DAO y servicios.
 5. [Arquitectura](./docs/05-arquitectura.md): capas, paquetes, navegación, sesión y cómo ejecutar.
-6. [Manual de usuario](./docs/06-manual-usuario.md) *(plantilla; se completa al final)*.
+6. [Manual de usuario](./docs/06-manual-usuario.md): uso de cada pantalla, con capturas.
 7. [Memoria descriptiva](./docs/07-memoria-descriptiva.md) *(para el registro en INDECOPI)*.
 8. [Guía de frontend](./docs/08-guia-frontend.md): colores, tipografía, íconos y especificación de cada pantalla.
 9. [Plan de implementación](./docs/09-plan-implementacion.md): fases de programación con criterios de aceptación.
@@ -21,10 +21,13 @@ Toda la documentación del proyecto vive en la carpeta [`docs/`](./docs), en ord
 ## Cómo ejecutar
 
 ```bash
-mvn javafx:run
+mvn javafx:run                       # la app
+mvn javafx:run -Dvyra.demo=true      # con pacientes, citas y pagos de ejemplo
+mvn test                             # pruebas
+mvn -Pinstalador package             # versión para Windows en target/instalador/Vyra
 ```
 
-Requiere JDK 21 y Maven. La base de datos `vyra.db` se crea sola la primera vez.
+Requiere JDK 21 y Maven. La base de datos `vyra.db` se crea sola la primera vez (en la versión instalada, en `%LOCALAPPDATA%\Vyra`). Primer ingreso: `admin` / `admin123`; con la demo también `msalinas` (odontólogo) y `recepcion`, con la contraseña `demo1234`.
 
 ## Equipo
 
@@ -39,3 +42,5 @@ Requiere JDK 21 y Maven. La base de datos `vyra.db` se crea sola la primera vez.
 - Maven
 - SQLite (base de datos)
 - Lombok y Jakarta Bean Validation
+- OpenPDF (exportación a PDF)
+- JUnit 5 (pruebas) y jpackage (empaquetado)

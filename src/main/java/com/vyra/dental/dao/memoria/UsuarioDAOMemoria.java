@@ -10,7 +10,7 @@ import com.vyra.dental.util.Validador;
 
 /**
  * Implementacion en memoria (ArrayList) de UsuarioDAO.
- * Para las pruebas de los servicios y los demos: los datos se pierden al cerrar la aplicacion.
+ * Para las pruebas de los servicios: los datos se pierden al terminar.
  */
 public class UsuarioDAOMemoria implements UsuarioDAO {
 

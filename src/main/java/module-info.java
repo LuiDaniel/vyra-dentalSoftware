@@ -7,6 +7,9 @@ module com.vyra.dental {
     requires java.prefs;
     requires jakarta.validation;
     requires org.hibernate.validator;
+    // PDF (fase 8): OpenPDF es un módulo automático y usa java.awt.Color para los colores
+    requires com.github.librepdf.openpdf;
+    requires java.desktop;
 
     opens com.vyra.dental to javafx.fxml;
     // javafx.base lee las propiedades (PropertyValueFactory); hibernate lee los campos anotados
@@ -23,5 +26,4 @@ module com.vyra.dental {
     exports com.vyra.dental.controller;
     exports com.vyra.dental.ui;
     exports com.vyra.dental.util;
-    exports com.vyra.dental.demo;
 }

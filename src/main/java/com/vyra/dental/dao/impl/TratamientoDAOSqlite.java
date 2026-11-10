@@ -115,7 +115,7 @@ public class TratamientoDAOSqlite implements TratamientoDAO {
         }
     }
 
-    /** Lo usa el demo; si el tratamiento tiene pagos, la clave foránea lo impide. */
+    /** Convención de los DAO; la aplicación no borra tratamientos. Si tiene pagos, la clave foránea lo impide. */
     @Override
     public boolean eliminar(int idTratamiento) {
         Connection conexion = ConexionBD.obtenerConexion();

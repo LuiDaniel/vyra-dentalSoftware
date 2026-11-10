@@ -54,6 +54,13 @@
         <VBox styleClass="card,lista" HBox.hgrow="ALWAYS" minWidth="460">
             <HBox styleClass="lista-barra">
                 <Label fx:id="tituloTabla" styleClass="card-titulo"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="botonExportar" text="Exportar" styleClass="btn-secundario,btn-chico" onAction="#exportar"
+                        minWidth="-Infinity">
+                    <graphic>
+                        <Icono nombre="descargar" tamano="16"/>
+                    </graphic>
+                </Button>
             </HBox>
             <TableView fx:id="tabla"/>
             <HBox styleClass="lista-pie">

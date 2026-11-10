@@ -20,6 +20,7 @@ import com.vyra.dental.service.Servicios;
 import com.vyra.dental.ui.Aviso;
 import com.vyra.dental.ui.CampoFormulario;
 import com.vyra.dental.ui.EstadoVacio;
+import com.vyra.dental.ui.ExportarPdf;
 import com.vyra.dental.ui.Icono;
 import com.vyra.dental.ui.Notificacion;
 import com.vyra.dental.ui.Pill;
@@ -78,6 +79,7 @@ public class PagosController implements RecibeParametro {
     @FXML private HBox barraMetodos;
     @FXML private FlowPane leyendaMetodos;
     @FXML private Label tituloTabla;
+    @FXML private Button botonExportar;
     @FXML private TableView<PagoResumen> tabla;
     @FXML private Label pie;
 
@@ -275,6 +277,16 @@ public class PagosController implements RecibeParametro {
             case SEMANA -> "la semana pasada";
             case MES -> Formatos.mes(LocalDate.now().minusMonths(1));
         };
+    }
+
+    /** Los pagos del periodo elegido, en PDF. */
+    @FXML
+    private void exportar() {
+        Rango rango = servicio.rango(periodo);
+        String nombre = nombrePeriodo();
+        ExportarPdf.exportar(botonExportar, Servicios.pdf().nombreArchivo("Pagos", rango.desde() + "-" + rango.hasta()),
+                salida -> Servicios.pdf().pagos(rango, nombre, salida),
+                mensaje -> avisoPago.mostrar(Aviso.Tipo.ERROR, mensaje));
     }
 
     // ===== Tabla =====

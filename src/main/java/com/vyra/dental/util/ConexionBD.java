@@ -4,7 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -19,12 +22,31 @@ import java.sql.Statement;
 public class ConexionBD {
 
     // Las pruebas usan -Dvyra.bd.url=jdbc:sqlite::memory: (ver pom.xml) para no tocar vyra.db
-    private static final String URL = System.getProperty("vyra.bd.url", "jdbc:sqlite:vyra.db");
+    private static final String URL = System.getProperty("vyra.bd.url", urlPorDefecto());
     private static final String SCHEMA_RESOURCE = "/com/vyra/schema.sql";
 
     private static Connection conexion;
 
     private ConexionBD() {
+    }
+
+    /**
+     * En desarrollo, vyra.db en la carpeta de ejecución. En la versión
+     * instalada (jpackage define jpackage.app-path), la carpeta del programa
+     * no se puede escribir: la base va en %LOCALAPPDATA%\Vyra\vyra.db.
+     */
+    private static String urlPorDefecto() {
+        if (System.getProperty("jpackage.app-path") == null) {
+            return "jdbc:sqlite:vyra.db";
+        }
+        String base = System.getenv("LOCALAPPDATA");
+        Path carpeta = base != null ? Path.of(base, "Vyra") : Path.of(System.getProperty("user.home"), ".vyra");
+        try {
+            Files.createDirectories(carpeta);
+        } catch (IOException e) {
+            throw new UncheckedIOException("No se pudo crear la carpeta de datos " + carpeta, e);
+        }
+        return "jdbc:sqlite:" + carpeta.resolve("vyra.db");
     }
 
     public static synchronized Connection obtenerConexion() {

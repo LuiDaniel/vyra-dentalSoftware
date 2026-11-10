@@ -250,7 +250,7 @@ classDiagram
     }
 ```
 
-`UsuarioDAO` conserva además `eliminar(int)` porque lo usa el demo de usuarios; la pantalla real desactiva usuarios (RN-14) en lugar de borrarlos.
+Los DAO conservan `eliminar(int)` por la convención de nombres, pero la aplicación no borra usuarios (los desactiva, RN-14) ni tratamientos o pagos.
 
 Reglas para los `DAOSqlite`:
 - Piden la conexión a `ConexionBD.obtenerConexion()` y **no la cierran** (es compartida). Sí cierran sus `PreparedStatement` y `ResultSet` con try-with-resources.
@@ -383,6 +383,7 @@ classDiagram
 - `TratamientoService` y `PagoService` (fase 6) reciben un `Clock` opcional. `TratamientoService` (solo el odontólogo escribe) registra en una cita no cancelada y no futura —la suya, si tiene profesional— con la fecha de la cita, y valida las piezas con la notación FDI (error en el campo `piezasDentales`). `PagoService` (Administrador y Recepción) aplica RN-12: monto mayor a 0 con hasta 2 decimales, fecha no futura (hoy si no se indica), método elegido y monto no mayor al saldo; compara en céntimos para evitar errores de redondeo de `double`. `PagoService.Periodo` (HOY, SEMANA, MES), `Rango` y `SaldoPendiente` son tipos internos del servicio.
 - `TratamientoDAOSqlite` guarda las piezas en `tratamiento_pieza` dentro de la misma transacción que el tratamiento (al crear y al actualizar, que las reemplaza).
 - `ReporteService` y `UsuarioService` (fase 7) son solo para el Administrador. `ReporteService` devuelve tipos internos (`ReporteCitas`, `ReporteHistorial`, `ReporteIngresos`) con los totales calculados en céntimos y acepta periodos de hasta un año (`DIAS_MAXIMOS`). `UsuarioService.crear()` recibe la contraseña en texto plano y guarda `HashUtil.hashear()`. `actualizar()` conserva el hash, y un administrador no puede desactivarse ni quitarse el rol a sí mismo. `Rol` tiene `getClaseCss()` para su píldora.
+- `PdfService` (fase 8) arma los PDF con OpenPDF: `historiaClinica(idPaciente, salida)`, `odontograma(...)`, `reporteCitas(...)`, `reporteHistorial(...)`, `reporteIngresos(...)`, `pagos(rango, periodo, salida)` y `nombreArchivo(tipo, detalle)`. Escribe en un `OutputStream` (las pruebas leen el texto del PDF) y usa los demás servicios, así cada exportación respeta los permisos de su dato: la parte clínica la exportan Administrador y Odontólogo (`puedeExportarClinica()`), los reportes el Administrador y los pagos Administrador y Recepción. Es el único lugar con colores fuera de `vyra.css`, en el formato de OpenPDF.
 - `CitaService.citasProximas(minutos)` (fase 7) arma el aviso de Inicio (RF-12) y `PacienteService.nuevosEntre(desde, hasta)` el "+3 en noviembre".
 - `ProfesionalService` (fase 4) asocia como mucho un usuario con rol Odontólogo por profesional y no elimina a un profesional que tenga citas.
 - Las búsquedas de pacientes ignoran mayúsculas y tildes (`util.Busqueda`): "lucia" encuentra a "Lucía".
@@ -416,7 +417,7 @@ Las filas del modelo (de `Usuario` a `Pago`) quedaron corregidas en la fase 1 de
 | `Pago` | ✔ Corregido (fase 1) | Agregar campos; `metodoPago` pasa a enum `MetodoPago` |
 | DAO | Las 8 interfaces completas, en SQLite y en memoria (fases 2 a 6) | Las 8 interfaces de la sección 2, con implementación SQLite |
 | Servicios | `AuthService`, `Sesion` (fase 2), `PacienteService` (fase 3), `CitaService` y `ProfesionalService` (fase 4), `HistoriaClinicaService` y `OdontogramaService` (fase 5), `TratamientoService` y `PagoService` (fase 6), `ReporteService` y `UsuarioService` (fase 7): todos los de la sección 3 | Los de la sección 3 |
-| `demo/*CrudDemoApp` | CRUD de prueba con `Alert` | Se mantienen hasta tener las pantallas reales; luego se borran |
+| `demo/*CrudDemoApp` | ✔ Borrados en la fase 8 | — |
 
 ---
 

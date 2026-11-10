@@ -55,16 +55,16 @@ flowchart TD
 src/main/java/
 ├── module-info.java
 └── com/vyra/dental/
-    ├── App.java                 punto de entrada: abre LoginView
+    ├── App.java                 aplicación JavaFX: abre LoginView
+    ├── Lanzador.java            main de la versión instalada (jpackage, classpath)
     ├── model/                   Paciente, Cita, Profesional, Tratamiento, Pago, enums...
     ├── dao/                     interfaces: PacienteDAO, CitaDAO...
     │   ├── impl/                implementaciones SQLite: PacienteDAOSqlite...
     │   └── memoria/             implementaciones en memoria (para pruebas)
-    ├── service/                 CitaService, PagoService, AuthService, Sesion, Servicios, ReglaNegocioException...
+    ├── service/                 CitaService, PagoService, PdfService, AuthService, Sesion, Servicios, ReglaNegocioException...
     ├── controller/              un controller por pantalla FXML
     ├── ui/                      componentes reutilizables: Icono, Avatar, Pill, PiezaDental...
-    ├── util/                    ConexionBD, Validador, HashUtil, DatosIniciales, Formatos
-    └── demo/                    CRUDs de prueba (temporales, se borran al terminar la UI)
+    └── util/                    ConexionBD, Validador, HashUtil, DatosIniciales, Formatos, Busqueda
 
 src/main/resources/com/vyra/
 ├── schema.sql                   script de tablas (ver 03-modelo-base-datos.md)
@@ -85,7 +85,7 @@ exports com.vyra.dental.service;
 exports com.vyra.dental.ui;
 ```
 
-Java no permite `exports`/`opens` de un paquete sin clases; por eso estas líneas se fueron activando en `module-info.java` a medida que cada paquete tuvo su primera clase (fases 1 y 2 del [plan](./09-plan-implementacion.md)). `module-info` también requiere `java.prefs` ("Recordar mi usuario" del login).
+Java no permite `exports`/`opens` de un paquete sin clases; por eso estas líneas se fueron activando en `module-info.java` a medida que cada paquete tuvo su primera clase (fases 1 y 2 del [plan](./09-plan-implementacion.md)). `module-info` también requiere `java.prefs` ("Recordar mi usuario" del login), `com.github.librepdf.openpdf` (PDF, fase 8; es un módulo automático) y `java.desktop` (OpenPDF usa `java.awt.Color`).
 
 **Cómo obtiene un controlador sus servicios:** con `service.Servicios` (por ejemplo `Servicios.auth()`), que crea cada servicio una sola vez con sus DAO SQLite. Así los controladores nunca crean ni llaman DAO, y las pruebas crean los servicios directamente con los `DAOMemoria`.
 
@@ -118,10 +118,10 @@ flowchart LR
 
 ## 6. Cómo se conecta a la base de datos
 
-La única clase `util.ConexionBD` abre la conexión JDBC a SQLite (`jdbc:sqlite:vyra.db`, en la carpeta desde donde se ejecuta la app) y la reutiliza en toda la aplicación. Al abrirla:
+La única clase `util.ConexionBD` abre la conexión JDBC a SQLite y la reutiliza en toda la aplicación. En desarrollo usa `jdbc:sqlite:vyra.db`, en la carpeta desde donde se ejecuta la app. En la versión instalada (jpackage define la propiedad `jpackage.app-path`) la carpeta del programa no se puede escribir, y la base va en `%LOCALAPPDATA%\Vyra\vyra.db`. Al abrirla:
 
 1. Ejecuta `PRAGMA foreign_keys = ON;` (SQLite no verifica las claves foráneas si no se activa).
-2. Ejecuta `schema.sql` (crea las tablas si no existen).
+2. Ejecuta `schema.sql` (crea las tablas si no existen) y agrega con `ALTER TABLE` las columnas nuevas que le falten a una base de una fase anterior.
 3. `App` llama luego a `DatosIniciales.crearAdminSiNoExiste(new UsuarioDAOSqlite())`.
 
 La URL se puede cambiar con la propiedad `-Dvyra.bd.url`. Las pruebas (`mvn test`) usan `jdbc:sqlite::memory:` (configurado en el `maven-surefire-plugin` del `pom.xml`), así nunca tocan el `vyra.db` de desarrollo.
@@ -133,7 +133,7 @@ Los DAO nunca abren su propia conexión: así se evitan bloqueos del archivo `.d
 - **Validación en 3 niveles:** el controlador revisa campos vacíos y formato (para dar respuesta inmediata), el modelo tiene anotaciones Jakarta que `Validador` revisa, y el servicio verifica las reglas de negocio (duplicados, cruces, saldo).
 - **Mostrar errores:** junto al campo que falló (borde rojo + texto debajo, con `ui.CampoFormulario`) o en un `Aviso` dentro del formulario. El controlador sabe qué campo falló por `ValidacionException.getErrores()` (Jakarta) y `ReglaNegocioException.getCampo()` (servicio). No usar `Alert` emergentes para errores de validación; solo para confirmar acciones destructivas ("¿Dar de baja a este paciente?").
 - **Éxito:** una notificación breve (toast) en la esquina inferior derecha, que desaparece sola a los 3 segundos.
-- **Hilos:** las operaciones con SQLite son rápidas (RNF-04: menos de 2 s) y pueden ir en el hilo de JavaFX. Solo la exportación a PDF y los reportes de periodos largos se ejecutan en un `javafx.concurrent.Task` para no congelar la ventana.
+- **Hilos:** las operaciones con SQLite son rápidas (RNF-04: menos de 2 s) y pueden ir en el hilo de JavaFX. La exportación a PDF corre en un `javafx.concurrent.Task` (`ui.ExportarPdf`) para no congelar la ventana; los reportes, que en un consultorio tienen pocos cientos de filas, se calculan en el hilo de JavaFX.
 
 ## 8. Cómo se ejecuta
 
@@ -142,9 +142,14 @@ Los DAO nunca abren su propia conexión: así se evitan bloqueos del archivo `.d
 | Ejecutar la app | `mvn javafx:run` |
 | Compilar | `mvn compile` |
 | Ejecutar pruebas | `mvn test` |
+| Ejecutar con datos de ejemplo | `mvn javafx:run -Dvyra.demo=true` |
+| Versión para Windows (carpeta portable) | `mvn -Pinstalador package` → `target/instalador/Vyra/Vyra.exe` |
+| Instalador `.msi` | `mvn -Pinstalador package -Djpackage.tipo=msi` (requiere [WiX Toolset 3](https://wixtoolset.org) en el `PATH`) |
 | Ver el diseño de referencia | Abrir `docs/ui/Inicio.html` en el navegador |
 
 Versión de Java: **21** (JDK 21 + JavaFX 21); el `pom.xml` compila con `release 21`.
+
+**Empaquetado (fase 8):** el perfil `instalador` copia las librerías a `target/paquete` y ejecuta `jpackage`. Las librerías van en el classpath, no en el module path, porque `jlink` no acepta módulos automáticos (SQLite, Hibernate Validator, OpenPDF). Por eso el punto de entrada es `Lanzador`: JavaFX no permite que la clase principal herede de `Application` cuando corre desde el classpath. El runtime se arma con los módulos del JDK listados en el `pom.xml`; `jdk.localedata` es necesario para los meses y días en español. La carpeta resultante pesa unos 140 MB con el JDK de GraalVM. El ícono del programa es el de Java mientras no se agregue un `.ico` (opción `--icon` de jpackage).
 
 ## 9. División de trabajo sugerida para el equipo
 
