@@ -172,6 +172,7 @@ Convenciones de SQLite para todo el proyecto:
 | id_entrada | INTEGER | PK, autoincrement | |
 | id_paciente | INTEGER | FK → PACIENTE, NOT NULL | |
 | id_cita | INTEGER | FK → CITA, NULL permitido | Cita en la que se registró |
+| id_profesional | INTEGER | FK → PROFESIONAL, NULL permitido | Profesional que la registró (fase 5). Null si el usuario no tiene profesional asociado |
 | fecha | TEXT | NOT NULL | |
 | observaciones | TEXT | | |
 | diagnostico | TEXT | | |
@@ -185,6 +186,7 @@ Convenciones de SQLite para todo el proyecto:
 | estado | TEXT | NOT NULL | `SANA`, `CARIADA`, `OBTURADA`, `EXTRAIDA`, `EN_TRATAMIENTO` |
 | fecha_registro | TEXT | NOT NULL | |
 | observacion | TEXT | | Nota del cambio ("Caries oclusal profunda") |
+| id_profesional | INTEGER | FK → PROFESIONAL, NULL permitido | Profesional que registró el cambio (fase 5), para el historial de la pieza |
 
 ### TRATAMIENTO
 | Campo | Tipo | Restricciones | Descripción |
@@ -217,6 +219,8 @@ Convenciones de SQLite para todo el proyecto:
 Este es el contenido que debe tener `src/main/resources/com/vyra/schema.sql`. `ConexionBD` lo ejecuta en cada arranque; como usa `IF NOT EXISTS`, no borra datos.
 
 > **Importante (desarrollo):** `CREATE TABLE IF NOT EXISTS` no agrega columnas nuevas a una tabla que ya existe. Si cambias el esquema, borra el archivo `vyra.db` local (está en `.gitignore`) para que se cree de nuevo. Cuando haya datos reales, los cambios se harán con `ALTER TABLE`.
+
+> **Columnas agregadas después (fase 5):** `id_profesional` de `historia_clinica_entrada` y de `odontograma_pieza`. Para que una `vyra.db` creada en una fase anterior siga funcionando, `ConexionBD.actualizarEsquema()` las agrega con `ALTER TABLE ... ADD COLUMN` si faltan. Las columnas que se agreguen en adelante deben seguir el mismo camino.
 
 > **Importante (claves foráneas):** SQLite no las verifica por defecto. `ConexionBD` debe ejecutar `PRAGMA foreign_keys = ON;` justo después de abrir la conexión.
 
@@ -272,6 +276,7 @@ CREATE TABLE IF NOT EXISTS historia_clinica_entrada (
     id_entrada INTEGER PRIMARY KEY AUTOINCREMENT,
     id_paciente INTEGER NOT NULL REFERENCES paciente(id_paciente),
     id_cita INTEGER REFERENCES cita(id_cita),
+    id_profesional INTEGER REFERENCES profesional(id_profesional),
     fecha TEXT NOT NULL,
     observaciones TEXT,
     diagnostico TEXT
@@ -285,7 +290,8 @@ CREATE TABLE IF NOT EXISTS odontograma_pieza (
     estado TEXT NOT NULL
         CHECK (estado IN ('SANA','CARIADA','OBTURADA','EXTRAIDA','EN_TRATAMIENTO')),
     fecha_registro TEXT NOT NULL,
-    observacion TEXT
+    observacion TEXT,
+    id_profesional INTEGER REFERENCES profesional(id_profesional)
 );
 
 CREATE TABLE IF NOT EXISTS tratamiento (
@@ -329,6 +335,7 @@ CREATE INDEX IF NOT EXISTS idx_pago_fecha ON pago(fecha_pago);
 
 - **Usuario administrador:** no va en `schema.sql` porque la contraseña necesita calcularse con `HashUtil`. La clase `util.DatosIniciales` lo crea al arrancar (`crearAdminSiNoExiste(UsuarioDAO)`) **solo si la tabla `usuario` está vacía**: usuario `admin`, nombre "Administrador", rol `ADMIN`, contraseña inicial `admin123`. Se debe cambiar después del primer ingreso.
 - **Datos de ejemplo (solo desarrollo):** `DatosIniciales.cargarEjemplos()` puede insertar los pacientes, profesionales y citas que aparecen en el diseño ([`docs/ui`](./ui)), para probar las pantallas con datos realistas. Se activa con la propiedad `-Dvyra.demo=true` y nunca en producción.
+  - Desde la fase 5 también crea el odontograma y la historia clínica de María Quispe (como en `docs/ui/Odontograma.html`) y dos usuarios ficticios para probar los otros roles mientras no exista la pantalla Usuarios: `msalinas` (Odontólogo, asociado al profesional Marco Salinas Vega) y `recepcion` (Recepción), ambos con la contraseña `demo1234`.
 
 ## 5. Consultas clave
 

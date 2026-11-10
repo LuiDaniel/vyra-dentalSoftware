@@ -2,13 +2,19 @@ package com.vyra.dental.util;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 import com.vyra.dental.dao.CitaDAO;
+import com.vyra.dental.dao.HistoriaClinicaDAO;
+import com.vyra.dental.dao.OdontogramaDAO;
 import com.vyra.dental.dao.PacienteDAO;
 import com.vyra.dental.dao.ProfesionalDAO;
 import com.vyra.dental.dao.UsuarioDAO;
 import com.vyra.dental.model.Cita;
 import com.vyra.dental.model.EstadoCita;
+import com.vyra.dental.model.EstadoPieza;
+import com.vyra.dental.model.HistoriaClinicaEntrada;
+import com.vyra.dental.model.OdontogramaPieza;
 import com.vyra.dental.model.Paciente;
 import com.vyra.dental.model.Profesional;
 import com.vyra.dental.model.Rol;
@@ -24,6 +30,9 @@ public final class DatosIniciales {
 
     /** Propiedad que activa los datos de ejemplo: {@code mvn javafx:run -Dvyra.demo=true}. */
     public static final String PROPIEDAD_DEMO = "vyra.demo";
+
+    /** Contraseña de los usuarios de ejemplo (solo con la demo activada). */
+    public static final String CONTRASENA_EJEMPLO = "demo1234";
 
     private DatosIniciales() {
     }
@@ -117,6 +126,72 @@ public final class DatosIniciales {
                     (Profesional) datos[0], (LocalDate) datos[2], LocalTime.parse((String) datos[3]),
                     LocalTime.parse((String) datos[4]), (String) datos[5], (EstadoCita) datos[6])));
         }
+    }
+
+    /**
+     * Usuarios ficticios para probar los otros roles mientras no exista la
+     * pantalla Usuarios (fase 7): "msalinas" (Odontólogo, asociado al
+     * profesional Marco Salinas Vega) y "recepcion" (Recepción). Ambos con la
+     * contraseña {@link #CONTRASENA_EJEMPLO}. Cada uno se crea solo si no existe.
+     */
+    public static void cargarUsuariosDeEjemplo(UsuarioDAO usuarioDAO, ProfesionalDAO profesionalDAO) {
+        if (usuarioDAO.buscarPorNombreUsuario("msalinas").isEmpty()) {
+            Usuario odontologo = usuarioDAO.crear(new Usuario(0, "msalinas", "Marco Salinas Vega",
+                    HashUtil.hashear(CONTRASENA_EJEMPLO), Rol.ODONTOLOGO, true));
+            profesionalDAO.listarTodos().stream()
+                    .filter(p -> p.getApellidos().equals("Salinas Vega") && p.getIdUsuario() == null)
+                    .findFirst()
+                    .ifPresent(salinas -> {
+                        salinas.setIdUsuario(odontologo.getIdUsuario());
+                        profesionalDAO.actualizar(salinas);
+                    });
+        }
+        if (usuarioDAO.buscarPorNombreUsuario("recepcion").isEmpty()) {
+            usuarioDAO.crear(new Usuario(0, "recepcion", "Rocío Mendoza Paz",
+                    HashUtil.hashear(CONTRASENA_EJEMPLO), Rol.RECEPCION, true));
+        }
+    }
+
+    /**
+     * Odontograma e historia clínica ficticios de María Quispe, como en
+     * docs/ui/Odontograma.html. Solo si su odontograma todavía está vacío.
+     */
+    public static void cargarEjemplosClinicos(PacienteDAO pacienteDAO, ProfesionalDAO profesionalDAO,
+                                              OdontogramaDAO odontogramaDAO, HistoriaClinicaDAO historiaDAO) {
+        Paciente maria = pacienteDAO.buscarPorDni("72481935").orElse(null);
+        if (maria == null || !odontogramaDAO.estadoActual(maria.getIdPaciente()).isEmpty()) {
+            return;
+        }
+        Integer salinas = profesionalDAO.listarTodos().stream()
+                .filter(p -> p.getApellidos().equals("Salinas Vega"))
+                .map(Profesional::getIdProfesional)
+                .findFirst()
+                .orElse(null);
+        int id = maria.getIdPaciente();
+        LocalDate hoy = LocalDate.now();
+        LocalDate primeraVisita = hoy.minusMonths(8);
+        LocalDate control = hoy.minusMonths(2);
+        LocalDate inicioEndodoncia = hoy.minusDays(25);
+
+        odontogramaDAO.registrarTodos(List.of(
+                new OdontogramaPieza(0, id, 18, EstadoPieza.EXTRAIDA, primeraVisita, "Extraída antes de la primera visita", salinas),
+                new OdontogramaPieza(0, id, 38, EstadoPieza.EXTRAIDA, primeraVisita, null, salinas),
+                new OdontogramaPieza(0, id, 16, EstadoPieza.OBTURADA, primeraVisita, "Resina oclusal", salinas),
+                new OdontogramaPieza(0, id, 26, EstadoPieza.OBTURADA, primeraVisita, null, salinas),
+                new OdontogramaPieza(0, id, 45, EstadoPieza.OBTURADA, primeraVisita, null, salinas),
+                new OdontogramaPieza(0, id, 24, EstadoPieza.CARIADA, control, "Caries interproximal", salinas),
+                new OdontogramaPieza(0, id, 47, EstadoPieza.CARIADA, control, null, salinas),
+                new OdontogramaPieza(0, id, 36, EstadoPieza.CARIADA, control, "Caries profunda", salinas),
+                new OdontogramaPieza(0, id, 36, EstadoPieza.EN_TRATAMIENTO, inicioEndodoncia, "Inicio de endodoncia", salinas)));
+
+        historiaDAO.crear(new HistoriaClinicaEntrada(0, id, null, salinas, primeraVisita,
+                "Paciente refiere sensibilidad al frío. Se realizan obturaciones en 16, 26 y 45.", "Caries múltiples"));
+        historiaDAO.crear(new HistoriaClinicaEntrada(0, id, null, salinas, control,
+                "Dolor espontáneo en 36. Radiografía periapical: caries profunda cercana a la pulpa.",
+                "Caries profunda en pieza 36"));
+        historiaDAO.crear(new HistoriaClinicaEntrada(0, id, null, salinas, inicioEndodoncia,
+                "Se inicia endodoncia de 36: apertura cameral y medicación intraconducto. Control en 3 semanas.",
+                "Pulpitis irreversible en pieza 36"));
     }
 
     private static Paciente paciente(String nombres, String apellidos, String dni, LocalDate nacimiento,

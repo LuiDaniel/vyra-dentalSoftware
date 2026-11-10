@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS historia_clinica_entrada (
     id_entrada INTEGER PRIMARY KEY AUTOINCREMENT,
     id_paciente INTEGER NOT NULL REFERENCES paciente(id_paciente),
     id_cita INTEGER REFERENCES cita(id_cita),
+    id_profesional INTEGER REFERENCES profesional(id_profesional),
     fecha TEXT NOT NULL,
     observaciones TEXT,
     diagnostico TEXT
@@ -68,7 +69,8 @@ CREATE TABLE IF NOT EXISTS odontograma_pieza (
     estado TEXT NOT NULL
         CHECK (estado IN ('SANA','CARIADA','OBTURADA','EXTRAIDA','EN_TRATAMIENTO')),
     fecha_registro TEXT NOT NULL,
-    observacion TEXT
+    observacion TEXT,
+    id_profesional INTEGER REFERENCES profesional(id_profesional)
 );
 
 CREATE TABLE IF NOT EXISTS tratamiento (

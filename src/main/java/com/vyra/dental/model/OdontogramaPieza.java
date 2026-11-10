@@ -30,4 +30,7 @@ public class OdontogramaPieza {
 
     private LocalDate fechaRegistro;
     private String observacion;
+
+    /** Profesional que registró el cambio; null si el usuario no tenía profesional asociado. */
+    private Integer idProfesional;
 }

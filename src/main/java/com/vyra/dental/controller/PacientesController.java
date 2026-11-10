@@ -20,6 +20,8 @@ import com.vyra.dental.service.Sesion;
 import com.vyra.dental.ui.Avatar;
 import com.vyra.dental.ui.Aviso;
 import com.vyra.dental.ui.CampoFormulario;
+import com.vyra.dental.ui.CeldaAlergias;
+import com.vyra.dental.ui.CeldaPaciente;
 import com.vyra.dental.ui.Dialogos;
 import com.vyra.dental.ui.EstadoVacio;
 import com.vyra.dental.ui.Icono;
@@ -55,8 +57,9 @@ import javafx.util.Duration;
 import javafx.util.StringConverter;
 
 /**
- * Lista de pacientes + ficha con la pestaña Datos (docs/08-guia-frontend.md §7.4, CU-01).
- * Administrador y Recepción editan; el odontólogo solo consulta.
+ * Lista de pacientes + ficha con las pestañas Datos, Historia clínica y Citas
+ * (docs/08-guia-frontend.md §7.4, CU-01). Administrador y Recepción editan los
+ * datos; el odontólogo solo los consulta, pero escribe la historia clínica.
  */
 public class PacientesController {
 
@@ -101,9 +104,12 @@ public class PacientesController {
     @FXML private Button botonBaja;
     @FXML private Button botonGuardar;
     @FXML private ToggleButton pestanaDatos;
+    @FXML private ToggleButton pestanaHistoria;
     @FXML private ToggleButton pestanaCitas;
     @FXML private VBox contenidoDatos;
     @FXML private VBox contenidoCitas;
+    @FXML private VBox historia;
+    @FXML private HistoriaClinicaPanelController historiaController;
 
     private final PacienteService servicio = Servicios.pacientes();
     private final CitaService citas = Servicios.citas();
@@ -120,11 +126,14 @@ public class PacientesController {
     /** Paciente abierto en la ficha; null cuando se está registrando uno nuevo. */
     private Paciente seleccionado;
     private boolean editable;
+    /** La recepcionista no ve la historia clínica (docs/02-casos-de-uso.md §3). */
+    private boolean verHistoria;
     private boolean ignorarSeleccion;
 
     @FXML
     private void initialize() {
         editable = servicio.puedeEditar();
+        verHistoria = Pantalla.HISTORIA_CLINICA.permitidaPara(Sesion.get().getUsuario().getRol());
         campos.put("nombres", cfNombres);
         campos.put("apellidos", cfApellidos);
         campos.put("dni", cfDni);
@@ -321,6 +330,7 @@ public class PacientesController {
         tituloFicha.setText("Nuevo paciente");
         subtituloFicha.setText("Completa sus datos. Los campos con * son obligatorios.");
         botonGuardar.setText("Registrar paciente");
+        pestanaHistoria.setDisable(true);
         pestanaCitas.setDisable(true);
         pestanaDatos.setSelected(true);
         mostrarPestana();
@@ -349,6 +359,7 @@ public class PacientesController {
         subtituloFicha.setText("DNI " + paciente.getDni() + desde);
         botonGuardar.setText("Guardar cambios");
         alternar(botonBaja, editable);
+        pestanaHistoria.setDisable(false);
         pestanaCitas.setDisable(false);
         mostrarPestana();
     }
@@ -562,7 +573,16 @@ public class PacientesController {
     private void configurarPestanas() {
         ToggleGroup pestanas = new ToggleGroup();
         pestanaDatos.setToggleGroup(pestanas);
+        pestanaHistoria.setToggleGroup(pestanas);
         pestanaCitas.setToggleGroup(pestanas);
+        alternar(pestanaHistoria, verHistoria);
+        // Si el odontólogo cambia las alergias en la historia clínica, la ficha y la lista se actualizan
+        historiaController.setAlActualizarPaciente(paciente -> {
+            seleccionado = paciente;
+            campoAlergias.setText(paciente.getAlergias());
+            campoAntecedentes.setText(paciente.getAntecedentes());
+            cargar();
+        });
         pestanas.selectedToggleProperty().addListener((obs, anterior, nueva) -> {
             if (nueva == null) {
                 anterior.setSelected(true);
@@ -571,14 +591,23 @@ public class PacientesController {
             }
         });
         alternar(contenidoCitas, false);
+        alternar(historia, false);
     }
 
     private void mostrarPestana() {
         boolean datos = pestanaDatos.isSelected();
+        boolean conHistoria = pestanaHistoria.isSelected();
+        boolean conCitas = pestanaCitas.isSelected();
         alternar(contenidoDatos, datos);
         alternar(pie, datos && editable);
-        alternar(contenidoCitas, !datos);
-        if (!datos) {
+        // Guardar es el botón por defecto: en otra pestaña, Enter no debe guardar la ficha
+        botonGuardar.setDisable(!(datos && editable));
+        alternar(historia, conHistoria);
+        alternar(contenidoCitas, conCitas);
+        if (conHistoria && seleccionado != null) {
+            historiaController.mostrar(seleccionado);
+        }
+        if (conCitas) {
             cargarCitasDelPaciente();
         }
     }
@@ -646,55 +675,6 @@ public class PacientesController {
             }
         });
         return columna;
-    }
-
-    /** Avatar + nombre + "DNI 72481935". */
-    private static class CeldaPaciente extends TableCell<Paciente, Paciente> {
-        private final Avatar avatar = new Avatar();
-        private final Label nombre = new Label();
-        private final Label dni = new Label();
-        private final HBox contenido = new HBox(avatar, new VBox(nombre, dni));
-
-        CeldaPaciente() {
-            nombre.getStyleClass().add("celda-titulo");
-            dni.getStyleClass().add("celda-sub");
-            contenido.getStyleClass().add("celda-paciente");
-            setText(null);
-        }
-
-        @Override
-        protected void updateItem(Paciente paciente, boolean vacio) {
-            super.updateItem(paciente, vacio);
-            if (vacio || paciente == null) {
-                setGraphic(null);
-                return;
-            }
-            avatar.mostrar(paciente.getIniciales(), paciente.getIdPaciente());
-            nombre.setText(paciente.getNombreCompleto());
-            dni.setText("DNI " + paciente.getDni());
-            setGraphic(contenido);
-        }
-    }
-
-    /** Píldora naranja con la alergia, o "Ninguna" en gris. */
-    private static class CeldaAlergias extends TableCell<Paciente, Paciente> {
-        @Override
-        protected void updateItem(Paciente paciente, boolean vacio) {
-            super.updateItem(paciente, vacio);
-            setText(null);
-            if (vacio || paciente == null) {
-                setGraphic(null);
-            } else if (paciente.tieneAlergias()) {
-                Label pill = new Label(paciente.getAlergias().lines().findFirst().orElse(""), new Icono("alerta", 12));
-                pill.getStyleClass().addAll("pill", "pill-alergia");
-                pill.setTooltip(new Tooltip(paciente.getAlergias()));
-                setGraphic(pill);
-            } else {
-                Label ninguna = new Label("Ninguna");
-                ninguna.getStyleClass().add("texto-tenue");
-                setGraphic(ninguna);
-            }
-        }
     }
 
     /** Accesos al odontograma y a una nueva cita, según lo que el rol puede ver. */

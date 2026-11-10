@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -165,6 +166,17 @@ public class CitaService {
 
     public List<Cita> citasDePaciente(int idPaciente) {
         return filtrarPorRol(citaDAO.listarPorPaciente(idPaciente));
+    }
+
+    /**
+     * Citas de hoy del paciente que no están canceladas, por hora (la "cita actual"
+     * del odontograma y la historia clínica); el odontólogo solo ve las suyas.
+     */
+    public List<Cita> citasDeHoyDePaciente(int idPaciente) {
+        return citasDePaciente(idPaciente).stream()
+                .filter(c -> c.getFecha().equals(hoy()) && c.getEstado() != EstadoCita.CANCELADA)
+                .sorted(Comparator.comparing(Cita::getHoraInicio))
+                .toList();
     }
 
     public Optional<Cita> buscarPorId(int idCita) {

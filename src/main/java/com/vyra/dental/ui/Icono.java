@@ -25,6 +25,8 @@ public class Icono extends Group {
             Map.entry("agenda", "M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM16 2v4M8 2v4M3 10h18"),
             Map.entry("pacientes", "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M5 7a4 4 0 1 0 8 0a4 4 0 1 0-8 0M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"),
             Map.entry("diente", "M12 5.5C10.5 4 8.5 3 6.5 3.5 3.5 4.3 3 7.5 3.8 10.5c.6 2.2 1.2 4 1.5 6.5.3 2.3.8 4 2 4 1.7 0 1.7-5 4.7-5s3 5 4.7 5c1.2 0 1.7-1.7 2-4 .3-2.5.9-4.3 1.5-6.5.8-3 .3-6.2-2.7-7C15.5 3 13.5 4 12 5.5z"),
+            // X que se dibuja encima de una pieza extraída (odontograma)
+            Map.entry("cruz-pieza", "M6.5 7.5l11 9M17.5 7.5l-11 9"),
             Map.entry("historia", "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8"),
             Map.entry("tratamientos", "M9 2h6a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2M9 12h6M9 16h4"),
             Map.entry("pagos", "M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM2 10h20M6 15h4"),

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.vyra.dental.ui.Aviso?>
+<?import com.vyra.dental.ui.CampoFormulario?>
+<?import com.vyra.dental.ui.Icono?>
+<?import com.vyra.dental.ui.LineaDeTiempo?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<!--
+  Historia clínica de un paciente: docs/08-guia-frontend.md §7.5. Se incluye
+  (fx:include) en la ficha de Pacientes y en la pantalla Historia clínica.
+-->
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.vyra.dental.controller.HistoriaClinicaPanelController"
+      fx:id="raiz" styleClass="ficha-formulario">
+
+    <!-- Datos generales del paciente: el odontólogo los edita aquí (CU-04, paso 3) -->
+    <Label text="INFORMACIÓN CLÍNICA" styleClass="seccion-titulo"/>
+    <CampoFormulario fx:id="cfAlergias" etiqueta="Alergias">
+        <TextArea fx:id="campoAlergias" prefRowCount="2" wrapText="true"/>
+    </CampoFormulario>
+    <CampoFormulario fx:id="cfAntecedentes" etiqueta="Antecedentes">
+        <TextArea fx:id="campoAntecedentes" prefRowCount="3" wrapText="true"/>
+    </CampoFormulario>
+    <Aviso fx:id="avisoDatos"/>
+    <HBox fx:id="accionesDatos" styleClass="acciones-derecha">
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="botonGuardarDatos" text="Guardar alergias y antecedentes" styleClass="btn-secundario,btn-chico"
+                onAction="#guardarDatos" minWidth="-Infinity"/>
+    </HBox>
+
+    <HBox styleClass="seccion-con-accion">
+        <Label text="HISTORIA CLÍNICA" styleClass="seccion-titulo"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="botonNuevaEntrada" text="Nueva entrada" styleClass="btn-primario,btn-chico"
+                onAction="#nuevaEntrada" minWidth="-Infinity">
+            <graphic>
+                <Icono nombre="mas" tamano="16"/>
+            </graphic>
+        </Button>
+    </HBox>
+
+    <!-- Formulario de nueva entrada: se muestra al pulsar "Nueva entrada" -->
+    <VBox fx:id="formularioEntrada" styleClass="entrada-formulario">
+        <Label text="Nueva entrada" styleClass="card-titulo"/>
+        <GridPane styleClass="rejilla-formulario">
+            <columnConstraints>
+                <ColumnConstraints percentWidth="40"/>
+                <ColumnConstraints percentWidth="60"/>
+            </columnConstraints>
+            <CampoFormulario etiqueta="Fecha" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                <TextField fx:id="campoFecha" editable="false" focusTraversable="false"/>
+            </CampoFormulario>
+            <CampoFormulario fx:id="cfCita" etiqueta="Cita" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                <ComboBox fx:id="campoCita" maxWidth="Infinity"/>
+            </CampoFormulario>
+        </GridPane>
+        <CampoFormulario fx:id="cfDiagnostico" etiqueta="Diagnóstico">
+            <TextField fx:id="campoDiagnostico" promptText="Ej. Pulpitis irreversible en pieza 36"/>
+        </CampoFormulario>
+        <CampoFormulario fx:id="cfObservaciones" etiqueta="Observaciones">
+            <TextArea fx:id="campoObservaciones" prefRowCount="3" wrapText="true"
+                      promptText="Hallazgos, procedimiento realizado, indicaciones…"/>
+        </CampoFormulario>
+        <Label text="Las entradas no se pueden editar ni borrar después de guardarlas." styleClass="texto-apoyo" wrapText="true"/>
+        <Aviso fx:id="avisoEntrada"/>
+        <HBox styleClass="acciones-derecha">
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Cancelar" styleClass="btn-secundario" onAction="#cancelarEntrada" minWidth="-Infinity"/>
+            <Button fx:id="botonGuardarEntrada" text="Guardar entrada" styleClass="btn-primario"
+                    onAction="#guardarEntrada" minWidth="-Infinity"/>
+        </HBox>
+    </VBox>
+
+    <VBox fx:id="contenedorHistorial">
+        <LineaDeTiempo fx:id="lineaTiempo"/>
+    </VBox>
+</VBox>

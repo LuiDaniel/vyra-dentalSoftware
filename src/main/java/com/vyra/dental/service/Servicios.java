@@ -1,6 +1,8 @@
 package com.vyra.dental.service;
 
 import com.vyra.dental.dao.impl.CitaDAOSqlite;
+import com.vyra.dental.dao.impl.HistoriaClinicaDAOSqlite;
+import com.vyra.dental.dao.impl.OdontogramaDAOSqlite;
 import com.vyra.dental.dao.impl.PacienteDAOSqlite;
 import com.vyra.dental.dao.impl.ProfesionalDAOSqlite;
 import com.vyra.dental.dao.impl.UsuarioDAOSqlite;
@@ -16,6 +18,8 @@ public final class Servicios {
     private static PacienteService pacientes;
     private static CitaService citas;
     private static ProfesionalService profesionales;
+    private static HistoriaClinicaService historiaClinica;
+    private static OdontogramaService odontograma;
 
     private Servicios() {
     }
@@ -47,5 +51,20 @@ public final class Servicios {
                     new CitaDAOSqlite());
         }
         return profesionales;
+    }
+
+    public static synchronized HistoriaClinicaService historiaClinica() {
+        if (historiaClinica == null) {
+            historiaClinica = new HistoriaClinicaService(new HistoriaClinicaDAOSqlite(), new PacienteDAOSqlite(),
+                    new CitaDAOSqlite());
+        }
+        return historiaClinica;
+    }
+
+    public static synchronized OdontogramaService odontograma() {
+        if (odontograma == null) {
+            odontograma = new OdontogramaService(new OdontogramaDAOSqlite());
+        }
+        return odontograma;
     }
 }

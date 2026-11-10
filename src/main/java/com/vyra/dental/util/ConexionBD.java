@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -32,6 +33,7 @@ public class ConexionBD {
                 conexion = DriverManager.getConnection(URL);
                 activarClavesForaneas(conexion);
                 inicializarEsquema(conexion);
+                actualizarEsquema(conexion);
             }
         } catch (SQLException e) {
             throw new RuntimeException("No se pudo conectar a la base de datos", e);
@@ -63,6 +65,34 @@ public class ConexionBD {
             }
         } catch (SQLException e) {
             throw new RuntimeException("No se pudo inicializar el esquema de la base de datos", e);
+        }
+    }
+
+    /**
+     * CREATE TABLE IF NOT EXISTS no agrega columnas a una tabla que ya existe:
+     * las columnas nuevas se agregan aquí con ALTER TABLE, para que una vyra.db
+     * de una fase anterior siga funcionando (docs/03-modelo-base-datos.md §3).
+     */
+    private static void actualizarEsquema(Connection conexion) throws SQLException {
+        // Fase 5: quién registró cada entrada de historia clínica y cada cambio del odontograma
+        agregarColumnaSiFalta(conexion, "historia_clinica_entrada", "id_profesional",
+                "INTEGER REFERENCES profesional(id_profesional)");
+        agregarColumnaSiFalta(conexion, "odontograma_pieza", "id_profesional",
+                "INTEGER REFERENCES profesional(id_profesional)");
+    }
+
+    private static void agregarColumnaSiFalta(Connection conexion, String tabla, String columna, String definicion)
+            throws SQLException {
+        try (Statement statement = conexion.createStatement()) {
+            // Los nombres son constantes de esta clase, nunca texto del usuario
+            try (ResultSet columnas = statement.executeQuery("PRAGMA table_info(" + tabla + ")")) {
+                while (columnas.next()) {
+                    if (columnas.getString("name").equals(columna)) {
+                        return;
+                    }
+                }
+            }
+            statement.execute("ALTER TABLE " + tabla + " ADD COLUMN " + columna + " " + definicion);
         }
     }
 

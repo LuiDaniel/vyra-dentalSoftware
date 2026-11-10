@@ -251,6 +251,12 @@ Cada pantalla indica: archivo FXML, controlador, requerimientos que cubre, roles
 - **Línea de tiempo** de entradas, de la más reciente a la más antigua: fecha, profesional, diagnóstico (SemiBold) y observaciones. Mismo estilo que el "Historial de la pieza" del odontograma (punto + línea vertical).
 - **Botón primario "Nueva entrada":** abre un formulario en el mismo panel con Fecha (hoy, no editable), Cita (la cita de hoy del paciente, si existe), Diagnóstico y Observaciones.
 - Las entradas no se editan ni se borran (RN-09). Botón secundario "Exportar PDF" (RF-11).
+- *Implementación (fase 5):*
+  - El contenido está en `HistoriaClinicaPanel.fxml` (`HistoriaClinicaPanelController`), que se incluye con `fx:include` en dos lugares: la pestaña "Historia clínica" de la ficha de Pacientes (entre Datos y Citas; la recepcionista no la ve) y la pantalla `HistoriaClinicaView.fxml` (`HistoriaClinicaController`) del menú. Esa pantalla sigue el patrón lista + panel: a la izquierda el buscador de pacientes (`ui.BuscadorPacientes`) y a la derecha la ficha del paciente elegido con su historia clínica y un botón para abrir su odontograma.
+  - Alergias y antecedentes se guardan con un botón secundario propio ("Guardar alergias y antecedentes"), que solo se habilita si cambiaron. Al guardar desde la ficha de Pacientes, la pestaña Datos y la lista se actualizan.
+  - En "Nueva entrada", la fecha es la de hoy (la pone el servicio) y el combo Cita ofrece las citas de hoy del paciente que no están canceladas (las del odontólogo, si es odontólogo) más "Sin cita"; por defecto elige la primera. Hay que escribir el diagnóstico o las observaciones. Enter en el diagnóstico guarda.
+  - Cada entrada guarda el profesional de la sesión (`id_profesional`); la línea de tiempo muestra "16 oct 2026 · Marco Salinas Vega". Si no hay diagnóstico, las observaciones van como título.
+  - "Exportar PDF" se agrega en la fase 8.
 
 ### 7.6 Odontograma — `OdontogramaView.fxml` / `OdontogramaController`
 **Referencia:** `docs/ui/Odontograma.html` (y la versión interactiva del lienzo) · **Cubre:** RF-05, CU-05, RF-11 · **Roles:** Odontólogo (completo); Admin (lectura)
@@ -267,6 +273,16 @@ Cada pantalla indica: archivo FXML, controlador, requerimientos que cubre, roles
   - Pieza seleccionada: cuadro con el número y su color, "Pieza 36 · Primer molar inferior izquierdo", "Estado actual: En tratamiento", campo "Observación del cambio" y enlace "Registrar tratamiento para esta pieza" (abre Tratamientos con la pieza ya elegida).
   - Historial de la pieza: línea de tiempo (estado, fecha, profesional y nota). Los cambios sin guardar aparecen arriba como "Hoy · sin guardar". Si no hay registros: "Sin cambios registrados..."
 - **Nombre de las piezas:** posición (1 incisivo central, 2 incisivo lateral, 3 canino, 4 primer premolar, 5 segundo premolar, 6 primer molar, 7 segundo molar, 8 tercer molar) + cuadrante (1 superior derecho, 2 superior izquierdo, 3 inferior izquierdo, 4 inferior derecho).
+- *Implementación (fase 5):*
+  - Desde el menú (sin paciente) la pantalla muestra el buscador de pacientes; desde la lista de Pacientes o desde Historia clínica se abre con el paciente. "Cambiar paciente" (secundario, en la tarjeta del paciente) vuelve al buscador.
+  - La barra empieza sin estado elegido: un clic en una pieza solo la selecciona. Con un estado elegido, el clic se lo aplica; otro clic en el mismo botón de la barra lo suelta. Volver a poner el estado guardado deshace el cambio pendiente. Las piezas con cambios sin guardar llevan un borde punteado (`.pieza:pendiente`).
+  - `PiezaDental` es un `ToggleButton` (para tener `:selected`), con el diente de `ui.Icono` ("diente", 40 px) y una X ("cruz-pieza") encima si está extraída. Los colores salen de las variables `-vy-pieza-*` de `vyra.css`; la clase de cada estado es `EstadoPieza.getClaseCss()`.
+  - La observación es de cada pieza cambiada: el campo se habilita cuando la pieza seleccionada tiene un cambio pendiente. "Guardar" llama a `registrarCambios(idPaciente, cambios, observaciones)`, que guarda todo en una transacción con la fecha de hoy y el profesional de la sesión (`id_profesional`).
+  - La "cita actual" es la primera cita de hoy del paciente que no está cancelada.
+  - Al cambiar de pantalla o cerrar sesión con cambios pendientes, `MainController` pregunta (interfaz `controller.ConfirmaSalida`); en el diálogo, Enter cancela.
+  - El administrador ve la barra como leyenda con los conteos, sin botón Guardar ni campo de observación.
+  - Para que las 16 piezas de cada fila entren a 1280 px sin desplazamiento horizontal, la separación entre piezas es de 2 px. Si la ayuda de la barra no entra, se parte en dos líneas.
+  - "Exportar PDF" se agrega en la fase 8 y "Registrar tratamiento para esta pieza" en la fase 6.
 
 ### 7.7 Tratamientos — `TratamientosView.fxml` / `TratamientosController`
 **Referencia:** no tiene pantalla propia; seguir el patrón de `docs/ui/Pagos.html` (tabla + panel) · **Cubre:** RF-06, CU-06 · **Roles:** Odontólogo (completo); Admin y Recepción (lectura)
@@ -313,7 +329,10 @@ Cada pantalla indica: archivo FXML, controlador, requerimientos que cubre, roles
 | `Icono` | `Group` con un `SVGPath` escalado. Constructor `Icono(String nombre, double tamano)`; usable en FXML con `<Icono nombre="agenda" tamano="18"/>` | Menú, botones, avisos |
 | `Avatar` | `StackPane` circular con iniciales y color según el id | Tablas, encabezados, menú |
 | `Pill` | `Label` con clase `.pill` + la clase del estado. Constructores para `EstadoCita`, `EstadoTratamiento` y `MetodoPago` | Tablas, agenda, Inicio |
-| `PiezaDental` | `Button` con el diente, el número y la letra; propiedad `estado` que cambia su clase CSS | Odontograma, selección de piezas en Tratamientos |
+| `PiezaDental` | `ToggleButton` con el número, el diente y la letra; `setEstado()` cambia su clase CSS y `setPendiente()` marca un cambio sin guardar | Odontograma, selección de piezas en Tratamientos |
+| `LineaDeTiempo` | `VBox` de sucesos con punto + línea vertical: `agregar(titulo, detalle, texto, claseColor)` | Historial de la pieza, historia clínica |
+| `BuscadorPacientes` | Tarjeta con buscador (300 ms de espera) y tabla de pacientes; el controlador le pasa cómo buscar con `configurar()` | Historia clínica y Odontograma abiertos desde el menú |
+| `CeldaPaciente`, `CeldaAlergias` | Celdas de tabla: avatar + nombre + DNI, y píldora de alergia (`CeldaAlergias.pillAlergia()`) | Pacientes, `BuscadorPacientes`, Odontograma |
 | `Aviso` | `HBox` con ícono y texto; tipos INFO, EXITO, ADVERTENCIA, ERROR | Formularios, Inicio |
 | `Notificacion` | Toast: `Notificacion.mostrar(ventana, "Paciente registrado")`, 3 s, abajo a la derecha | Después de guardar |
 | `CampoFormulario` | `VBox` con etiqueta + control + mensaje de error; métodos `mostrarError(String)` y `limpiarError()` | Todos los formularios |

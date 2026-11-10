@@ -268,6 +268,23 @@ class CitaServiceTest {
         assertEquals(1, servicio.citasActivasDeHoy());
     }
 
+    @Test
+    void citasDeHoyDelPacienteSinLasCanceladasYSoloLasDelOdontologo() {
+        Cita deSalinas = servicio.agendar(cita(salinas, maria, HOY, "16:00", "16:30"));
+        servicio.agendar(cita(nunez, maria, HOY, "11:00", "11:30"));
+        Cita cancelada = servicio.agendar(cita(salinas, maria, HOY, "12:00", "12:30"));
+        servicio.cancelar(cancelada.getIdCita());
+        servicio.agendar(cita(salinas, maria, FECHA, "09:00", "09:30"));
+        servicio.agendar(cita(salinas, jorge, HOY, "17:00", "17:30"));
+
+        assertEquals(List.of(LocalTime.of(11, 0), LocalTime.of(16, 0)),
+                servicio.citasDeHoyDePaciente(maria.getIdPaciente()).stream().map(Cita::getHoraInicio).toList());
+
+        iniciarSesion(Rol.ODONTOLOGO, salinas);
+        assertEquals(List.of(deSalinas.getIdCita()),
+                servicio.citasDeHoyDePaciente(maria.getIdPaciente()).stream().map(Cita::getIdCita).toList());
+    }
+
     private static Cita cita(Profesional profesional, Paciente paciente, LocalDate fecha, String inicio, String fin) {
         return new Cita(0, paciente, profesional, fecha, LocalTime.parse(inicio), LocalTime.parse(fin),
                 "Control", EstadoCita.PENDIENTE);

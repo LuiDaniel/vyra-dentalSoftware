@@ -48,6 +48,9 @@ public class MainController {
     private final Map<Pantalla, ToggleButton> botonesMenu = new EnumMap<>(Pantalla.class);
     private final Label contadorAgenda = new Label();
     private Rol rol;
+    private Pantalla pantallaActual;
+    /** Controlador de la pantalla abierta, para preguntarle si se puede salir. */
+    private Object controladorActual;
 
     /**
      * El marco abierto, para que una pantalla abra otra:
@@ -81,9 +84,17 @@ public class MainController {
         navegar(destino, null);
     }
 
-    /** Carga la pantalla en el área de contenido; si el rol no la tiene permitida, no hace nada. */
+    /**
+     * Carga la pantalla en el área de contenido; si el rol no la tiene permitida,
+     * o la pantalla abierta tiene cambios que el usuario no quiere perder, no hace nada.
+     */
     public void navegar(Pantalla destino, Object parametro) {
         if (!destino.permitidaPara(rol)) {
+            return;
+        }
+        if (!puedeSalirDeLaPantallaActual()) {
+            // El ToggleButton ya se marcó con el clic: se vuelve a marcar la pantalla abierta
+            botonesMenu.get(pantallaActual).setSelected(true);
             return;
         }
         ScrollPane desplazable = new ScrollPane(cargarVista(destino, parametro));
@@ -91,14 +102,22 @@ public class MainController {
         desplazable.getStyleClass().add("contenido-scroll");
         contenido.getChildren().setAll(desplazable);
 
+        pantallaActual = destino;
         botonesMenu.get(destino).setSelected(true);
         ruta.setText(destino == Pantalla.INICIO ? "Inicio" : "Inicio / " + destino.getTitulo());
     }
 
     @FXML
     private void salir() {
+        if (!puedeSalirDeLaPantallaActual()) {
+            return;
+        }
         Servicios.auth().cerrarSesion();
         App.mostrarLogin();
+    }
+
+    private boolean puedeSalirDeLaPantallaActual() {
+        return !(controladorActual instanceof ConfirmaSalida pantalla) || pantalla.confirmarSalida();
     }
 
     private void construirMenu() {
@@ -155,12 +174,14 @@ public class MainController {
 
     private Node cargarVista(Pantalla destino, Object parametro) {
         URL vista = getClass().getResource(destino.getRutaVista());
+        controladorActual = null;
         if (vista == null) {
             return enConstruccion(destino);
         }
         try {
             FXMLLoader loader = new FXMLLoader(vista);
             Node raiz = loader.load();
+            controladorActual = loader.getController();
             if (loader.getController() instanceof RecibeParametro receptor) {
                 receptor.recibir(parametro);
             }

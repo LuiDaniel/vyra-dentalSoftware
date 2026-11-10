@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.vyra.dental.ui.Avatar?>
+<?import com.vyra.dental.ui.BuscadorPacientes?>
+<?import com.vyra.dental.ui.CampoFormulario?>
+<?import com.vyra.dental.ui.Aviso?>
+<?import com.vyra.dental.ui.LineaDeTiempo?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- Odontograma: docs/08-guia-frontend.md §7.6, referencia docs/ui/Odontograma.html -->
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.vyra.dental.controller.OdontogramaController"
+      fx:id="raiz" styleClass="pagina,pagina-odontograma">
+
+    <!-- Sin paciente: se elige uno -->
+    <VBox fx:id="vistaSeleccion" styleClass="pagina-seccion">
+        <HBox styleClass="pagina-encabezado">
+            <VBox styleClass="pagina-titulos">
+                <Label text="Odontograma" styleClass="titulo-pagina"/>
+                <Label text="Elige un paciente para ver su odontograma." styleClass="texto-secundario"/>
+            </VBox>
+        </HBox>
+        <BuscadorPacientes fx:id="buscador"/>
+    </VBox>
+
+    <!-- Odontograma del paciente elegido -->
+    <VBox fx:id="vistaOdontograma" styleClass="pagina-seccion">
+        <HBox styleClass="card,odontograma-paciente">
+            <Avatar fx:id="avatarPaciente" styleClass="avatar-grande"/>
+            <VBox styleClass="odontograma-paciente-textos">
+                <Label fx:id="nombrePaciente" styleClass="odontograma-nombre" wrapText="true"/>
+                <Label fx:id="detallePaciente" styleClass="texto-secundario" wrapText="true"/>
+            </VBox>
+            <HBox fx:id="contenedorAlergia"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Cambiar paciente" styleClass="btn-secundario" onAction="#cambiarPaciente" minWidth="-Infinity"/>
+            <Button fx:id="botonGuardar" styleClass="btn-primario" onAction="#guardar" minWidth="-Infinity"/>
+        </HBox>
+
+        <Aviso fx:id="avisoGuardar"/>
+
+        <VBox styleClass="card">
+            <HBox styleClass="odontograma-barra">
+                <Label fx:id="etiquetaHerramientas" styleClass="campo-etiqueta" minWidth="-Infinity"/>
+                <HBox fx:id="herramientas" styleClass="herramientas" minWidth="-Infinity"/>
+                <!-- La ayuda se parte en dos líneas si no entra: los botones nunca se recortan -->
+                <Label fx:id="ayuda" styleClass="texto-apoyo,odontograma-ayuda" wrapText="true" minWidth="0"
+                       maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            </HBox>
+            <VBox fx:id="arcada" styleClass="arcada"/>
+        </VBox>
+
+        <HBox styleClass="odontograma-detalle">
+            <!-- Pieza seleccionada -->
+            <VBox styleClass="card,odontograma-tarjeta" HBox.hgrow="ALWAYS" prefWidth="360">
+                <HBox styleClass="pieza-resumen">
+                    <Label fx:id="cuadroPieza" styleClass="pieza-cuadro"/>
+                    <VBox styleClass="pieza-resumen-textos" HBox.hgrow="ALWAYS">
+                        <Label fx:id="tituloPieza" styleClass="card-titulo" wrapText="true"/>
+                        <Label fx:id="estadoPieza" styleClass="texto-secundario" wrapText="true"/>
+                    </VBox>
+                </HBox>
+                <CampoFormulario fx:id="cfObservacion" etiqueta="Observación del cambio">
+                    <TextArea fx:id="campoObservacion" prefRowCount="3" wrapText="true"
+                              promptText="Ej. Caries oclusal profunda, se programa obturación."/>
+                </CampoFormulario>
+                <Label fx:id="ayudaObservacion" styleClass="texto-apoyo" wrapText="true"/>
+            </VBox>
+
+            <!-- Historial de la pieza -->
+            <VBox styleClass="card,odontograma-tarjeta" HBox.hgrow="ALWAYS" prefWidth="360">
+                <Label fx:id="tituloHistorial" styleClass="card-titulo"/>
+                <LineaDeTiempo fx:id="historial"/>
+                <Label fx:id="historialVacio" styleClass="texto-secundario" wrapText="true"/>
+            </VBox>
+        </HBox>
+    </VBox>
+</VBox>
