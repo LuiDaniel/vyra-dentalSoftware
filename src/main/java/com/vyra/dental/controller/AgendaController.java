@@ -170,7 +170,10 @@ public class AgendaController implements RecibeParametro {
         refrescar();
     }
 
-    /** Desde Pacientes: "Agendar cita para este paciente". */
+    /**
+     * Desde Pacientes: "Agendar cita para este paciente". Desde Inicio: una
+     * cita de "Agenda de hoy" (se abre su día con la cita elegida) o "Nueva cita".
+     */
     @Override
     public void recibir(Object parametro) {
         if (gestiona && parametro instanceof Paciente paciente) {
@@ -178,6 +181,12 @@ public class AgendaController implements RecibeParametro {
             mostrarFormulario();
             elegirPaciente(paciente);
             campoProfesional.requestFocus();
+        } else if (parametro instanceof Cita cita) {
+            fecha = cita.getFecha();
+            seleccionarCita(cita);
+        } else if (gestiona && parametro == Solicitud.NUEVO) {
+            limpiarFormulario();
+            mostrarFormulario();
         }
     }
 

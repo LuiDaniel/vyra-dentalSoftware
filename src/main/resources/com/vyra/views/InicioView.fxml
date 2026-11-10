@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.vyra.dental.ui.GraficoBarras?>
+<?import com.vyra.dental.ui.Icono?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- Inicio: docs/08-guia-frontend.md §7.2, referencia docs/ui/Inicio.html -->
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.vyra.dental.controller.InicioController"
+      fx:id="raiz" styleClass="pagina">
+
+    <HBox styleClass="pagina-encabezado">
+        <VBox styleClass="pagina-titulos">
+            <Label fx:id="saludo" styleClass="titulo-pagina"/>
+            <Label text="Este es el resumen de tu consultorio para hoy." styleClass="texto-secundario"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <HBox fx:id="accionesEncabezado" styleClass="acciones-encabezado">
+            <Button text="Nuevo paciente" styleClass="btn-secundario" onAction="#nuevoPaciente" minWidth="-Infinity">
+                <graphic>
+                    <Icono nombre="pacientes" tamano="16"/>
+                </graphic>
+            </Button>
+            <Button text="Nueva cita" styleClass="btn-primario" onAction="#nuevaCita" minWidth="-Infinity">
+                <graphic>
+                    <Icono nombre="agenda" tamano="16"/>
+                </graphic>
+            </Button>
+        </HBox>
+    </HBox>
+
+    <!-- Aviso de citas próximas (RF-12, CU-12) -->
+    <HBox fx:id="avisoProximas" styleClass="aviso-proximas">
+        <StackPane styleClass="aviso-proximas-icono">
+            <Icono nombre="reloj" tamano="18"/>
+        </StackPane>
+        <VBox styleClass="aviso-proximas-textos" HBox.hgrow="ALWAYS">
+            <Label fx:id="proximasTitulo" styleClass="aviso-proximas-titulo"/>
+            <Label fx:id="proximasLista" styleClass="aviso-proximas-lista" wrapText="true"/>
+        </VBox>
+        <Button text="Ver agenda" styleClass="enlace" onAction="#verAgenda" minWidth="-Infinity"/>
+    </HBox>
+
+    <HBox fx:id="kpis" styleClass="kpis"/>
+
+    <HBox styleClass="inicio-columnas">
+        <!-- Agenda de hoy -->
+        <VBox styleClass="card,agenda-hoy" HBox.hgrow="ALWAYS" minWidth="440">
+            <HBox styleClass="card-encabezado">
+                <VBox styleClass="card-encabezado-textos">
+                    <Label text="Agenda de hoy" styleClass="card-titulo"/>
+                    <Label fx:id="resumenAgenda" styleClass="texto-apoyo"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Ver todas" styleClass="enlace" onAction="#verAgenda" minWidth="-Infinity"/>
+            </HBox>
+            <VBox fx:id="filasAgenda"/>
+        </VBox>
+
+        <VBox styleClass="inicio-lateral" prefWidth="340" minWidth="320" maxWidth="360">
+            <!-- Ingresos de la semana (solo el Administrador) -->
+            <VBox fx:id="tarjetaIngresos" styleClass="card,card-relleno">
+                <HBox styleClass="card-encabezado-fila">
+                    <VBox styleClass="card-encabezado-textos" HBox.hgrow="ALWAYS">
+                        <Label text="Ingresos de la semana" styleClass="card-titulo"/>
+                        <Label fx:id="rangoSemana" styleClass="texto-apoyo"/>
+                    </VBox>
+                    <Label fx:id="totalSemana" styleClass="monto-grande" minWidth="-Infinity"/>
+                </HBox>
+                <GraficoBarras fx:id="graficoSemana"/>
+            </VBox>
+
+            <VBox styleClass="card,card-relleno">
+                <Label text="Accesos rápidos" styleClass="card-titulo"/>
+                <GridPane fx:id="accesos" styleClass="accesos-rapidos"/>
+            </VBox>
+        </VBox>
+    </HBox>
+</VBox>

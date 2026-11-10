@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.vyra.dental.ui.Aviso?>
+<?import com.vyra.dental.ui.CampoFormulario?>
+<?import com.vyra.dental.ui.GraficoBarras?>
+<?import com.vyra.dental.ui.Icono?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- Reportes: docs/08-guia-frontend.md §7.9 (tarjetas .card y KPI como en Inicio) -->
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.vyra.dental.controller.ReportesController"
+      fx:id="raiz" styleClass="pagina">
+
+    <HBox styleClass="pagina-encabezado">
+        <VBox styleClass="pagina-titulos">
+            <Label text="Reportes" styleClass="titulo-pagina"/>
+            <Label fx:id="subtitulo" styleClass="texto-secundario"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <HBox fx:id="selectorTipo" styleClass="segmentado" minWidth="-Infinity" maxHeight="-Infinity"/>
+    </HBox>
+
+    <!-- Filtros -->
+    <VBox styleClass="card,card-relleno">
+        <HBox styleClass="filtros-reporte">
+            <HBox fx:id="filtroFechas" styleClass="filtros-reporte">
+                <CampoFormulario fx:id="cfDesde" etiqueta="Desde">
+                    <DatePicker fx:id="campoDesde" prefWidth="150"/>
+                </CampoFormulario>
+                <CampoFormulario fx:id="cfHasta" etiqueta="Hasta">
+                    <DatePicker fx:id="campoHasta" prefWidth="150"/>
+                </CampoFormulario>
+                <HBox fx:id="atajos" styleClass="filtros,atajos-fecha"/>
+            </HBox>
+            <CampoFormulario fx:id="cfProfesional" etiqueta="Profesional">
+                <ComboBox fx:id="campoProfesional" prefWidth="230"/>
+            </CampoFormulario>
+            <CampoFormulario fx:id="cfPaciente" etiqueta="Paciente" HBox.hgrow="ALWAYS">
+                <VBox>
+                    <HBox fx:id="buscadorPaciente" styleClass="buscador" maxWidth="420">
+                        <Icono nombre="buscar" tamano="16"/>
+                        <TextField fx:id="campoPaciente" promptText="Buscar por nombre o DNI" HBox.hgrow="ALWAYS"
+                                   accessibleText="Buscar el paciente del reporte"/>
+                    </HBox>
+                    <HBox fx:id="pacienteElegido" styleClass="paciente-elegido" maxWidth="420">
+                        <Label fx:id="nombrePaciente" styleClass="celda-titulo" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                        <Button text="Cambiar" styleClass="enlace" onAction="#quitarPaciente" minWidth="-Infinity"/>
+                    </HBox>
+                </VBox>
+            </CampoFormulario>
+        </HBox>
+        <Aviso fx:id="avisoFiltros"/>
+    </VBox>
+
+    <!-- Indicadores del reporte -->
+    <HBox fx:id="kpis" styleClass="kpis"/>
+
+    <!-- Detalle: tabla y, en Ingresos, barras por día -->
+    <HBox styleClass="inicio-columnas">
+        <VBox styleClass="card,lista" HBox.hgrow="ALWAYS" minWidth="440">
+            <HBox styleClass="lista-barra">
+                <Label fx:id="tituloTabla" styleClass="card-titulo"/>
+            </HBox>
+            <!-- La tabla del reporte elegido (cada reporte tiene sus columnas) -->
+            <VBox fx:id="contenedorTabla"/>
+            <HBox styleClass="lista-pie">
+                <Label fx:id="pie" styleClass="texto-secundario"/>
+            </HBox>
+        </VBox>
+        <VBox fx:id="tarjetaBarras" styleClass="card,card-relleno" prefWidth="380" minWidth="340" maxWidth="420">
+            <Label fx:id="tituloBarras" styleClass="card-titulo"/>
+            <GraficoBarras fx:id="grafico"/>
+        </VBox>
+    </HBox>
+</VBox>

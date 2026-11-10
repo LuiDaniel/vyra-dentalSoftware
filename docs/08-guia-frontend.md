@@ -181,6 +181,7 @@ BorderPane.app-shell
 - Los ítems del menú son `ToggleButton` en un `ToggleGroup`, para que solo uno quede seleccionado.
 - Se ocultan los grupos e ítems que el rol no puede ver (matriz en [`02-casos-de-uso.md`](./02-casos-de-uso.md#3-matriz-de-permisos-por-rol)).
 - El buscador global (en Inicio) busca pacientes por nombre o DNI y, al elegir uno, abre su ficha en Pacientes. Atajo `Ctrl+K`.
+  - *Implementación (fase 7):* en Inicio la barra superior muestra el buscador en lugar de la ruta. `Ctrl+K` desde otra pantalla vuelve a Inicio y lo enfoca. Pacientes recibe el paciente y filtra la lista por su DNI, así queda marcado aunque esté en otra página.
 - La fecha de la barra superior va en formato largo: "Jueves, 29 de octubre de 2026" (ver sección 9).
 
 ## 7. Pantallas
@@ -205,6 +206,13 @@ Cada pantalla indica: archivo FXML, controlador, requerimientos que cubre, roles
 - **Ingresos de la semana** (solo Administrador): barras verticales lunes a sábado; el día actual en `-vy-primario`, los demás en `-vy-primario-borde`. Se puede hacer con `HBox` de `Region` con alto proporcional (no hace falta `BarChart`).
 - **Accesos rápidos:** cuadrícula 2×2 de botones con ícono: Registrar paciente, Agendar cita, Registrar pago, Abrir odontograma.
 - **Datos:** `CitaService.citasDelDia(hoy)`, `PacienteService`, `TratamientoService`, `ReporteService.ingresosPorPeriodo()`.
+- *Implementación (fase 7):*
+  - El aviso usa `CitaService.citasProximas(60)`: citas pendientes o confirmadas de hoy que empiezan desde ahora y dentro de la hora; el odontólogo solo ve las suyas.
+  - Detalles de los KPI: "Pacientes registrados" dice cuántos se registraron en el mes ("+3 en noviembre"). "Tratamientos en curso" dice cuántos se iniciaron en el mes, porque no se guarda una fecha prevista de fin y "finalizan esta semana" no se puede calcular.
+  - Cuarto KPI: el Administrador ve "Ingresos de {mes}" con el % respecto al mes anterior. Recepción ve "Pagos registrados hoy" (cantidad y total). El odontólogo no ve pagos (matriz de permisos), así que ve "Atendidas hoy".
+  - Los botones "Nuevo paciente" y "Nueva cita" solo los ven Administrador y Recepción; abren esas pantallas con el formulario vacío (parámetro `controller.Solicitud.NUEVO`). Una fila de "Agenda de hoy" abre la Agenda en ese día con la cita elegida.
+  - Accesos rápidos: los primeros 4 que el rol puede abrir de esta lista: Registrar paciente, Agendar cita, Registrar pago, Abrir odontograma, Historia clínica, Tratamientos, Ver agenda.
+  - Las barras de la semana (`ui.GraficoBarras`) muestran "—" en los días que todavía no llegan.
 
 ### 7.3 Agenda — `AgendaView.fxml` / `AgendaController`
 **Referencia:** `docs/ui/Citas.html` · **Cubre:** RF-02, RF-03, CU-02, CU-03 · **Roles:** Admin y Recepción (completo); Odontólogo (solo lectura de sus citas + "Marcar atendida")
@@ -314,7 +322,7 @@ Cada pantalla indica: archivo FXML, controlador, requerimientos que cubre, roles
 - *Implementación (fase 6):*
   - El periodo "Semana" va de lunes a domingo y el mes es el calendario. El % compara con el periodo anterior completo (ayer, la semana pasada, el mes pasado); si ese no tuvo cobros, se indica en lugar del %.
   - "Saldo pendiente" suma lo que deben todos los tratamientos (también los finalizados que no se pagaron completos) y dice en cuántos.
-  - La tabla muestra los pagos del periodo elegido (no solo los recientes). El botón "Exportar" queda para Reportes (fase 7).
+  - La tabla muestra los pagos del periodo elegido (no solo los recientes). El botón "Exportar" se agrega en la fase 8, con los PDF.
   - Tratamiento: el buscador sugiere, al entrar o al escribir, los tratamientos que todavía deben algo ("Endodoncia pieza 36 · María Quispe Huamán · Saldo S/ 400.00"). "Cambiar" suelta el elegido. Desde Tratamientos o desde la pestaña Pagos de la ficha del paciente se llega con el tratamiento ya elegido.
   - El monto acepta "200", "200.50" o "1,250.00". Mientras se escribe, el pie muestra el saldo que quedará (en rojo si supera el saldo). Tras registrar, si el tratamiento ya no debe nada se suelta.
   - Colores de los métodos en la barra apilada: Efectivo `-vy-primario`, Yape / Plin `-vy-acento`, Tarjeta `-vy-celeste` (`#7DD3FC`), Transferencia `-vy-borde-campo`. Las píldoras usan `MetodoPago.getClaseCss()`.
@@ -328,12 +336,19 @@ Cada pantalla indica: archivo FXML, controlador, requerimientos que cubre, roles
 - **Historial de paciente:** tratamientos del paciente con costo, pagado y saldo.
 - **Ingresos:** total + tabla por método de pago + barras por día.
 - Botón "Exportar PDF" (en un `Task`, con indicador de progreso).
+- *Implementación (fase 7):*
+  - Los filtros solo muestran lo que usa cada reporte: Citas (fechas + profesional), Historial (paciente, con buscador de sugerencias), Ingresos (fechas). Al cambiar cualquier filtro, el reporte se recalcula; los atajos se marcan solos si las fechas coinciden. Por defecto, "Este mes". El periodo puede ser de hasta un año.
+  - Citas: KPI Citas, Atendidas, Canceladas y Asistencia. La asistencia es atendidas ÷ (atendidas + pendientes o confirmadas de días pasados); las canceladas y las futuras no cuentan. Si no hay nada que medir, se muestra "—".
+  - Historial: KPI Tratamientos, Costo total, Pagado y Saldo, y tabla con fecha, tratamiento, piezas, costo, pagado, saldo y estado.
+  - Ingresos: KPI Total, Pagos y Promedio por pago, tabla por método (pagos, total, %) y barras por día (por mes si el periodo pasa de 31 días). Con más de 12 barras el gráfico se compacta y el rango va en el título.
+  - "Exportar PDF" (y el "Exportar" de Pagos) se agregan en la fase 8, junto con el PDF de historia clínica y odontograma.
 
 ### 7.10 Profesionales — `ProfesionalesView.fxml` / `ProfesionalesController`
 **Cubre:** RF-07, CU-07 · **Roles:** Admin. Patrón lista + panel: tabla (avatar, nombre, especialidad, teléfono, horario, usuario asociado) y formulario (nombres*, apellidos*, especialidad, teléfono, horario de atención, `ComboBox` de usuario con rol Odontólogo).
 
 ### 7.11 Usuarios y roles — `UsuariosView.fxml` / `UsuariosController`
 **Cubre:** RF-08 · **Roles:** Admin. Patrón lista + panel: tabla (avatar, nombre completo, usuario, rol en píldora, estado Activo/Inactivo) y formulario (nombre completo*, usuario*, rol* segmentado, contraseña* solo al crear o con un botón "Restablecer contraseña", interruptor Activo). Un administrador no puede desactivarse a sí mismo.
+- *Implementación (fase 7):* el interruptor Activo es un `CheckBox`. Bajo el rol se explica qué ve cada uno. Con el propio usuario, el rol y "Activo" quedan deshabilitados: no puede quitarse el rol de Administrador ni desactivarse, y así siempre queda un administrador activo. Para un odontólogo se indica a qué profesional está asociado o se advierte que sin profesional no verá citas. Su rol no puede cambiar mientras esté asociado a un profesional. El nombre de usuario no admite espacios y respeta mayúsculas, porque el inicio de sesión las distingue. Rol en píldora: `Rol.getClaseCss()` (`pill-rol-admin`...).
 
 ## 8. Componentes reutilizables (`com.vyra.dental.ui`)
 
@@ -347,6 +362,8 @@ Cada pantalla indica: archivo FXML, controlador, requerimientos que cubre, roles
 | `BuscadorPacientes` | Tarjeta con buscador (300 ms de espera) y tabla de pacientes; el controlador le pasa cómo buscar con `configurar()` | Historia clínica y Odontograma abiertos desde el menú |
 | `CeldaPaciente`, `CeldaAlergias` | Celdas de tabla: avatar + nombre + DNI (`CeldaPaciente<S>` sirve para cualquier tipo de fila que traiga al paciente), y píldora de alergia (`CeldaAlergias.pillAlergia()`) | Pacientes, `BuscadorPacientes`, Odontograma, Tratamientos |
 | `AvancePago` | Barra de lo pagado + "S/ 250.00 de S/ 650.00"; `mostrar(pagado, costo)` | Tratamientos, pestaña Pagos de la ficha |
+| `Kpi` | Tarjeta de indicador: título con ícono, cifra y detalle; `mostrar(cifra, detalle, tendencia)` pinta el detalle en verde o rojo | Inicio, Reportes |
+| `GraficoBarras` | Barras verticales con `Region` de alto proporcional; `mostrar(etiquetas, valores, textos, resaltada)`. Con más de 12 barras se compacta (`.grafico-denso`) | Inicio, Reportes |
 | `Aviso` | `HBox` con ícono y texto; tipos INFO, EXITO, ADVERTENCIA, ERROR | Formularios, Inicio |
 | `Notificacion` | Toast: `Notificacion.mostrar(ventana, "Paciente registrado")`, 3 s, abajo a la derecha | Después de guardar |
 | `CampoFormulario` | `VBox` con etiqueta + control + mensaje de error; métodos `mostrarError(String)` y `limpiarError()` | Todos los formularios |

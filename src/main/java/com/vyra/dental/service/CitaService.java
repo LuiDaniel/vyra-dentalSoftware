@@ -187,6 +187,22 @@ public class CitaService {
         return citaDAO.ultimaVisita(idPaciente);
     }
 
+    /**
+     * RF-12, CU-12: citas pendientes o confirmadas de hoy que empiezan desde
+     * ahora y dentro de los próximos {@code minutos}, por hora (aviso de Inicio).
+     * El odontólogo solo ve las suyas.
+     */
+    public List<Cita> citasProximas(int minutos) {
+        LocalTime ahora = LocalTime.now(reloj);
+        LocalTime limite = ahora.plusMinutes(minutos);
+        return citasDelDia(hoy()).stream()
+                .filter(c -> c.getEstado() == EstadoCita.PENDIENTE || c.getEstado() == EstadoCita.CONFIRMADA)
+                // Si el límite pasa de medianoche, cuenta todo lo que queda del día
+                .filter(c -> !c.getHoraInicio().isBefore(ahora) && (limite.isBefore(ahora) || c.getHoraInicio().isBefore(limite)))
+                .sorted(Comparator.comparing(Cita::getHoraInicio))
+                .toList();
+    }
+
     /** Citas de hoy que no están canceladas (contador del menú). */
     public int citasActivasDeHoy() {
         return (int) citasDelDia(hoy()).stream()

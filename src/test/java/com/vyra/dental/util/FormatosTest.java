@@ -92,6 +92,12 @@ class FormatosTest {
     }
 
     @Test
+    void milesSinDecimales() {
+        assertEquals("1,120", Formatos.miles(1120.4));
+        assertEquals("0", Formatos.miles(0));
+    }
+
+    @Test
     void leeMontosEscritosPorElUsuario() {
         assertEquals(650, Formatos.leerMonto("650"));
         assertEquals(1250.5, Formatos.leerMonto(" 1,250.50 "));

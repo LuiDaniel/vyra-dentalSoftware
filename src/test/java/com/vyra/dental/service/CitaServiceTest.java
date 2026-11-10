@@ -285,6 +285,25 @@ class CitaServiceTest {
                 servicio.citasDeHoyDePaciente(maria.getIdPaciente()).stream().map(Cita::getIdCita).toList());
     }
 
+    @Test
+    void citasProximasDeLaSiguienteHora() {
+        // El reloj marca las 10:00: las citas de antes ya no son "próximas"
+        citaDAO.crear(new Cita(0, maria, salinas, HOY, LocalTime.of(9, 30), LocalTime.of(10, 0), "Antes",
+                EstadoCita.CONFIRMADA));
+        Cita alas10 = servicio.agendar(cita(salinas, maria, HOY, "10:00", "10:30"));
+        Cita alas1030 = servicio.agendar(cita(nunez, jorge, HOY, "10:30", "11:00"));
+        servicio.agendar(cita(salinas, jorge, HOY, "11:00", "11:30"));
+        citaDAO.crear(new Cita(0, maria, salinas, HOY, LocalTime.of(10, 30), LocalTime.of(11, 0), "Cancelada",
+                EstadoCita.CANCELADA));
+        servicio.agendar(cita(salinas, jorge, FECHA, "10:30", "11:00"));
+
+        assertEquals(List.of(alas10.getIdCita(), alas1030.getIdCita()),
+                servicio.citasProximas(60).stream().map(Cita::getIdCita).toList());
+
+        iniciarSesion(Rol.ODONTOLOGO, salinas);
+        assertEquals(List.of(alas10.getIdCita()), servicio.citasProximas(60).stream().map(Cita::getIdCita).toList());
+    }
+
     private static Cita cita(Profesional profesional, Paciente paciente, LocalDate fecha, String inicio, String fin) {
         return new Cita(0, paciente, profesional, fecha, LocalTime.parse(inicio), LocalTime.parse(fin),
                 "Control", EstadoCita.PENDIENTE);

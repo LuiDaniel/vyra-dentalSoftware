@@ -14,6 +14,7 @@
     -vy-acento: #2DD4BF;
     -vy-primario-suave: #F0FDFA;
     -vy-primario-borde: #99F6E4;
+    -vy-primario-claro: #CCFBF1;
     -vy-sidebar: #0B1F2A;
     -vy-sidebar-activo: #123B40;
     -vy-sidebar-hover: #132D38;
@@ -2230,6 +2231,257 @@
 }
 
 .pie-pago {
+    -fx-spacing: 10px;
+    -fx-alignment: center-left;
+}
+
+/* ===== 17. Inicio, Reportes y Usuarios (docs/08-guia-frontend.md §7.2, §7.9 y §7.11) ===== */
+
+/* Buscador global de la barra superior (solo en Inicio) */
+.buscador-global {
+    -fx-pref-height: 40px;
+    -fx-min-height: 40px;
+}
+
+.atajo-teclado {
+    -fx-background-color: -vy-borde-campo, -vy-superficie;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 6px, 5px;
+    -fx-padding: 1px 6px;
+    -fx-font-size: 11px;
+    -fx-text-fill: -vy-texto-2;
+}
+
+.acciones-encabezado {
+    -fx-spacing: 10px;
+    -fx-alignment: center-right;
+}
+
+/* Aviso de citas próximas (RF-12) */
+.aviso-proximas {
+    -fx-background-color: -vy-aviso-info-borde, -vy-aviso-info-fondo;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 12px, 11px;
+    -fx-padding: 14px 18px;
+    -fx-spacing: 14px;
+    -fx-alignment: center-left;
+}
+
+.aviso-proximas-icono {
+    -fx-background-color: -vy-primario-claro;
+    -fx-background-radius: 10px;
+    -fx-min-width: 36px;
+    -fx-min-height: 36px;
+    -fx-max-width: 36px;
+    -fx-max-height: 36px;
+}
+
+.aviso-proximas-icono .icono {
+    -fx-stroke: -vy-primario-hover;
+}
+
+.aviso-proximas-textos {
+    -fx-spacing: 2px;
+}
+
+.aviso-proximas-titulo {
+    -fx-font-family: "Inter SemiBold";
+    -fx-text-fill: -vy-aviso-info-texto;
+}
+
+.aviso-proximas-lista {
+    -fx-font-size: 13px;
+    -fx-text-fill: -vy-primario-hover;
+}
+
+/* Ícono de los indicadores (ui.Kpi) */
+.kpi-icono {
+    -fx-background-color: -vy-primario-suave;
+    -fx-background-radius: 10px;
+    -fx-min-width: 34px;
+    -fx-min-height: 34px;
+    -fx-max-width: 34px;
+    -fx-max-height: 34px;
+}
+
+.kpi-icono .icono {
+    -fx-stroke: -vy-primario;
+}
+
+/* Columnas de Inicio y de Reportes */
+.inicio-columnas {
+    -fx-spacing: 16px;
+    -fx-alignment: top-left;
+}
+
+.inicio-lateral {
+    -fx-spacing: 16px;
+}
+
+.card-relleno {
+    -fx-padding: 18px 20px;
+    -fx-spacing: 14px;
+}
+
+.card-encabezado {
+    -fx-padding: 16px 20px;
+    -fx-alignment: center-left;
+    -fx-border-color: transparent transparent -vy-borde-suave transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.card-encabezado-fila {
+    -fx-spacing: 10px;
+    -fx-alignment: top-left;
+}
+
+.card-encabezado-textos {
+    -fx-spacing: 2px;
+}
+
+.monto-grande {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+/* Agenda de hoy: cada fila abre la cita en la Agenda */
+.fila-agenda-hoy {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent transparent -vy-separador transparent;
+    -fx-border-width: 0 0 1px 0;
+    -fx-padding: 12px 20px;
+    -fx-alignment: center-left;
+    -fx-cursor: hand;
+}
+
+.fila-agenda-hoy:hover {
+    -fx-background-color: -vy-fila-hover;
+}
+
+.fila-agenda-hoy:focus-visible {
+    -fx-background-color: -vy-primario-suave;
+}
+
+.fila-agenda-horas {
+    -fx-min-width: 56px;
+}
+
+/* Barras verticales (ui.GraficoBarras) */
+.grafico-barras {
+    -fx-spacing: 10px;
+    -fx-pref-height: 150px;
+    -fx-min-height: 150px;
+    -fx-padding: 8px 0 0 0;
+}
+
+.barra-columna {
+    -fx-spacing: 8px;
+}
+
+.barra,
+.barra-resaltada {
+    -fx-background-radius: 8px 8px 4px 4px;
+    -fx-pref-width: 34px;
+    -fx-max-width: 34px;
+    -fx-min-width: 6px;
+}
+
+/* Muchas barras (un mes por día): más juntas, con esquinas pequeñas */
+.grafico-denso {
+    -fx-spacing: 3px;
+}
+
+.grafico-denso .barra,
+.grafico-denso .barra-resaltada {
+    -fx-background-radius: 3px 3px 1px 1px;
+    -fx-min-width: 2px;
+}
+
+.barra { -fx-background-color: -vy-primario-borde; }
+.barra-resaltada { -fx-background-color: -vy-primario; }
+
+.barra-valor {
+    -fx-font-size: 11px;
+    -fx-text-fill: -vy-texto-2;
+}
+
+.barra-etiqueta,
+.barra-etiqueta-resaltada {
+    -fx-font-family: "Inter Medium";
+    -fx-font-size: 12px;
+    -fx-text-fill: -vy-etiqueta;
+}
+
+.barra-etiqueta-resaltada {
+    -fx-font-family: "Inter";
+    -fx-font-weight: bold;
+}
+
+/* Accesos rápidos */
+.accesos-rapidos {
+    -fx-hgap: 10px;
+    -fx-vgap: 10px;
+}
+
+.acceso-rapido {
+    -fx-background-color: -vy-borde, -vy-superficie;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 12px, 11px;
+    -fx-padding: 14px;
+    -fx-alignment: top-left;
+    -fx-cursor: hand;
+}
+
+.acceso-rapido:hover {
+    -fx-background-color: -vy-primario-borde, -vy-primario-suave;
+}
+
+.acceso-rapido:focus-visible {
+    -fx-background-color: -vy-halo, -vy-primario, -vy-superficie;
+    -fx-background-insets: -3, 0, 1;
+}
+
+.acceso-icono {
+    -fx-background-color: -vy-primario-suave;
+    -fx-background-radius: 9px;
+    -fx-min-width: 32px;
+    -fx-min-height: 32px;
+    -fx-max-width: 32px;
+    -fx-max-height: 32px;
+}
+
+.acceso-icono .icono {
+    -fx-stroke: -vy-primario;
+}
+
+.acceso-texto {
+    -fx-font-family: "Inter SemiBold";
+    -fx-font-size: 13px;
+}
+
+/* Usuarios: píldoras de rol */
+.pill-rol-admin      { -fx-background-color: -vy-pill-yape-fondo;       -fx-text-fill: -vy-pill-yape-texto; }
+.pill-rol-recepcion  { -fx-background-color: -vy-pill-confirmada-fondo; -fx-text-fill: -vy-pill-confirmada-texto; }
+.pill-rol-odontologo { -fx-background-color: -vy-primario-claro;        -fx-text-fill: -vy-primario-hover; }
+
+/* Reportes: filtros */
+.filtros-reporte {
+    -fx-spacing: 16px;
+    -fx-alignment: bottom-left;
+}
+
+.atajos-fecha {
+    -fx-padding: 0 0 4px 0;
+}
+
+.paciente-elegido {
+    -fx-background-color: -vy-borde-campo, -vy-superficie;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 10px, 9px;
+    -fx-padding: 0 12px;
+    -fx-min-height: 40px;
     -fx-spacing: 10px;
     -fx-alignment: center-left;
 }

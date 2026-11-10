@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.vyra.dental.ui.Avatar?>
+<?import com.vyra.dental.ui.Aviso?>
+<?import com.vyra.dental.ui.CampoFormulario?>
+<?import com.vyra.dental.ui.Icono?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- Usuarios y roles: docs/08-guia-frontend.md §7.11 (patrón lista + panel) -->
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.vyra.dental.controller.UsuariosController"
+      fx:id="raiz" styleClass="pagina">
+
+    <HBox styleClass="pagina-encabezado">
+        <VBox styleClass="pagina-titulos">
+            <Label text="Usuarios y roles" styleClass="titulo-pagina"/>
+            <Label fx:id="resumen" styleClass="texto-secundario"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Nuevo usuario" styleClass="btn-primario" onAction="#nuevo" minWidth="-Infinity">
+            <graphic>
+                <Icono nombre="mas" tamano="16"/>
+            </graphic>
+        </Button>
+    </HBox>
+
+    <HBox styleClass="lista-y-panel" fillHeight="false">
+        <VBox styleClass="card,lista" HBox.hgrow="ALWAYS" minWidth="440">
+            <HBox styleClass="lista-barra">
+                <HBox styleClass="buscador" HBox.hgrow="ALWAYS">
+                    <Icono nombre="buscar" tamano="16"/>
+                    <TextField fx:id="campoBuscar" promptText="Buscar por nombre o usuario" HBox.hgrow="ALWAYS"
+                               accessibleText="Buscar usuarios"/>
+                </HBox>
+            </HBox>
+            <TableView fx:id="tabla"/>
+            <HBox styleClass="lista-pie">
+                <Label fx:id="pie" styleClass="texto-secundario"/>
+            </HBox>
+        </VBox>
+
+        <VBox fx:id="panel" styleClass="panel-form,panel-ficha" prefWidth="420" minWidth="380" maxWidth="460">
+            <HBox styleClass="ficha-encabezado">
+                <Avatar fx:id="avatarFicha" styleClass="avatar-grande"/>
+                <VBox styleClass="ficha-titulos" HBox.hgrow="ALWAYS">
+                    <Label fx:id="tituloFicha" styleClass="panel-titulo" wrapText="true"/>
+                    <Label fx:id="subtituloFicha" styleClass="texto-secundario" wrapText="true"/>
+                </VBox>
+            </HBox>
+
+            <VBox styleClass="ficha-formulario">
+                <CampoFormulario fx:id="cfNombreCompleto" etiqueta="Nombre completo" obligatorio="true">
+                    <TextField fx:id="campoNombreCompleto" promptText="Ej. Rocío Mendoza Paz"/>
+                </CampoFormulario>
+                <CampoFormulario fx:id="cfNombreUsuario" etiqueta="Usuario" obligatorio="true">
+                    <TextField fx:id="campoNombreUsuario" promptText="Para iniciar sesión, sin espacios"/>
+                </CampoFormulario>
+                <CampoFormulario fx:id="cfRol" etiqueta="Rol" obligatorio="true">
+                    <HBox styleClass="segmentado,segmentado-ancho">
+                        <ToggleButton fx:id="rolAdmin" text="Administrador" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                        <ToggleButton fx:id="rolRecepcion" text="Recepción" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                        <ToggleButton fx:id="rolOdontologo" text="Odontólogo" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                    </HBox>
+                </CampoFormulario>
+                <Label fx:id="ayudaRol" styleClass="texto-apoyo" wrapText="true"/>
+
+                <Button fx:id="botonRestablecer" text="Restablecer contraseña" styleClass="enlace"
+                        onAction="#mostrarRestablecer">
+                    <graphic>
+                        <Icono nombre="candado" tamano="16"/>
+                    </graphic>
+                </Button>
+                <CampoFormulario fx:id="cfContrasena" etiqueta="Contraseña" obligatorio="true">
+                    <PasswordField fx:id="campoContrasena"/>
+                </CampoFormulario>
+
+                <VBox styleClass="campo-formulario">
+                    <CheckBox fx:id="campoActivo" text="Usuario activo"/>
+                    <Label fx:id="ayudaActivo" styleClass="texto-apoyo" wrapText="true"/>
+                </VBox>
+
+                <Aviso fx:id="avisoProfesional"/>
+                <Aviso fx:id="avisoFormulario"/>
+            </VBox>
+
+            <HBox styleClass="panel-pie">
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Cancelar" styleClass="btn-secundario" onAction="#cancelar" minWidth="-Infinity"/>
+                <Button fx:id="botonGuardar" styleClass="btn-primario" onAction="#guardar" minWidth="-Infinity"/>
+            </HBox>
+        </VBox>
+    </HBox>
+</VBox>

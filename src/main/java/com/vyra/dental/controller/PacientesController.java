@@ -64,7 +64,7 @@ import javafx.util.StringConverter;
  * (docs/08-guia-frontend.md §7.4, CU-01). Administrador y Recepción editan los
  * datos; el odontólogo solo los consulta, pero escribe la historia clínica.
  */
-public class PacientesController {
+public class PacientesController implements RecibeParametro {
 
     private static final double ALTO_FILA = 58;
     private static final double ALTO_ENCABEZADO = 44;
@@ -180,6 +180,24 @@ public class PacientesController {
             prepararNuevo();
         } else {
             mostrarPanel(false);
+        }
+    }
+
+    /** Desde Inicio: "Nuevo paciente" o un paciente elegido en el buscador de la barra superior. */
+    @Override
+    public void recibir(Object parametro) {
+        if (parametro == Solicitud.NUEVO && editable) {
+            prepararNuevo();
+        } else if (parametro instanceof Paciente paciente) {
+            servicio.buscarPorId(paciente.getIdPaciente()).ifPresent(encontrado -> {
+                // Se filtra la lista por su DNI, así queda marcado aunque esté en otra página
+                campoBuscar.setText(encontrado.getDni());
+                esperaBusqueda.stop();
+                pagina = 0;
+                seleccionado = encontrado;
+                cargar();
+                mostrar(encontrado);
+            });
         }
     }
 

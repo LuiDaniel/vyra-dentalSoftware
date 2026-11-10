@@ -189,6 +189,7 @@ classDiagram
         +buscarPorDni(String) Optional~Paciente~
         +buscar(String texto, FiltroPaciente, int limite, int desde) List~Paciente~
         +contarActivos(String texto, FiltroPaciente) int
+        +contarRegistradosEntre(LocalDate, LocalDate) int
         +actualizar(Paciente) boolean
         +darDeBaja(int) boolean
     }
@@ -298,6 +299,7 @@ classDiagram
         +citasDeHoyDePaciente(int) List~Cita~
         +ultimaVisita(int idPaciente) Optional~LocalDate~
         +citasActivasDeHoy() int
+        +citasProximas(int minutos) List~Cita~
     }
     class HistoriaClinicaService {
         +registrarEntrada(HistoriaClinicaEntrada) HistoriaClinicaEntrada
@@ -337,13 +339,21 @@ classDiagram
         +puedeRegistrar() boolean
     }
     class ReporteService {
-        +citasDelDia(LocalDate) List~Cita~
-        +citasDeLaSemana(LocalDate) List~Cita~
-        +historialPaciente(int) List~Tratamiento~
-        +ingresosPorPeriodo(LocalDate, LocalDate) Map~MetodoPago,Double~
+        +citas(LocalDate, LocalDate, Integer idProfesional) ReporteCitas
+        +historialPaciente(int) ReporteHistorial
+        +ingresos(LocalDate, LocalDate) ReporteIngresos
+        +ingresosPorDia(LocalDate, LocalDate) SortedMap~LocalDate,Double~
+        +puedeVer() boolean
     }
     class ProfesionalService
-    class UsuarioService
+    class UsuarioService {
+        +listarTodos() List~Usuario~
+        +crear(Usuario, String contrasena) Usuario
+        +actualizar(Usuario) void
+        +restablecerContrasena(int idUsuario, String nueva) void
+        +profesionalDe(int idUsuario) Optional~Profesional~
+        +puedeEditar() boolean
+    }
 
     CitaService --> CitaDAO
     PacienteService --> PacienteDAO
@@ -359,6 +369,9 @@ classDiagram
     TratamientoService --> CitaDAO
     ReporteService --> CitaDAO
     ReporteService --> PagoDAO
+    ReporteService --> TratamientoDAO
+    UsuarioService --> UsuarioDAO
+    UsuarioService --> ProfesionalDAO
 ```
 
 - Cuando una regla no se cumple, el servicio lanza `ReglaNegocioException` (en `service/`, hereda de `RuntimeException`) con un mensaje listo para mostrarse al usuario: "El Dr. Salinas ya tiene una cita de 09:00 a 10:00". Si el error es de un campo, se crea con `new ReglaNegocioException("dni", mensaje)` y `getCampo()` lo devuelve, para mostrarlo bajo ese campo.
@@ -369,6 +382,8 @@ classDiagram
   - `registrarCambios` recibe la observación de cada pieza cambiada, rechaza piezas fuera de la notación FDI (19, 20, 29...: RN-10) antes de guardar nada, omite los cambios que dejan la pieza como estaba y guarda el resto en una sola transacción (`OdontogramaDAO.registrarTodos`). Devuelve cuántos registros guardó. `estadoActual` devuelve las 32 piezas; las que no tienen registros son `SANA`.
 - `TratamientoService` y `PagoService` (fase 6) reciben un `Clock` opcional. `TratamientoService` (solo el odontólogo escribe) registra en una cita no cancelada y no futura —la suya, si tiene profesional— con la fecha de la cita, y valida las piezas con la notación FDI (error en el campo `piezasDentales`). `PagoService` (Administrador y Recepción) aplica RN-12: monto mayor a 0 con hasta 2 decimales, fecha no futura (hoy si no se indica), método elegido y monto no mayor al saldo; compara en céntimos para evitar errores de redondeo de `double`. `PagoService.Periodo` (HOY, SEMANA, MES), `Rango` y `SaldoPendiente` son tipos internos del servicio.
 - `TratamientoDAOSqlite` guarda las piezas en `tratamiento_pieza` dentro de la misma transacción que el tratamiento (al crear y al actualizar, que las reemplaza).
+- `ReporteService` y `UsuarioService` (fase 7) son solo para el Administrador. `ReporteService` devuelve tipos internos (`ReporteCitas`, `ReporteHistorial`, `ReporteIngresos`) con los totales calculados en céntimos y acepta periodos de hasta un año (`DIAS_MAXIMOS`). `UsuarioService.crear()` recibe la contraseña en texto plano y guarda `HashUtil.hashear()`. `actualizar()` conserva el hash, y un administrador no puede desactivarse ni quitarse el rol a sí mismo. `Rol` tiene `getClaseCss()` para su píldora.
+- `CitaService.citasProximas(minutos)` (fase 7) arma el aviso de Inicio (RF-12) y `PacienteService.nuevosEntre(desde, hasta)` el "+3 en noviembre".
 - `ProfesionalService` (fase 4) asocia como mucho un usuario con rol Odontólogo por profesional y no elimina a un profesional que tenga citas.
 - Las búsquedas de pacientes ignoran mayúsculas y tildes (`util.Busqueda`): "lucia" encuentra a "Lucía".
 - `PacienteService` (fase 3) normaliza antes de validar: quita espacios sobrantes, guarda los campos vacíos como `null` y acepta el teléfono con espacios ("987 654 321"). El DNI no se repite ni siquiera con un paciente dado de baja (RN-01). Los listados son de 20 por página (`TAMANO_PAGINA`).
@@ -380,7 +395,7 @@ classDiagram
 | Paquete | Clases |
 |---|---|
 | `controller` | `LoginController`, `MainController`, `InicioController`, `AgendaController`, `PacientesController`, `HistoriaClinicaController` (pantalla) y `HistoriaClinicaPanelController` (panel reutilizable), `OdontogramaController`, `TratamientosController`, `PagosController`, `ReportesController`, `ProfesionalesController`, `UsuariosController` |
-| `ui` | Componentes JavaFX reutilizables: `Icono` (SVGPath), `Avatar` (iniciales), `Pill` (estado), `PiezaDental` (botón del odontograma), `LineaDeTiempo`, `BuscadorPacientes`, `CeldaPaciente`, `CeldaAlergias`, `AvancePago`, `Aviso` (alertas en línea), `Notificacion` (toast) |
+| `ui` | Componentes JavaFX reutilizables: `Icono` (SVGPath), `Avatar` (iniciales), `Pill` (estado), `PiezaDental` (botón del odontograma), `LineaDeTiempo`, `BuscadorPacientes`, `CeldaPaciente`, `CeldaAlergias`, `AvancePago`, `Kpi`, `GraficoBarras`, `Aviso` (alertas en línea), `Notificacion` (toast) |
 | `util` | `ConexionBD` (existe), `Validador` (existe), `HashUtil` (PBKDF2), `DatosIniciales` (admin y datos de ejemplo), `Formatos` (fechas en español, soles) |
 
 El detalle de cada pantalla y de cada componente está en [`08-guia-frontend.md`](./08-guia-frontend.md).
@@ -400,7 +415,7 @@ Las filas del modelo (de `Usuario` a `Pago`) quedaron corregidas en la fase 1 de
 | `Tratamiento` | ✔ Corregido (fase 1) | Agregar |
 | `Pago` | ✔ Corregido (fase 1) | Agregar campos; `metodoPago` pasa a enum `MetodoPago` |
 | DAO | Las 8 interfaces completas, en SQLite y en memoria (fases 2 a 6) | Las 8 interfaces de la sección 2, con implementación SQLite |
-| Servicios | `AuthService`, `Sesion` (fase 2), `PacienteService` (fase 3), `CitaService` y `ProfesionalService` (fase 4), `HistoriaClinicaService` y `OdontogramaService` (fase 5), `TratamientoService` y `PagoService` (fase 6) | Los de la sección 3 |
+| Servicios | `AuthService`, `Sesion` (fase 2), `PacienteService` (fase 3), `CitaService` y `ProfesionalService` (fase 4), `HistoriaClinicaService` y `OdontogramaService` (fase 5), `TratamientoService` y `PagoService` (fase 6), `ReporteService` y `UsuarioService` (fase 7): todos los de la sección 3 | Los de la sección 3 |
 | `demo/*CrudDemoApp` | CRUD de prueba con `Alert` | Se mantienen hasta tener las pantallas reales; luego se borran |
 
 ---

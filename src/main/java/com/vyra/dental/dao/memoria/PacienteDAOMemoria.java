@@ -1,5 +1,6 @@
 package com.vyra.dental.dao.memoria;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -52,6 +53,14 @@ public class PacienteDAOMemoria implements PacienteDAO {
     @Override
     public int contarActivos(String texto, FiltroPaciente filtro) {
         return (int) pacientes.stream().filter(coincide(texto, filtro)).count();
+    }
+
+    @Override
+    public int contarRegistradosEntre(LocalDate desde, LocalDate hasta) {
+        return (int) pacientes.stream()
+                .filter(p -> p.isActivo() && p.getFechaRegistro() != null
+                        && !p.getFechaRegistro().isBefore(desde) && !p.getFechaRegistro().isAfter(hasta))
+                .count();
     }
 
     @Override

@@ -65,6 +65,11 @@ public class PacienteService {
         return pacienteDAO.contarActivos(texto, filtro);
     }
 
+    /** Pacientes activos registrados entre las dos fechas (ambas incluidas). */
+    public int nuevosEntre(LocalDate desde, LocalDate hasta) {
+        return pacienteDAO.contarRegistradosEntre(desde, hasta);
+    }
+
     public Optional<Paciente> buscarPorId(int idPaciente) {
         return pacienteDAO.buscarPorId(idPaciente);
     }

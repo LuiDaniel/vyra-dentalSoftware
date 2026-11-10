@@ -16,7 +16,7 @@ public class AuthService {
 
     public static final String CREDENCIALES_INCORRECTAS = "Usuario o contraseña incorrectos.";
     public static final String USUARIO_DESACTIVADO = "Tu usuario está desactivado. Consulta con el administrador.";
-    static final int LARGO_MINIMO_CONTRASENA = 6;
+    public static final int LARGO_MINIMO_CONTRASENA = 6;
 
     // Si el usuario no existe se verifica contra este hash, para que la respuesta
     // tarde lo mismo y no delate qué nombres de usuario existen

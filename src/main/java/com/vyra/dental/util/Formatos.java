@@ -110,6 +110,12 @@ public final class Formatos {
         return "S/ " + formato.format(monto);
     }
 
+    /** "1,120" (sin decimales, para las cifras de los gráficos). */
+    public static String miles(double monto) {
+        DecimalFormat formato = new DecimalFormat("#,##0", DecimalFormatSymbols.getInstance(Locale.US));
+        return formato.format(monto);
+    }
+
     /**
      * Lee un monto escrito por el usuario: "650", "650.5", "1,250.00" o "S/ 80".
      * La coma solo separa miles (formato de Perú). Lanza NumberFormatException
