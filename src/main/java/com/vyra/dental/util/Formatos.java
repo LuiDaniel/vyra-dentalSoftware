@@ -35,6 +35,7 @@ public final class Formatos {
 
     private static final DateTimeFormatter HORA = DateTimeFormatter.ofPattern("HH:mm");
     private static final DateTimeFormatter MES_ANIO = DateTimeFormatter.ofPattern("MMMM yyyy", ES_PE);
+    private static final DateTimeFormatter MES = DateTimeFormatter.ofPattern("MMMM", ES_PE);
     private static final DateTimeFormatter DIA_Y_MES = DateTimeFormatter.ofPattern("EEEE d 'de' MMMM", ES_PE);
     // Propias, como en FECHA_CORTA: el JDK escribe "lun." con punto
     private static final String[] DIAS_CORTOS = { "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom" };
@@ -55,6 +56,12 @@ public final class Formatos {
     /** "29 oct 2026". */
     public static String fechaCorta(LocalDate fecha) {
         return fecha == null ? "" : FECHA_CORTA.format(fecha);
+    }
+
+    /** "29 oct" (tablas donde el año se sobreentiende, como los pagos del periodo). */
+    public static String diaMes(LocalDate fecha) {
+        String corta = fechaCorta(fecha);
+        return corta.isEmpty() ? corta : corta.substring(0, corta.lastIndexOf(' '));
     }
 
     /** "Jueves 29 de octubre" (título de la agenda). */
@@ -81,6 +88,11 @@ public final class Formatos {
         return fecha == null ? "" : MES_ANIO.format(fecha);
     }
 
+    /** "noviembre" (para "Cobrado en noviembre"). */
+    public static String mes(LocalDate fecha) {
+        return fecha == null ? "" : MES.format(fecha);
+    }
+
     /** Formato de los campos de fecha (DatePicker): "14/03/1992". */
     public static DateTimeFormatter formatoFechaCampo() {
         return FECHA_CAMPO;
@@ -96,6 +108,22 @@ public final class Formatos {
         // DecimalFormat no es seguro entre hilos, por eso se crea en cada llamada
         DecimalFormat formato = new DecimalFormat("#,##0.00", DecimalFormatSymbols.getInstance(Locale.US));
         return "S/ " + formato.format(monto);
+    }
+
+    /**
+     * Lee un monto escrito por el usuario: "650", "650.5", "1,250.00" o "S/ 80".
+     * La coma solo separa miles (formato de Perú). Lanza NumberFormatException
+     * si no es un número.
+     */
+    public static double leerMonto(String texto) {
+        if (texto == null || texto.isBlank()) {
+            throw new NumberFormatException("Monto vacío");
+        }
+        String limpio = texto.strip().replaceFirst("(?i)^s/\\s*", "").replace(",", "").replace(" ", "");
+        if (!limpio.matches("\\d+(\\.\\d+)?|\\.\\d+")) {
+            throw new NumberFormatException("Monto inválido: " + texto);
+        }
+        return Double.parseDouble(limpio);
     }
 
     /** "987 654 321". Si no tiene 9 dígitos se devuelve sin cambios. */

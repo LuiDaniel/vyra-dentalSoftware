@@ -74,6 +74,7 @@ public class OdontogramaController implements RecibeParametro, ConfirmaSalida {
     @FXML private CampoFormulario cfObservacion;
     @FXML private TextArea campoObservacion;
     @FXML private Label ayudaObservacion;
+    @FXML private Button enlaceTratamiento;
     @FXML private Label tituloHistorial;
     @FXML private LineaDeTiempo historial;
     @FXML private Label historialVacio;
@@ -378,6 +379,7 @@ public class OdontogramaController implements RecibeParametro, ConfirmaSalida {
             estadoPieza.setText("Haz clic en una pieza para ver su estado y su historial.");
             alternar(cfObservacion, false);
             alternar(ayudaObservacion, false);
+            alternar(enlaceTratamiento, false);
             mostrarHistorial();
             return;
         }
@@ -393,6 +395,8 @@ public class OdontogramaController implements RecibeParametro, ConfirmaSalida {
 
         alternar(cfObservacion, editable);
         alternar(ayudaObservacion, editable);
+        // Solo el odontólogo registra tratamientos (docs/02-casos-de-uso.md §3)
+        alternar(enlaceTratamiento, Servicios.tratamientos().puedeEditar());
         campoObservacion.setDisable(nuevo == null);
         ayudaObservacion.setText(nuevo == null
                 ? "Para registrar un cambio, elige un estado en la barra y haz clic en la pieza."
@@ -426,6 +430,14 @@ public class OdontogramaController implements RecibeParametro, ConfirmaSalida {
         }
         historialVacio.setText("Sin cambios registrados: la pieza figura como sana.");
         alternar(historialVacio, historial.estaVacia());
+    }
+
+    /** Abre Tratamientos con el formulario dirigido a este paciente y esta pieza (CU-06). */
+    @FXML
+    private void registrarTratamiento() {
+        if (paciente != null && seleccionada != null) {
+            MainController.actual().navegar(Pantalla.TRATAMIENTOS, new NuevoTratamiento(paciente, seleccionada));
+        }
     }
 
     // ===== Guardar =====

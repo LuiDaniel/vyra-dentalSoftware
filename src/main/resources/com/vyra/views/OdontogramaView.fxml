@@ -3,6 +3,7 @@
 <?import com.vyra.dental.ui.Avatar?>
 <?import com.vyra.dental.ui.BuscadorPacientes?>
 <?import com.vyra.dental.ui.CampoFormulario?>
+<?import com.vyra.dental.ui.Icono?>
 <?import com.vyra.dental.ui.Aviso?>
 <?import com.vyra.dental.ui.LineaDeTiempo?>
 <?import javafx.scene.control.Button?>
@@ -70,6 +71,12 @@
                               promptText="Ej. Caries oclusal profunda, se programa obturación."/>
                 </CampoFormulario>
                 <Label fx:id="ayudaObservacion" styleClass="texto-apoyo" wrapText="true"/>
+                <Button fx:id="enlaceTratamiento" text="Registrar tratamiento para esta pieza" styleClass="enlace"
+                        onAction="#registrarTratamiento">
+                    <graphic>
+                        <Icono nombre="mas" tamano="16"/>
+                    </graphic>
+                </Button>
             </VBox>
 
             <!-- Historial de la pieza -->

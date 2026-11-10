@@ -109,7 +109,7 @@ public class BuscadorPacientes extends VBox {
         tabla.minHeightProperty().bind(alto);
 
         TableColumn<Paciente, Paciente> paciente = columna("PACIENTE", 250);
-        paciente.setCellFactory(c -> new CeldaPaciente());
+        paciente.setCellFactory(c -> new CeldaPaciente<>());
         TableColumn<Paciente, Paciente> edad = columna("EDAD", 80);
         edad.setCellFactory(c -> new TableCell<>() {
             @Override

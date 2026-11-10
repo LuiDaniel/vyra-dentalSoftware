@@ -71,10 +71,14 @@
                 <ToggleButton fx:id="pestanaDatos" text="Datos" styleClass="pestana" selected="true"/>
                 <ToggleButton fx:id="pestanaHistoria" text="Historia clínica" styleClass="pestana"/>
                 <ToggleButton fx:id="pestanaCitas" text="Citas" styleClass="pestana"/>
+                <ToggleButton fx:id="pestanaPagos" text="Pagos" styleClass="pestana"/>
             </HBox>
 
             <!-- Pestaña Citas: las citas del paciente, de la más reciente a la más antigua -->
             <VBox fx:id="contenidoCitas" styleClass="ficha-citas"/>
+
+            <!-- Pestaña Pagos (solo Administrador y Recepción): sus tratamientos, lo pagado y el saldo -->
+            <VBox fx:id="contenidoPagos" styleClass="ficha-citas"/>
 
             <!-- Pestaña Historia clínica (solo Administrador y Odontólogo): docs/08-guia-frontend.md §7.5 -->
             <fx:include fx:id="historia" source="HistoriaClinicaPanel.fxml"/>

@@ -8,15 +8,19 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
+import com.vyra.dental.dao.memoria.CitaDAOMemoria;
 import com.vyra.dental.dao.memoria.HistoriaClinicaDAOMemoria;
 import com.vyra.dental.dao.memoria.OdontogramaDAOMemoria;
 import com.vyra.dental.dao.memoria.PacienteDAOMemoria;
+import com.vyra.dental.dao.memoria.PagoDAOMemoria;
 import com.vyra.dental.dao.memoria.ProfesionalDAOMemoria;
+import com.vyra.dental.dao.memoria.TratamientoDAOMemoria;
 import com.vyra.dental.dao.memoria.UsuarioDAOMemoria;
 import com.vyra.dental.model.EstadoPieza;
 import com.vyra.dental.model.OdontogramaPieza;
 import com.vyra.dental.model.Profesional;
 import com.vyra.dental.model.Rol;
+import com.vyra.dental.model.TratamientoResumen;
 import com.vyra.dental.model.Usuario;
 
 class DatosInicialesTest {
@@ -83,5 +87,25 @@ class DatosInicialesTest {
                 EstadoPieza.EXTRAIDA, 2L), conteo);
         assertEquals(2, odontograma.historialPieza(maria, 36).size());
         assertEquals(3, historia.listarPorPaciente(maria).size());
+    }
+
+    @Test
+    void losTratamientosYPagosDeEjemploSeCarganUnaVez() {
+        PacienteDAOMemoria pacientes = new PacienteDAOMemoria();
+        ProfesionalDAOMemoria profesionales = new ProfesionalDAOMemoria();
+        CitaDAOMemoria citas = new CitaDAOMemoria();
+        PagoDAOMemoria pagos = new PagoDAOMemoria();
+        TratamientoDAOMemoria tratamientos = new TratamientoDAOMemoria(citas, pagos);
+        DatosIniciales.cargarEjemplos(pacientes);
+        DatosIniciales.cargarEjemplosAgenda(pacientes, profesionales, citas);
+
+        DatosIniciales.cargarEjemplosPagos(pacientes, profesionales, citas, tratamientos, pagos);
+        DatosIniciales.cargarEjemplosPagos(pacientes, profesionales, citas, tratamientos, pagos);
+
+        assertEquals(7, tratamientos.listarTodos().size());
+        int maria = pacientes.buscarPorDni("72481935").orElseThrow().getIdPaciente();
+        TratamientoResumen endodoncia = tratamientos.resumenesDePaciente(maria).get(0);
+        assertEquals("Endodoncia pieza 36", endodoncia.getTratamiento().getDescripcion());
+        assertEquals(400.0, endodoncia.getSaldo());
     }
 }

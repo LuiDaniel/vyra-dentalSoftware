@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.vyra.dental.ui.Aviso?>
+<?import com.vyra.dental.ui.CampoFormulario?>
+<?import com.vyra.dental.ui.Icono?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- Pagos: docs/08-guia-frontend.md §7.8, referencia docs/ui/Pagos.html -->
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.vyra.dental.controller.PagosController"
+      fx:id="raiz" styleClass="pagina">
+
+    <HBox styleClass="pagina-encabezado">
+        <VBox styleClass="pagina-titulos">
+            <Label text="Pagos" styleClass="titulo-pagina"/>
+            <Label text="Registra pagos asociados a tratamientos." styleClass="texto-secundario"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <HBox fx:id="selectorPeriodo" styleClass="segmentado" minWidth="-Infinity" maxHeight="-Infinity"/>
+    </HBox>
+
+    <!-- Indicadores -->
+    <HBox styleClass="kpis">
+        <VBox styleClass="kpi" HBox.hgrow="ALWAYS" prefWidth="220">
+            <Label fx:id="tituloCobrado" styleClass="kpi-etiqueta"/>
+            <Label fx:id="valorCobrado" styleClass="kpi-valor"/>
+            <Label fx:id="comparacionCobrado" styleClass="kpi-detalle" wrapText="true"/>
+        </VBox>
+        <VBox styleClass="kpi" HBox.hgrow="ALWAYS" prefWidth="220">
+            <Label text="Saldo pendiente de tratamientos" styleClass="kpi-etiqueta"/>
+            <Label fx:id="valorSaldo" styleClass="kpi-valor"/>
+            <Label fx:id="detalleSaldo" styleClass="kpi-detalle" wrapText="true"/>
+        </VBox>
+        <VBox styleClass="kpi,kpi-metodos" HBox.hgrow="ALWAYS" prefWidth="220">
+            <Label text="Métodos de pago" styleClass="kpi-etiqueta"/>
+            <HBox fx:id="barraMetodos" styleClass="barra-metodos"/>
+            <FlowPane fx:id="leyendaMetodos" styleClass="leyenda-metodos"/>
+        </VBox>
+    </HBox>
+
+    <HBox styleClass="lista-y-panel" fillHeight="false">
+        <!-- Pagos del periodo -->
+        <VBox styleClass="card,lista" HBox.hgrow="ALWAYS" minWidth="460">
+            <HBox styleClass="lista-barra">
+                <Label fx:id="tituloTabla" styleClass="card-titulo"/>
+            </HBox>
+            <TableView fx:id="tabla"/>
+            <HBox styleClass="lista-pie">
+                <Label fx:id="pie" styleClass="texto-secundario"/>
+            </HBox>
+        </VBox>
+
+        <!-- Registrar pago -->
+        <VBox styleClass="panel-form,panel-ficha" prefWidth="380" minWidth="350" maxWidth="420">
+            <VBox styleClass="panel-encabezado">
+                <Label text="Registrar pago" styleClass="panel-titulo"/>
+            </VBox>
+            <VBox styleClass="ficha-formulario">
+                <CampoFormulario fx:id="cfTratamiento" etiqueta="Tratamiento" obligatorio="true">
+                    <VBox>
+                        <HBox fx:id="buscadorTratamiento" styleClass="buscador">
+                            <Icono nombre="buscar" tamano="16"/>
+                            <TextField fx:id="campoTratamiento" promptText="Buscar por paciente o DNI" HBox.hgrow="ALWAYS"
+                                       accessibleText="Buscar el tratamiento a pagar"/>
+                        </HBox>
+                        <VBox fx:id="tarjetaTratamiento" styleClass="tarjeta-tratamiento">
+                            <HBox styleClass="tarjeta-tratamiento-fila">
+                                <VBox HBox.hgrow="ALWAYS">
+                                    <Label fx:id="tarjetaDescripcion" styleClass="celda-titulo" wrapText="true"/>
+                                    <Label fx:id="tarjetaPaciente" styleClass="celda-sub" wrapText="true"/>
+                                </VBox>
+                                <Label fx:id="tarjetaCosto" styleClass="monto" minWidth="-Infinity"/>
+                            </HBox>
+                            <ProgressBar fx:id="tarjetaAvance" styleClass="barra-pago" maxWidth="Infinity"/>
+                            <HBox styleClass="tarjeta-tratamiento-fila">
+                                <Label fx:id="tarjetaSaldo" styleClass="texto-apoyo" wrapText="true" HBox.hgrow="ALWAYS"
+                                       maxWidth="Infinity"/>
+                                <Button text="Cambiar" styleClass="enlace" onAction="#quitarTratamiento" minWidth="-Infinity"
+                                        accessibleText="Cambiar de tratamiento"/>
+                            </HBox>
+                        </VBox>
+                    </VBox>
+                </CampoFormulario>
+
+                <GridPane styleClass="rejilla-formulario">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="50"/>
+                        <ColumnConstraints percentWidth="50"/>
+                    </columnConstraints>
+                    <CampoFormulario fx:id="cfMonto" etiqueta="Monto (S/)" obligatorio="true" GridPane.columnIndex="0">
+                        <TextField fx:id="campoMonto" promptText="0.00" styleClass="campo-monto"/>
+                    </CampoFormulario>
+                    <CampoFormulario fx:id="cfFecha" etiqueta="Fecha de pago" obligatorio="true" GridPane.columnIndex="1">
+                        <DatePicker fx:id="campoFecha" maxWidth="Infinity"/>
+                    </CampoFormulario>
+                </GridPane>
+
+                <CampoFormulario fx:id="cfMetodo" etiqueta="Método de pago" obligatorio="true">
+                    <GridPane fx:id="metodos" styleClass="metodos-pago">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50"/>
+                            <ColumnConstraints percentWidth="50"/>
+                        </columnConstraints>
+                    </GridPane>
+                </CampoFormulario>
+
+                <CampoFormulario fx:id="cfOperacion" etiqueta="N.º de operación">
+                    <TextField fx:id="campoOperacion" promptText="Opcional"/>
+                </CampoFormulario>
+
+                <Aviso fx:id="avisoPago"/>
+            </VBox>
+            <VBox styleClass="panel-pie,pie-pago">
+                <Label fx:id="saldoDespues" styleClass="texto-secundario" wrapText="true"/>
+                <Button fx:id="botonRegistrar" styleClass="btn-primario" onAction="#registrar" maxWidth="Infinity"/>
+            </VBox>
+        </VBox>
+    </HBox>
+</VBox>

@@ -235,6 +235,7 @@ Cada pantalla indica: archivo FXML, controlador, requerimientos que cubre, roles
   - Paciente: avatar + nombre (SemiBold) + "DNI 72481935" debajo (12 px). Se hace con un `cellFactory`.
   - Teléfono ("987 654 321"), Edad ("34 años"), Última visita ("29 oct 2026"), Alergias (píldora naranja con ícono `alerta`, o "Ninguna" en gris), Acciones (botones `diente` → Odontograma y `agenda` → Nueva cita para ese paciente).
   - Pie: "Mostrando 1–7 de 248" + botones Anterior / Siguiente (20 por página).
+  - *Implementación (fase 6):* la pestaña **Pagos** (solo Administrador y Recepción) muestra el saldo pendiente del paciente y cada tratamiento con lo pagado, su estado y un botón "Cobrar" que abre Pagos con ese tratamiento elegido.
   - *Implementación (fase 3):* la lista se ordena por apellidos; los filtros se aplican en la consulta, así la paginación cuenta bien. "Última visita" muestra "—" hasta que existan las citas (fase 4). El panel tiene por ahora solo la pestaña Datos; las demás se agregan en sus fases.
 - **Panel de ficha (derecha):** avatar grande + nombre completo + "DNI · Paciente desde {mes año}". Pestañas: **Datos**, **Historia clínica** (ver 7.5), **Citas** (lista de sus citas) y **Pagos** (sus pagos y saldo). En Datos, un formulario en 3 secciones:
   - Datos personales: Nombres*, Apellidos*, DNI*, Fecha de nacimiento.
@@ -282,7 +283,7 @@ Cada pantalla indica: archivo FXML, controlador, requerimientos que cubre, roles
   - Al cambiar de pantalla o cerrar sesión con cambios pendientes, `MainController` pregunta (interfaz `controller.ConfirmaSalida`); en el diálogo, Enter cancela.
   - El administrador ve la barra como leyenda con los conteos, sin botón Guardar ni campo de observación.
   - Para que las 16 piezas de cada fila entren a 1280 px sin desplazamiento horizontal, la separación entre piezas es de 2 px. Si la ayuda de la barra no entra, se parte en dos líneas.
-  - "Exportar PDF" se agrega en la fase 8 y "Registrar tratamiento para esta pieza" en la fase 6.
+  - "Exportar PDF" se agrega en la fase 8. "Registrar tratamiento para esta pieza" (solo el odontólogo) abre Tratamientos con el formulario nuevo, la pieza escrita y la cita de hoy del paciente elegida (parámetro `controller.NuevoTratamiento`).
 
 ### 7.7 Tratamientos — `TratamientosView.fxml` / `TratamientosController`
 **Referencia:** no tiene pantalla propia; seguir el patrón de `docs/ui/Pagos.html` (tabla + panel) · **Cubre:** RF-06, CU-06 · **Roles:** Odontólogo (completo); Admin y Recepción (lectura)
@@ -291,6 +292,11 @@ Cada pantalla indica: archivo FXML, controlador, requerimientos que cubre, roles
 - **Tabla:** Fecha, Paciente (avatar + nombre), Descripción, Piezas (chips pequeños con los números: "36", "47"), Costo, Pagado (barra de progreso + "S/ 250 de S/ 650"), Estado (píldora).
 - **Panel "Nuevo tratamiento":** Cita (las citas de hoy y las atendidas recientes, "29 oct · María Quispe · Endodoncia"), Descripción*, Piezas (mini odontograma de selección múltiple o campo "36, 47" validado con la notación FDI), Costo (S/)*, Estado (segmentado En curso / Finalizado).
 - Seleccionar uno existente muestra su detalle, sus pagos y el botón "Marcar como finalizado".
+- *Implementación (fase 6):*
+  - Con el panel a la derecha, siete columnas no entran a 1280 px. La tabla tiene cuatro: Tratamiento (descripción + "16 oct 2026 · pieza 36"), Paciente (avatar + nombre + DNI), Pagado (`ui.AvancePago`) y Estado. Las piezas en chips y el costo, lo pagado y el saldo van en el detalle.
+  - El selector En curso / Finalizados / Todos está en la barra de la tabla, junto al buscador (por nombre o DNI del paciente, sin tildes). Empieza en "En curso".
+  - "Nuevo tratamiento" (solo el odontólogo) ofrece las citas de hoy no canceladas y las atendidas en los últimos 30 días (`TratamientoService.DIAS_CITAS_RECIENTES`), solo las suyas si su usuario tiene profesional. El tratamiento toma la fecha de la cita. Las piezas se escriben ("36, 47"), se validan con la notación FDI y se guardan sin repetir y en orden.
+  - En el detalle, el odontólogo ve "Marcar como finalizado"; Administrador y Recepción ven "Registrar pago" (si hay saldo), que abre Pagos con ese tratamiento elegido.
 
 ### 7.8 Pagos — `PagosView.fxml` / `PagosController`
 **Referencia:** `docs/ui/Pagos.html` · **Cubre:** RF-10, CU-10 · **Roles:** Admin y Recepción
@@ -305,6 +311,13 @@ Cada pantalla indica: archivo FXML, controlador, requerimientos que cubre, roles
   - N.º de operación (opcional).
   - Pie: "Saldo después de este pago: S/ 200.00" (se recalcula al escribir) y botón primario de ancho completo "Registrar pago de S/ 200.00".
 - **Errores:** monto mayor al saldo → "El monto supera el saldo pendiente (S/ 400.00)".
+- *Implementación (fase 6):*
+  - El periodo "Semana" va de lunes a domingo y el mes es el calendario. El % compara con el periodo anterior completo (ayer, la semana pasada, el mes pasado); si ese no tuvo cobros, se indica en lugar del %.
+  - "Saldo pendiente" suma lo que deben todos los tratamientos (también los finalizados que no se pagaron completos) y dice en cuántos.
+  - La tabla muestra los pagos del periodo elegido (no solo los recientes). El botón "Exportar" queda para Reportes (fase 7).
+  - Tratamiento: el buscador sugiere, al entrar o al escribir, los tratamientos que todavía deben algo ("Endodoncia pieza 36 · María Quispe Huamán · Saldo S/ 400.00"). "Cambiar" suelta el elegido. Desde Tratamientos o desde la pestaña Pagos de la ficha del paciente se llega con el tratamiento ya elegido.
+  - El monto acepta "200", "200.50" o "1,250.00". Mientras se escribe, el pie muestra el saldo que quedará (en rojo si supera el saldo). Tras registrar, si el tratamiento ya no debe nada se suelta.
+  - Colores de los métodos en la barra apilada: Efectivo `-vy-primario`, Yape / Plin `-vy-acento`, Tarjeta `-vy-celeste` (`#7DD3FC`), Transferencia `-vy-borde-campo`. Las píldoras usan `MetodoPago.getClaseCss()`.
 
 ### 7.9 Reportes — `ReportesView.fxml` / `ReportesController`
 **Referencia:** sin pantalla propia; usar tarjetas `.card` y el estilo de KPI de Inicio · **Cubre:** RF-09, CU-09 · **Roles:** Admin
@@ -332,7 +345,8 @@ Cada pantalla indica: archivo FXML, controlador, requerimientos que cubre, roles
 | `PiezaDental` | `ToggleButton` con el número, el diente y la letra; `setEstado()` cambia su clase CSS y `setPendiente()` marca un cambio sin guardar | Odontograma, selección de piezas en Tratamientos |
 | `LineaDeTiempo` | `VBox` de sucesos con punto + línea vertical: `agregar(titulo, detalle, texto, claseColor)` | Historial de la pieza, historia clínica |
 | `BuscadorPacientes` | Tarjeta con buscador (300 ms de espera) y tabla de pacientes; el controlador le pasa cómo buscar con `configurar()` | Historia clínica y Odontograma abiertos desde el menú |
-| `CeldaPaciente`, `CeldaAlergias` | Celdas de tabla: avatar + nombre + DNI, y píldora de alergia (`CeldaAlergias.pillAlergia()`) | Pacientes, `BuscadorPacientes`, Odontograma |
+| `CeldaPaciente`, `CeldaAlergias` | Celdas de tabla: avatar + nombre + DNI (`CeldaPaciente<S>` sirve para cualquier tipo de fila que traiga al paciente), y píldora de alergia (`CeldaAlergias.pillAlergia()`) | Pacientes, `BuscadorPacientes`, Odontograma, Tratamientos |
+| `AvancePago` | Barra de lo pagado + "S/ 250.00 de S/ 650.00"; `mostrar(pagado, costo)` | Tratamientos, pestaña Pagos de la ficha |
 | `Aviso` | `HBox` con ícono y texto; tipos INFO, EXITO, ADVERTENCIA, ERROR | Formularios, Inicio |
 | `Notificacion` | Toast: `Notificacion.mostrar(ventana, "Paciente registrado")`, 3 s, abajo a la derecha | Después de guardar |
 | `CampoFormulario` | `VBox` con etiqueta + control + mensaje de error; métodos `mostrarError(String)` y `limpiarError()` | Todos los formularios |

@@ -49,6 +49,9 @@
     -vy-pill-atendida-fondo: #D1FAE5;    -vy-pill-atendida-texto: #065F46;
     -vy-pill-cancelada-fondo: #FEE2E2;   -vy-pill-cancelada-texto: #991B1B;
     -vy-pill-alergia-fondo: #FFEDD5;     -vy-pill-alergia-texto: #9A3412;
+    -vy-pill-yape-fondo: #EDE9FE;        -vy-pill-yape-texto: #5B21B6;
+    /* Tercer color de la barra de métodos de pago (tarjeta), docs/ui/Pagos.html */
+    -vy-celeste: #7DD3FC;
 
     /* Bloques de la agenda (fondo / borde / texto), guía §2 */
     -vy-cita-pendiente-fondo: #FFFBEB;  -vy-cita-pendiente-borde: #FDE68A;  -vy-cita-pendiente-texto: #78350F;
@@ -451,8 +454,9 @@
     -fx-font-size: 13px;
 }
 
-/* Ficha (panel derecho) */
-.panel-ficha {
+/* Ficha (panel derecho). Va con .panel-form, que se declara después con padding 24:
+   el selector doble gana, y los márgenes los ponen las secciones internas. */
+.panel-form.panel-ficha {
     -fx-padding: 0;
     -fx-spacing: 0;
 }
@@ -702,6 +706,17 @@
     -fx-padding: 0;
     -fx-border-width: 0;
     -fx-underline: false;
+}
+
+.button.enlace {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-cursor: hand;
+    -fx-graphic-text-gap: 8px;
+}
+
+.button.enlace .icono {
+    -fx-stroke: -vy-primario;
 }
 
 .enlace:hover {
@@ -1998,3 +2013,223 @@
     -fx-border-width: 0 0 1px 0;
 }
 
+/* ===== 16. Tratamientos y Pagos (docs/08-guia-frontend.md §7.7 y §7.8) ===== */
+
+/* Píldoras de método de pago */
+.pill-efectivo      { -fx-background-color: -vy-pill-atendida-fondo;   -fx-text-fill: -vy-pill-atendida-texto; }
+.pill-yape-plin     { -fx-background-color: -vy-pill-yape-fondo;       -fx-text-fill: -vy-pill-yape-texto; }
+.pill-tarjeta       { -fx-background-color: -vy-pill-confirmada-fondo; -fx-text-fill: -vy-pill-confirmada-texto; }
+.pill-transferencia { -fx-background-color: -vy-separador;             -fx-text-fill: -vy-etiqueta; }
+
+/* Barra de lo pagado (ui.AvancePago y detalle) */
+.avance-pago {
+    -fx-spacing: 4px;
+    -fx-alignment: center-left;
+}
+
+.barra-pago {
+    -fx-pref-height: 6px;
+    -fx-min-height: 6px;
+    -fx-max-height: 6px;
+}
+
+.barra-pago > .track {
+    -fx-background-color: -vy-borde;
+    -fx-background-insets: 0;
+    -fx-background-radius: 999px;
+}
+
+.barra-pago > .bar {
+    -fx-background-color: -vy-primario;
+    -fx-background-insets: 0;
+    -fx-background-radius: 999px;
+    -fx-padding: 3px;
+}
+
+/* Montos */
+.monto {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.monto-saldo {
+    -fx-text-fill: -vy-primario;
+}
+
+.table-row-cell .celda-monto {
+    -fx-alignment: center-right;
+    -fx-font-weight: bold;
+}
+
+.texto-error {
+    -fx-text-fill: -vy-error-texto;
+}
+
+/* Detalle del tratamiento */
+.panel-encabezado-titulo {
+    -fx-spacing: 10px;
+    -fx-alignment: top-left;
+}
+
+.chips-piezas {
+    -fx-hgap: 6px;
+    -fx-vgap: 6px;
+}
+
+.chip-pieza {
+    -fx-background-color: -vy-borde-campo, -vy-fila-hover;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 6px, 5px;
+    -fx-padding: 2px 8px;
+    -fx-font-family: "Inter SemiBold";
+    -fx-font-size: 12px;
+    -fx-text-fill: -vy-etiqueta;
+}
+
+.lista-pagos {
+    -fx-spacing: 0;
+}
+
+.fila-pago {
+    -fx-padding: 10px 0;
+    -fx-alignment: center-left;
+    -fx-border-color: transparent transparent -vy-separador transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+/* Indicadores de Pagos */
+.kpis {
+    -fx-spacing: 16px;
+}
+
+.kpi {
+    -fx-spacing: 10px;
+}
+
+.kpi-etiqueta {
+    -fx-font-family: "Inter Medium";
+    -fx-font-size: 13px;
+    -fx-text-fill: -vy-texto-2;
+}
+
+.kpi-detalle {
+    -fx-font-size: 12px;
+    -fx-text-fill: -vy-texto-2;
+}
+
+.kpi-subida {
+    -fx-font-family: "Inter SemiBold";
+    -fx-text-fill: -vy-aviso-exito-texto;
+}
+
+.kpi-bajada {
+    -fx-font-family: "Inter SemiBold";
+    -fx-text-fill: -vy-error-texto;
+}
+
+.barra-metodos {
+    -fx-spacing: 2px;
+    -fx-pref-height: 10px;
+    -fx-min-height: 10px;
+    -fx-max-height: 10px;
+}
+
+.segmento-metodo,
+.segmento-vacio {
+    -fx-background-radius: 3px;
+}
+
+.segmento-vacio                       { -fx-background-color: -vy-borde; }
+.segmento-metodo.pill-efectivo,
+.leyenda-cuadro.pill-efectivo         { -fx-background-color: -vy-primario; }
+.segmento-metodo.pill-yape-plin,
+.leyenda-cuadro.pill-yape-plin        { -fx-background-color: -vy-acento; }
+.segmento-metodo.pill-tarjeta,
+.leyenda-cuadro.pill-tarjeta          { -fx-background-color: -vy-celeste; }
+.segmento-metodo.pill-transferencia,
+.leyenda-cuadro.pill-transferencia    { -fx-background-color: -vy-borde-campo; }
+
+.leyenda-metodos {
+    -fx-hgap: 14px;
+    -fx-vgap: 6px;
+}
+
+.leyenda-metodo {
+    -fx-font-size: 12px;
+    -fx-text-fill: -vy-etiqueta;
+    -fx-graphic-text-gap: 6px;
+}
+
+.leyenda-cuadro {
+    -fx-background-radius: 2px;
+    -fx-min-width: 8px;
+    -fx-min-height: 8px;
+    -fx-max-width: 8px;
+    -fx-max-height: 8px;
+}
+
+/* Registrar pago */
+.tarjeta-tratamiento {
+    -fx-background-color: -vy-borde-campo, -vy-superficie;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 10px, 9px;
+    -fx-padding: 12px 14px;
+    -fx-spacing: 10px;
+}
+
+.tarjeta-tratamiento-fila {
+    -fx-spacing: 10px;
+    -fx-alignment: center-left;
+}
+
+.campo-monto {
+    -fx-font-family: "Inter SemiBold";
+    -fx-font-size: 16px;
+}
+
+.metodos-pago {
+    -fx-hgap: 8px;
+    -fx-vgap: 8px;
+}
+
+.boton-metodo {
+    -fx-background-color: -vy-borde, -vy-superficie;
+    -fx-background-insets: 0, 1.5;
+    -fx-background-radius: 10px, 9px;
+    -fx-pref-height: 46px;
+    -fx-min-height: 46px;
+    -fx-padding: 0 12px;
+    -fx-alignment: center-left;
+    -fx-graphic-text-gap: 10px;
+    -fx-font-family: "Inter SemiBold";
+    -fx-font-size: 14px;
+    -fx-text-fill: -vy-etiqueta;
+    -fx-cursor: hand;
+}
+
+.boton-metodo:hover {
+    -fx-background-color: -vy-borde-campo, -vy-superficie;
+}
+
+.boton-metodo:selected {
+    -fx-background-color: -vy-primario, -vy-primario-suave;
+    -fx-text-fill: -vy-primario;
+}
+
+.boton-metodo:selected .icono {
+    -fx-stroke: -vy-primario;
+}
+
+.boton-metodo:focus-visible {
+    -fx-background-color: -vy-halo, -vy-primario, -vy-superficie;
+    -fx-background-insets: -3, 0, 1.5;
+}
+
+.boton-metodo:selected:focus-visible {
+    -fx-background-color: -vy-halo, -vy-primario, -vy-primario-suave;
+}
+
+.pie-pago {
+    -fx-spacing: 10px;
+    -fx-alignment: center-left;
+}

@@ -150,6 +150,7 @@ classDiagram
 **Decisiones del modelo:**
 - `Cita` guarda objetos `Paciente` y `Profesional` completos porque la agenda siempre los muestra. Las demás entidades guardan solo el id del padre (`idPaciente`, `idCita`, `idTratamiento`), para no cargar más datos de los necesarios.
 - Los enums tienen un método `getEtiqueta()` con el texto que ve el usuario (`EN_TRATAMIENTO` → "En tratamiento", `YAPE_PLIN` → "Yape / Plin"). La UI nunca muestra `name()` directamente.
+- Para las listas hay dos clases de lectura que no son tablas (fase 6): `TratamientoResumen` (el tratamiento + paciente y profesional de su cita + lo pagado; calcula `getSaldo()` y `getAvance()`) y `PagoResumen` (el pago + el concepto y el paciente). Las arman los DAO con un JOIN; así el modelo sigue guardando solo el id del padre. `MetodoPago` también tiene `getClaseCss()` (`"pill-yape-plin"`...).
 - `EstadoPieza` además tiene `getCodigo()` (`""`, `"C"`, `"O"`, `"X"`, `"T"`) para el odontograma, y `EstadoCita`/`EstadoTratamiento` tienen `getClaseCss()` (`"pill-confirmada"`...). Ver [`08-guia-frontend.md`](./08-guia-frontend.md).
 - `Usuario` **no** calcula hashes. Hoy existe `Usuario.autenticar()` con SHA-256 sin sal; eso se mueve a `util.HashUtil` y a `AuthService` (RN-13).
 - Validaciones nuevas: `Cita` (`@NotNull` en paciente, profesional, fecha, horaInicio, horaFin y estado), `Profesional` (`@NotBlank` en nombres y apellidos, teléfono de 9 dígitos), `Usuario.nombreCompleto` (`@NotBlank`), `Pago.metodoPago` (`@NotNull`), `HistoriaClinicaEntrada.fecha` (`@NotNull`), `OdontogramaPieza` (`@NotNull` en estado) y número de pieza entre 11 y 48 en `OdontogramaPieza` y `Tratamiento.piezasDentales` (RN-10; el `CHECK` de la BD rechaza además 19, 20, 29...).
@@ -227,7 +228,11 @@ classDiagram
         +listarPorPaciente(int) List~Tratamiento~
         +listarPorEstado(EstadoTratamiento) List~Tratamiento~
         +actualizar(Tratamiento) boolean
+        +actualizarEstado(int, EstadoTratamiento) boolean
         +eliminar(int) boolean
+        +buscarResumenes(String textoPaciente, EstadoTratamiento) List~TratamientoResumen~
+        +buscarResumen(int) Optional~TratamientoResumen~
+        +resumenesDePaciente(int) List~TratamientoResumen~
     }
     class PagoDAO {
         <<interface>>
@@ -237,6 +242,8 @@ classDiagram
         +listarPorTratamiento(int) List~Pago~
         +listarPorPeriodo(LocalDate, LocalDate) List~Pago~
         +totalPagado(int idTratamiento) double
+        +resumenesEntre(LocalDate, LocalDate) List~PagoResumen~
+        +totalesPorMetodo(LocalDate, LocalDate) Map~MetodoPago,Double~
         +actualizar(Pago) boolean
         +eliminar(int) boolean
     }
@@ -309,11 +316,25 @@ classDiagram
     class TratamientoService {
         +registrar(Tratamiento) Tratamiento
         +finalizar(int) void
-        +listarPorPaciente(int) List~Tratamiento~
+        +buscar(String textoPaciente, EstadoTratamiento) List~TratamientoResumen~
+        +resumen(int) Optional~TratamientoResumen~
+        +dePaciente(int idPaciente) List~TratamientoResumen~
+        +citasParaRegistrar() List~Cita~
+        +puedeEditar() boolean
+        +leerPiezas(String)$ List~Integer~
     }
     class PagoService {
         +registrar(Pago) Pago
         +saldo(int idTratamiento) double
+        +pagosDe(int idTratamiento) List~Pago~
+        +pagosEntre(Rango) List~PagoResumen~
+        +totalesPorMetodo(Rango) Map~MetodoPago,Double~
+        +totalCobrado(Rango) double
+        +saldoPendiente() SaldoPendiente
+        +tratamientosConSaldo(String) List~TratamientoResumen~
+        +rango(Periodo) Rango
+        +rangoAnterior(Periodo) Rango
+        +puedeRegistrar() boolean
     }
     class ReporteService {
         +citasDelDia(LocalDate) List~Cita~
@@ -334,6 +355,8 @@ classDiagram
     HistoriaClinicaService --> CitaDAO
     PagoService --> PagoDAO
     PagoService --> TratamientoDAO
+    TratamientoService --> TratamientoDAO
+    TratamientoService --> CitaDAO
     ReporteService --> CitaDAO
     ReporteService --> PagoDAO
 ```
@@ -344,6 +367,8 @@ classDiagram
 - `HistoriaClinicaService` y `OdontogramaService` (fase 5) reciben también un `Clock` opcional, como `CitaService`. Solo el odontólogo escribe (`puedeEditar()`); el administrador consulta. Cada entrada y cada cambio de pieza guarda el profesional de la sesión (`idProfesional`, null si el usuario no tiene profesional asociado) y la fecha de hoy, sin importar la que traiga el objeto.
   - `registrarEntrada` exige diagnóstico u observaciones; si indica una cita, debe ser del mismo paciente y no estar cancelada (errores en los campos `diagnostico` e `idCita`). `actualizarDatosClinicos` cambia solo alergias y antecedentes del paciente (CU-04, paso 3).
   - `registrarCambios` recibe la observación de cada pieza cambiada, rechaza piezas fuera de la notación FDI (19, 20, 29...: RN-10) antes de guardar nada, omite los cambios que dejan la pieza como estaba y guarda el resto en una sola transacción (`OdontogramaDAO.registrarTodos`). Devuelve cuántos registros guardó. `estadoActual` devuelve las 32 piezas; las que no tienen registros son `SANA`.
+- `TratamientoService` y `PagoService` (fase 6) reciben un `Clock` opcional. `TratamientoService` (solo el odontólogo escribe) registra en una cita no cancelada y no futura —la suya, si tiene profesional— con la fecha de la cita, y valida las piezas con la notación FDI (error en el campo `piezasDentales`). `PagoService` (Administrador y Recepción) aplica RN-12: monto mayor a 0 con hasta 2 decimales, fecha no futura (hoy si no se indica), método elegido y monto no mayor al saldo; compara en céntimos para evitar errores de redondeo de `double`. `PagoService.Periodo` (HOY, SEMANA, MES), `Rango` y `SaldoPendiente` son tipos internos del servicio.
+- `TratamientoDAOSqlite` guarda las piezas en `tratamiento_pieza` dentro de la misma transacción que el tratamiento (al crear y al actualizar, que las reemplaza).
 - `ProfesionalService` (fase 4) asocia como mucho un usuario con rol Odontólogo por profesional y no elimina a un profesional que tenga citas.
 - Las búsquedas de pacientes ignoran mayúsculas y tildes (`util.Busqueda`): "lucia" encuentra a "Lucía".
 - `PacienteService` (fase 3) normaliza antes de validar: quita espacios sobrantes, guarda los campos vacíos como `null` y acepta el teléfono con espacios ("987 654 321"). El DNI no se repite ni siquiera con un paciente dado de baja (RN-01). Los listados son de 20 por página (`TAMANO_PAGINA`).
@@ -355,7 +380,7 @@ classDiagram
 | Paquete | Clases |
 |---|---|
 | `controller` | `LoginController`, `MainController`, `InicioController`, `AgendaController`, `PacientesController`, `HistoriaClinicaController` (pantalla) y `HistoriaClinicaPanelController` (panel reutilizable), `OdontogramaController`, `TratamientosController`, `PagosController`, `ReportesController`, `ProfesionalesController`, `UsuariosController` |
-| `ui` | Componentes JavaFX reutilizables: `Icono` (SVGPath), `Avatar` (iniciales), `Pill` (estado), `PiezaDental` (botón del odontograma), `LineaDeTiempo`, `BuscadorPacientes`, `CeldaPaciente`, `CeldaAlergias`, `Aviso` (alertas en línea), `Notificacion` (toast) |
+| `ui` | Componentes JavaFX reutilizables: `Icono` (SVGPath), `Avatar` (iniciales), `Pill` (estado), `PiezaDental` (botón del odontograma), `LineaDeTiempo`, `BuscadorPacientes`, `CeldaPaciente`, `CeldaAlergias`, `AvancePago`, `Aviso` (alertas en línea), `Notificacion` (toast) |
 | `util` | `ConexionBD` (existe), `Validador` (existe), `HashUtil` (PBKDF2), `DatosIniciales` (admin y datos de ejemplo), `Formatos` (fechas en español, soles) |
 
 El detalle de cada pantalla y de cada componente está en [`08-guia-frontend.md`](./08-guia-frontend.md).
@@ -374,8 +399,8 @@ Las filas del modelo (de `Usuario` a `Pago`) quedaron corregidas en la fase 1 de
 | `OdontogramaPieza` | ✔ Corregido (fase 1) | Agregar |
 | `Tratamiento` | ✔ Corregido (fase 1) | Agregar |
 | `Pago` | ✔ Corregido (fase 1) | Agregar campos; `metodoPago` pasa a enum `MetodoPago` |
-| DAO | Usuario, Profesional, Paciente, Cita, Historia clínica y Odontograma completos (SQLite y memoria, fases 2 a 5); Tratamiento y Pago solo en memoria | Las 8 interfaces de la sección 2, con implementación SQLite |
-| Servicios | `AuthService`, `Sesion` (fase 2), `PacienteService` (fase 3), `CitaService` y `ProfesionalService` (fase 4), `HistoriaClinicaService` y `OdontogramaService` (fase 5) | Los de la sección 3 |
+| DAO | Las 8 interfaces completas, en SQLite y en memoria (fases 2 a 6) | Las 8 interfaces de la sección 2, con implementación SQLite |
+| Servicios | `AuthService`, `Sesion` (fase 2), `PacienteService` (fase 3), `CitaService` y `ProfesionalService` (fase 4), `HistoriaClinicaService` y `OdontogramaService` (fase 5), `TratamientoService` y `PagoService` (fase 6) | Los de la sección 3 |
 | `demo/*CrudDemoApp` | CRUD de prueba con `Alert` | Se mantienen hasta tener las pantallas reales; luego se borran |
 
 ---

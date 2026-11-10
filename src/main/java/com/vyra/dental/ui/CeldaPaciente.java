@@ -7,8 +7,11 @@ import javafx.scene.control.TableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-/** Celda de tabla con avatar + nombre + "DNI 72481935" (docs/08-guia-frontend.md §7.4). */
-public class CeldaPaciente extends TableCell<Paciente, Paciente> {
+/**
+ * Celda de tabla con avatar + nombre + "DNI 72481935" (docs/08-guia-frontend.md §7.4).
+ * {@code S} es el tipo de fila: Paciente, o un resumen que trae al paciente.
+ */
+public class CeldaPaciente<S> extends TableCell<S, Paciente> {
 
     private final Avatar avatar = new Avatar();
     private final Label nombre = new Label();

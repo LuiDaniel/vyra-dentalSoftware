@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.vyra.dental.ui.Aviso?>
+<?import com.vyra.dental.ui.CampoFormulario?>
+<?import com.vyra.dental.ui.Icono?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- Tratamientos: docs/08-guia-frontend.md §7.7 (patrón tabla + panel de docs/ui/Pagos.html) -->
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.vyra.dental.controller.TratamientosController"
+      fx:id="raiz" styleClass="pagina">
+
+    <HBox styleClass="pagina-encabezado">
+        <VBox styleClass="pagina-titulos">
+            <Label text="Tratamientos" styleClass="titulo-pagina"/>
+            <Label fx:id="resumen" styleClass="texto-secundario"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="botonNuevo" text="Nuevo tratamiento" styleClass="btn-primario" onAction="#nuevo" minWidth="-Infinity">
+            <graphic>
+                <Icono nombre="mas" tamano="16"/>
+            </graphic>
+        </Button>
+    </HBox>
+
+    <HBox styleClass="lista-y-panel" fillHeight="false">
+        <!-- Lista -->
+        <VBox styleClass="card,lista" HBox.hgrow="ALWAYS" minWidth="460">
+            <HBox styleClass="lista-barra">
+                <HBox styleClass="buscador" HBox.hgrow="ALWAYS">
+                    <Icono nombre="buscar" tamano="16"/>
+                    <TextField fx:id="campoBuscar" promptText="Buscar por paciente o DNI" HBox.hgrow="ALWAYS"
+                               accessibleText="Buscar tratamientos por paciente"/>
+                </HBox>
+                <HBox fx:id="selectorEstado" styleClass="segmentado" minWidth="-Infinity"/>
+            </HBox>
+            <TableView fx:id="tabla"/>
+            <HBox styleClass="lista-pie">
+                <Label fx:id="pie" styleClass="texto-secundario"/>
+            </HBox>
+        </VBox>
+
+        <!-- Sin tratamiento elegido -->
+        <VBox fx:id="sinSeleccion" styleClass="card,estado-vacio" prefWidth="370" minWidth="340" maxWidth="440">
+            <StackPane styleClass="estado-vacio-icono">
+                <Icono nombre="tratamientos" tamano="28"/>
+            </StackPane>
+            <Label text="Elige un tratamiento" styleClass="card-titulo"/>
+            <Label text="Verás sus piezas, lo pagado y su saldo." styleClass="texto-secundario"/>
+        </VBox>
+
+        <!-- Detalle del tratamiento elegido -->
+        <VBox fx:id="detalle" styleClass="panel-form,panel-ficha" prefWidth="370" minWidth="340" maxWidth="440">
+            <VBox styleClass="panel-encabezado">
+                <HBox styleClass="panel-encabezado-titulo">
+                    <Label fx:id="detalleTitulo" styleClass="panel-titulo" wrapText="true" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                    <HBox fx:id="detalleEstado"/>
+                </HBox>
+                <Label fx:id="detalleSubtitulo" styleClass="texto-secundario" wrapText="true"/>
+            </VBox>
+            <VBox styleClass="ficha-formulario">
+                <VBox styleClass="detalle-dato">
+                    <Label text="PIEZAS" styleClass="seccion-titulo"/>
+                    <FlowPane fx:id="detallePiezas" styleClass="chips-piezas"/>
+                </VBox>
+                <GridPane styleClass="rejilla-formulario">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="33.3"/>
+                        <ColumnConstraints percentWidth="33.3"/>
+                        <ColumnConstraints percentWidth="33.4"/>
+                    </columnConstraints>
+                    <VBox styleClass="detalle-dato" GridPane.columnIndex="0">
+                        <Label text="Costo" styleClass="detalle-etiqueta"/>
+                        <Label fx:id="detalleCosto" styleClass="monto"/>
+                    </VBox>
+                    <VBox styleClass="detalle-dato" GridPane.columnIndex="1">
+                        <Label text="Pagado" styleClass="detalle-etiqueta"/>
+                        <Label fx:id="detallePagado" styleClass="monto"/>
+                    </VBox>
+                    <VBox styleClass="detalle-dato" GridPane.columnIndex="2">
+                        <Label text="Saldo" styleClass="detalle-etiqueta"/>
+                        <Label fx:id="detalleSaldo" styleClass="monto,monto-saldo"/>
+                    </VBox>
+                </GridPane>
+                <ProgressBar fx:id="detalleAvance" styleClass="barra-pago" maxWidth="Infinity"/>
+
+                <Label text="PAGOS" styleClass="seccion-titulo"/>
+                <VBox fx:id="detallePagos" styleClass="lista-pagos"/>
+                <Aviso fx:id="avisoDetalle"/>
+            </VBox>
+            <HBox fx:id="pieDetalle" styleClass="panel-pie">
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="botonFinalizar" text="Marcar como finalizado" styleClass="btn-primario"
+                        onAction="#finalizar" minWidth="-Infinity"/>
+                <Button fx:id="botonPagar" text="Registrar pago" styleClass="btn-primario"
+                        onAction="#registrarPago" minWidth="-Infinity"/>
+            </HBox>
+        </VBox>
+
+        <!-- Nuevo tratamiento (solo el odontólogo) -->
+        <VBox fx:id="formulario" styleClass="panel-form,panel-ficha" prefWidth="370" minWidth="340" maxWidth="440">
+            <VBox styleClass="panel-encabezado">
+                <Label text="Nuevo tratamiento" styleClass="panel-titulo"/>
+                <Label text="Se registra en una cita de hoy o en una atendida en los últimos 30 días."
+                       styleClass="texto-secundario" wrapText="true"/>
+            </VBox>
+            <VBox styleClass="ficha-formulario">
+                <CampoFormulario fx:id="cfCita" etiqueta="Cita" obligatorio="true">
+                    <ComboBox fx:id="campoCita" maxWidth="Infinity" promptText="Elige la cita"/>
+                </CampoFormulario>
+                <CampoFormulario fx:id="cfDescripcion" etiqueta="Descripción" obligatorio="true">
+                    <TextField fx:id="campoDescripcion" promptText="Ej. Endodoncia pieza 36"/>
+                </CampoFormulario>
+                <GridPane styleClass="rejilla-formulario">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="55"/>
+                        <ColumnConstraints percentWidth="45"/>
+                    </columnConstraints>
+                    <CampoFormulario fx:id="cfPiezas" etiqueta="Piezas" GridPane.columnIndex="0">
+                        <TextField fx:id="campoPiezas" promptText="Ej. 36, 47"/>
+                    </CampoFormulario>
+                    <CampoFormulario fx:id="cfCosto" etiqueta="Costo (S/)" obligatorio="true" GridPane.columnIndex="1">
+                        <TextField fx:id="campoCosto" promptText="0.00"/>
+                    </CampoFormulario>
+                </GridPane>
+                <Label text="Piezas en notación FDI (11–48), separadas por comas. Puede quedar vacío." styleClass="texto-apoyo" wrapText="true"/>
+                <VBox styleClass="campo-formulario">
+                    <Label text="Estado" styleClass="campo-etiqueta"/>
+                    <HBox styleClass="segmentado,segmentado-ancho">
+                        <ToggleButton fx:id="estadoEnCurso" text="En curso" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                        <ToggleButton fx:id="estadoFinalizado" text="Finalizado" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                    </HBox>
+                </VBox>
+                <Aviso fx:id="avisoFormulario"/>
+            </VBox>
+            <HBox styleClass="panel-pie">
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Cancelar" styleClass="btn-secundario" onAction="#cancelar" minWidth="-Infinity"/>
+                <Button fx:id="botonRegistrar" text="Registrar tratamiento" styleClass="btn-primario"
+                        onAction="#registrar" minWidth="-Infinity"/>
+            </HBox>
+        </VBox>
+    </HBox>
+</VBox>

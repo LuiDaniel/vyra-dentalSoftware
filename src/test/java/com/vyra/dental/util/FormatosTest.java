@@ -1,6 +1,7 @@
 package com.vyra.dental.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -20,6 +21,8 @@ class FormatosTest {
     void fechaCortaSinPuntoEnElMes() {
         assertEquals("29 oct 2026", Formatos.fechaCorta(FECHA));
         assertEquals("05 set 2026", Formatos.fechaCorta(LocalDate.of(2026, 9, 5)));
+        assertEquals("29 oct", Formatos.diaMes(FECHA));
+        assertEquals("", Formatos.diaMes(null));
     }
 
     @Test
@@ -86,5 +89,16 @@ class FormatosTest {
         assertEquals("", Formatos.hora(null));
         assertEquals("", Formatos.telefono(null));
         assertEquals("", Formatos.edad(null));
+    }
+
+    @Test
+    void leeMontosEscritosPorElUsuario() {
+        assertEquals(650, Formatos.leerMonto("650"));
+        assertEquals(1250.5, Formatos.leerMonto(" 1,250.50 "));
+        assertEquals(80, Formatos.leerMonto("S/ 80"));
+        assertEquals(0.5, Formatos.leerMonto(".5"));
+        for (String invalido : new String[] { "", "abc", "12,5.3.1", "-10", "1e3" }) {
+            assertThrows(NumberFormatException.class, () -> Formatos.leerMonto(invalido), invalido);
+        }
     }
 }

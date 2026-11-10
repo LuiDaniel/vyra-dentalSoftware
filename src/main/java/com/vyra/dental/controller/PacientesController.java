@@ -12,11 +12,13 @@ import java.util.function.Function;
 import com.vyra.dental.model.Cita;
 import com.vyra.dental.model.FiltroPaciente;
 import com.vyra.dental.model.Paciente;
+import com.vyra.dental.model.TratamientoResumen;
 import com.vyra.dental.service.CitaService;
 import com.vyra.dental.service.PacienteService;
 import com.vyra.dental.service.ReglaNegocioException;
 import com.vyra.dental.service.Servicios;
 import com.vyra.dental.service.Sesion;
+import com.vyra.dental.ui.AvancePago;
 import com.vyra.dental.ui.Avatar;
 import com.vyra.dental.ui.Aviso;
 import com.vyra.dental.ui.CampoFormulario;
@@ -52,12 +54,13 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 
 /**
- * Lista de pacientes + ficha con las pestañas Datos, Historia clínica y Citas
+ * Lista de pacientes + ficha con las pestañas Datos, Historia clínica, Citas y Pagos
  * (docs/08-guia-frontend.md §7.4, CU-01). Administrador y Recepción editan los
  * datos; el odontólogo solo los consulta, pero escribe la historia clínica.
  */
@@ -106,8 +109,10 @@ public class PacientesController {
     @FXML private ToggleButton pestanaDatos;
     @FXML private ToggleButton pestanaHistoria;
     @FXML private ToggleButton pestanaCitas;
+    @FXML private ToggleButton pestanaPagos;
     @FXML private VBox contenidoDatos;
     @FXML private VBox contenidoCitas;
+    @FXML private VBox contenidoPagos;
     @FXML private VBox historia;
     @FXML private HistoriaClinicaPanelController historiaController;
 
@@ -128,12 +133,15 @@ public class PacientesController {
     private boolean editable;
     /** La recepcionista no ve la historia clínica (docs/02-casos-de-uso.md §3). */
     private boolean verHistoria;
+    /** El odontólogo no ve los pagos (docs/02-casos-de-uso.md §3). */
+    private boolean verPagos;
     private boolean ignorarSeleccion;
 
     @FXML
     private void initialize() {
         editable = servicio.puedeEditar();
         verHistoria = Pantalla.HISTORIA_CLINICA.permitidaPara(Sesion.get().getUsuario().getRol());
+        verPagos = Pantalla.PAGOS.permitidaPara(Sesion.get().getUsuario().getRol());
         campos.put("nombres", cfNombres);
         campos.put("apellidos", cfApellidos);
         campos.put("dni", cfDni);
@@ -206,7 +214,7 @@ public class PacientesController {
         tabla.minHeightProperty().bind(alto);
 
         TableColumn<Paciente, Paciente> paciente = columna("PACIENTE", 250);
-        paciente.setCellFactory(c -> new CeldaPaciente());
+        paciente.setCellFactory(c -> new CeldaPaciente<>());
 
         TableColumn<Paciente, Paciente> telefono = columnaTexto("TELÉFONO", 110,
                 p -> p.getTelefono() == null ? "—" : Formatos.telefono(p.getTelefono()));
@@ -332,6 +340,7 @@ public class PacientesController {
         botonGuardar.setText("Registrar paciente");
         pestanaHistoria.setDisable(true);
         pestanaCitas.setDisable(true);
+        pestanaPagos.setDisable(true);
         pestanaDatos.setSelected(true);
         mostrarPestana();
         alternar(botonBaja, false);
@@ -361,6 +370,7 @@ public class PacientesController {
         alternar(botonBaja, editable);
         pestanaHistoria.setDisable(false);
         pestanaCitas.setDisable(false);
+        pestanaPagos.setDisable(false);
         mostrarPestana();
     }
 
@@ -575,7 +585,9 @@ public class PacientesController {
         pestanaDatos.setToggleGroup(pestanas);
         pestanaHistoria.setToggleGroup(pestanas);
         pestanaCitas.setToggleGroup(pestanas);
+        pestanaPagos.setToggleGroup(pestanas);
         alternar(pestanaHistoria, verHistoria);
+        alternar(pestanaPagos, verPagos);
         // Si el odontólogo cambia las alergias en la historia clínica, la ficha y la lista se actualizan
         historiaController.setAlActualizarPaciente(paciente -> {
             seleccionado = paciente;
@@ -591,6 +603,7 @@ public class PacientesController {
             }
         });
         alternar(contenidoCitas, false);
+        alternar(contenidoPagos, false);
         alternar(historia, false);
     }
 
@@ -598,17 +611,76 @@ public class PacientesController {
         boolean datos = pestanaDatos.isSelected();
         boolean conHistoria = pestanaHistoria.isSelected();
         boolean conCitas = pestanaCitas.isSelected();
+        boolean conPagos = pestanaPagos.isSelected();
         alternar(contenidoDatos, datos);
         alternar(pie, datos && editable);
         // Guardar es el botón por defecto: en otra pestaña, Enter no debe guardar la ficha
         botonGuardar.setDisable(!(datos && editable));
         alternar(historia, conHistoria);
         alternar(contenidoCitas, conCitas);
+        alternar(contenidoPagos, conPagos);
         if (conHistoria && seleccionado != null) {
             historiaController.mostrar(seleccionado);
         }
         if (conCitas) {
             cargarCitasDelPaciente();
+        }
+        if (conPagos) {
+            cargarPagosDelPaciente();
+        }
+    }
+
+    /** Pestaña Pagos: saldo total y, por tratamiento, lo pagado con un acceso a "Registrar pago". */
+    private void cargarPagosDelPaciente() {
+        contenidoPagos.getChildren().clear();
+        if (seleccionado == null) {
+            return;
+        }
+        List<TratamientoResumen> tratamientos;
+        try {
+            tratamientos = Servicios.tratamientos().dePaciente(seleccionado.getIdPaciente());
+        } catch (RuntimeException e) {
+            contenidoPagos.getChildren().add(new EstadoVacio("No se pudo cargar los pagos", e.getMessage()));
+            return;
+        }
+        if (tratamientos.isEmpty()) {
+            contenidoPagos.getChildren().add(new EstadoVacio("Sin tratamientos registrados",
+                    "Cuando el odontólogo registre uno, podrás cobrarlo desde aquí."));
+            return;
+        }
+        double saldo = tratamientos.stream().mapToDouble(TratamientoResumen::getSaldo).sum();
+        long conSaldo = tratamientos.stream().filter(t -> t.getSaldo() > 0).count();
+        Label total = new Label(saldo > 0
+                ? "Saldo pendiente: " + Formatos.dinero(saldo) + (conSaldo == 1 ? " en 1 tratamiento" : " en " + conSaldo + " tratamientos")
+                : "No tiene saldo pendiente.");
+        total.getStyleClass().add("celda-titulo");
+        HBox resumenPagos = new HBox(total);
+        resumenPagos.getStyleClass().add("fila-cita");
+        contenidoPagos.getChildren().add(resumenPagos);
+
+        for (TratamientoResumen tratamiento : tratamientos) {
+            Label descripcion = new Label(tratamiento.getTratamiento().getDescripcion());
+            descripcion.getStyleClass().add("celda-titulo");
+            descripcion.setWrapText(true);
+            Label detalle = new Label(Formatos.fechaCorta(tratamiento.getTratamiento().getFecha()) + " · Saldo "
+                    + Formatos.dinero(tratamiento.getSaldo()));
+            detalle.getStyleClass().add("celda-sub");
+            detalle.setWrapText(true);
+            AvancePago avance = new AvancePago();
+            avance.mostrar(tratamiento.getPagado(), tratamiento.getTratamiento().getCosto());
+            VBox textos = new VBox(4, descripcion, detalle, avance);
+            HBox.setHgrow(textos, Priority.ALWAYS);
+            HBox fila = new HBox(12, textos, new Pill(tratamiento.getTratamiento().getEstado()));
+            if (tratamiento.getSaldo() > 0) {
+                Button cobrar = new Button("Cobrar");
+                cobrar.getStyleClass().addAll("btn-secundario", "btn-chico");
+                cobrar.setMinWidth(Region.USE_PREF_SIZE);
+                cobrar.setAccessibleText("Registrar pago de " + tratamiento.getTratamiento().getDescripcion());
+                cobrar.setOnAction(e -> MainController.actual().navegar(Pantalla.PAGOS, tratamiento));
+                fila.getChildren().add(cobrar);
+            }
+            fila.getStyleClass().add("fila-cita");
+            contenidoPagos.getChildren().add(fila);
         }
     }
 

@@ -8,7 +8,9 @@ import com.vyra.dental.dao.impl.CitaDAOSqlite;
 import com.vyra.dental.dao.impl.HistoriaClinicaDAOSqlite;
 import com.vyra.dental.dao.impl.OdontogramaDAOSqlite;
 import com.vyra.dental.dao.impl.PacienteDAOSqlite;
+import com.vyra.dental.dao.impl.PagoDAOSqlite;
 import com.vyra.dental.dao.impl.ProfesionalDAOSqlite;
+import com.vyra.dental.dao.impl.TratamientoDAOSqlite;
 import com.vyra.dental.dao.impl.UsuarioDAOSqlite;
 import com.vyra.dental.util.ConexionBD;
 import com.vyra.dental.util.DatosIniciales;
@@ -45,6 +47,8 @@ public class App extends Application {
             DatosIniciales.cargarUsuariosDeEjemplo(new UsuarioDAOSqlite(), new ProfesionalDAOSqlite());
             DatosIniciales.cargarEjemplosClinicos(new PacienteDAOSqlite(), new ProfesionalDAOSqlite(),
                     new OdontogramaDAOSqlite(), new HistoriaClinicaDAOSqlite());
+            DatosIniciales.cargarEjemplosPagos(new PacienteDAOSqlite(), new ProfesionalDAOSqlite(), new CitaDAOSqlite(),
+                    new TratamientoDAOSqlite(), new PagoDAOSqlite());
         }
 
         ventana = stage;

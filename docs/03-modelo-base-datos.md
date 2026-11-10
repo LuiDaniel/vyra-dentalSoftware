@@ -336,6 +336,7 @@ CREATE INDEX IF NOT EXISTS idx_pago_fecha ON pago(fecha_pago);
 - **Usuario administrador:** no va en `schema.sql` porque la contraseña necesita calcularse con `HashUtil`. La clase `util.DatosIniciales` lo crea al arrancar (`crearAdminSiNoExiste(UsuarioDAO)`) **solo si la tabla `usuario` está vacía**: usuario `admin`, nombre "Administrador", rol `ADMIN`, contraseña inicial `admin123`. Se debe cambiar después del primer ingreso.
 - **Datos de ejemplo (solo desarrollo):** `DatosIniciales.cargarEjemplos()` puede insertar los pacientes, profesionales y citas que aparecen en el diseño ([`docs/ui`](./ui)), para probar las pantallas con datos realistas. Se activa con la propiedad `-Dvyra.demo=true` y nunca en producción.
   - Desde la fase 5 también crea el odontograma y la historia clínica de María Quispe (como en `docs/ui/Odontograma.html`) y dos usuarios ficticios para probar los otros roles mientras no exista la pantalla Usuarios: `msalinas` (Odontólogo, asociado al profesional Marco Salinas Vega) y `recepcion` (Recepción), ambos con la contraseña `demo1234`.
+  - Desde la fase 6 crea además siete tratamientos con sus pagos (como en `docs/ui/Pagos.html`), cada uno en una cita atendida a las 18:00 creada para eso. Solo si todavía no hay tratamientos.
 
 ## 5. Consultas clave
 
