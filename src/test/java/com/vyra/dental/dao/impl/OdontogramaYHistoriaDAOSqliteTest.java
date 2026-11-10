@@ -37,7 +37,7 @@ class OdontogramaYHistoriaDAOSqliteTest {
         Paciente nuevo = new Paciente();
         nuevo.setNombres("Elena");
         nuevo.setApellidos("Odontograma Sql " + contador);
-        nuevo.setDni(String.format("9200%04d", contador));
+        nuevo.setDni(String.format("9400%04d", contador));
         paciente = new PacienteDAOSqlite().crear(nuevo);
         profesional = new ProfesionalDAOSqlite().crear(
                 new Profesional(0, null, "Prof" + contador, "Odontograma Sql", "Endodoncia", null, null));

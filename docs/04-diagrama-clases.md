@@ -209,6 +209,7 @@ classDiagram
     class HistoriaClinicaDAO {
         <<interface>>
         +crear(HistoriaClinicaEntrada) HistoriaClinicaEntrada
+        +buscarPorId(int) Optional~HistoriaClinicaEntrada~
         +listarPorPaciente(int) List~HistoriaClinicaEntrada~
     }
     class OdontogramaDAO {

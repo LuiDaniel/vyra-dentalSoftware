@@ -9,6 +9,7 @@ import java.sql.Types;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.vyra.dental.dao.HistoriaClinicaDAO;
 import com.vyra.dental.model.HistoriaClinicaEntrada;
@@ -18,6 +19,9 @@ import com.vyra.dental.util.ConexionBD;
  * Implementacion SQLite de HistoriaClinicaDAO (tabla historia_clinica_entrada).
  */
 public class HistoriaClinicaDAOSqlite implements HistoriaClinicaDAO {
+
+    private static final String SELECT = "SELECT id_entrada, id_paciente, id_cita, id_profesional, fecha, "
+            + "observaciones, diagnostico FROM historia_clinica_entrada ";
 
     @Override
     public HistoriaClinicaEntrada crear(HistoriaClinicaEntrada entrada) {
@@ -44,12 +48,19 @@ public class HistoriaClinicaDAOSqlite implements HistoriaClinicaDAO {
     }
 
     @Override
+    public Optional<HistoriaClinicaEntrada> buscarPorId(int idEntrada) {
+        return listar(SELECT + "WHERE id_entrada = ?", idEntrada).stream().findFirst();
+    }
+
+    @Override
     public List<HistoriaClinicaEntrada> listarPorPaciente(int idPaciente) {
-        String sql = "SELECT id_entrada, id_paciente, id_cita, id_profesional, fecha, observaciones, diagnostico "
-                + "FROM historia_clinica_entrada WHERE id_paciente = ? ORDER BY fecha DESC, id_entrada DESC";
+        return listar(SELECT + "WHERE id_paciente = ? ORDER BY fecha DESC, id_entrada DESC", idPaciente);
+    }
+
+    private List<HistoriaClinicaEntrada> listar(String sql, int parametro) {
         Connection conexion = ConexionBD.obtenerConexion();
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
-            ps.setInt(1, idPaciente);
+            ps.setInt(1, parametro);
             try (ResultSet rs = ps.executeQuery()) {
                 List<HistoriaClinicaEntrada> entradas = new ArrayList<>();
                 while (rs.next()) {

@@ -3,6 +3,7 @@ package com.vyra.dental.dao.memoria;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import com.vyra.dental.dao.HistoriaClinicaDAO;
 import com.vyra.dental.model.HistoriaClinicaEntrada;
@@ -26,6 +27,14 @@ public class HistoriaClinicaDAOMemoria implements HistoriaClinicaDAO {
         entrada.setIdEntrada(siguienteId++);
         entradas.add(copia(entrada));
         return entrada;
+    }
+
+    @Override
+    public Optional<HistoriaClinicaEntrada> buscarPorId(int idEntrada) {
+        return entradas.stream()
+                .filter(e -> e.getIdEntrada() == idEntrada)
+                .findFirst()
+                .map(HistoriaClinicaDAOMemoria::copia);
     }
 
     @Override
