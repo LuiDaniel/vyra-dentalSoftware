@@ -72,7 +72,7 @@ Este documento ordena el trabajo de programación en fases cortas. Cada fase dej
 1. `PacienteDAOSqlite` (incluida la búsqueda paginada de [`03` §5.6](./03-modelo-base-datos.md#56-búsqueda-de-pacientes-pantalla-pacientes)).
 2. `PacienteService`: registrar (DNI único), actualizar, dar de baja, buscar. Pruebas con `PacienteDAOMemoria`.
 3. `PacientesView.fxml` + `PacientesController`, solo la pestaña Datos ([guía §7.4](./08-guia-frontend.md#74-pacientes--pacientesviewfxml--pacientescontroller)).
-4. `DatosIniciales.cargarEjemplos()` con los pacientes del diseño (solo con `-Dvyra.demo=true`; el `pom.xml` lo pasa a la app: `mvn javafx:run -Dvyra.demo=true`).
+4. `DatosIniciales.cargarEjemplos()` con los pacientes del diseño (solo con `-Dvyra.demo=true`; el `pom.xml` lo pasa a la app: `mvn javafx:run "-Dvyra.demo=true"`).
 
 **Listo cuando:** se puede registrar, buscar, editar y dar de baja; un DNI repetido o mal formado muestra el error bajo el campo; los datos siguen ahí después de cerrar y abrir la app.
 

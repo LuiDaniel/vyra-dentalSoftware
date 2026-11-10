@@ -16,7 +16,8 @@ Si el código y los documentos no coinciden, sigue los documentos y avisa de la 
 - Ejecutar: `mvn javafx:run`
 - Compilar: `mvn compile`
 - Pruebas: `mvn test`
-- Con datos de ejemplo: `mvn javafx:run -Dvyra.demo=true` (usuarios `admin`/`admin123`, `msalinas` y `recepcion` con `demo1234`)
+- Con datos de ejemplo: `mvn javafx:run "-Dvyra.demo=true"` (usuarios `admin`/`admin123`, `msalinas` y `recepcion` con `demo1234`)
+- En PowerShell las opciones `-D...` van entre comillas (si no, Maven dice "Unknown lifecycle phase").
 - Versión para Windows: `mvn -Pinstalador package` → `target/instalador/Vyra/Vyra.exe` (`-Djpackage.tipo=msi` necesita WiX 3)
 - La base de datos `vyra.db` se crea en la carpeta de ejecución. Si cambias `schema.sql`, bórrala (está en `.gitignore`).
 

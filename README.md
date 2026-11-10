@@ -22,10 +22,12 @@ Toda la documentación del proyecto vive en la carpeta [`docs/`](./docs), en ord
 
 ```bash
 mvn javafx:run                       # la app
-mvn javafx:run -Dvyra.demo=true      # con pacientes, citas y pagos de ejemplo
+mvn javafx:run "-Dvyra.demo=true"      # con pacientes, citas y pagos de ejemplo
 mvn test                             # pruebas
 mvn -Pinstalador package             # versión para Windows en target/instalador/Vyra
 ```
+
+En PowerShell (la terminal de VS Code en Windows), las opciones `-D...` van entre comillas como arriba: sin comillas, PowerShell las parte en el punto y Maven responde "Unknown lifecycle phase".
 
 Requiere JDK 21 y Maven. La base de datos `vyra.db` se crea sola la primera vez (en la versión instalada, en `%LOCALAPPDATA%\Vyra`). Primer ingreso: `admin` / `admin123`; con la demo también `msalinas` (odontólogo) y `recepcion`, con la contraseña `demo1234`.
 

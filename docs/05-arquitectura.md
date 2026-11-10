@@ -142,9 +142,9 @@ Los DAO nunca abren su propia conexión: así se evitan bloqueos del archivo `.d
 | Ejecutar la app | `mvn javafx:run` |
 | Compilar | `mvn compile` |
 | Ejecutar pruebas | `mvn test` |
-| Ejecutar con datos de ejemplo | `mvn javafx:run -Dvyra.demo=true` |
+| Ejecutar con datos de ejemplo | `mvn javafx:run "-Dvyra.demo=true"` |
 | Versión para Windows (carpeta portable) | `mvn -Pinstalador package` → `target/instalador/Vyra/Vyra.exe` |
-| Instalador `.msi` | `mvn -Pinstalador package -Djpackage.tipo=msi` (requiere [WiX Toolset 3](https://wixtoolset.org) en el `PATH`) |
+| Instalador `.msi` | `mvn -Pinstalador package "-Djpackage.tipo=msi"` (requiere [WiX Toolset 3](https://wixtoolset.org) en el `PATH`) |
 | Ver el diseño de referencia | Abrir `docs/ui/Inicio.html` en el navegador |
 
 Versión de Java: **21** (JDK 21 + JavaFX 21); el `pom.xml` compila con `release 21`.

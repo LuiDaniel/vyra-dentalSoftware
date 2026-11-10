@@ -34,7 +34,7 @@ public final class DatosIniciales {
     public static final String ADMIN_USUARIO = "admin";
     public static final String ADMIN_CONTRASENA_INICIAL = "admin123";
 
-    /** Propiedad que activa los datos de ejemplo: {@code mvn javafx:run -Dvyra.demo=true}. */
+    /** Propiedad que activa los datos de ejemplo: {@code mvn javafx:run "-Dvyra.demo=true"}. */
     public static final String PROPIEDAD_DEMO = "vyra.demo";
 
     /** Contraseña de los usuarios de ejemplo (solo con la demo activada). */
