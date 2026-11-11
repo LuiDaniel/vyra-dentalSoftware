@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vyra · Guía de estudio de 30 minutos</title>
+<style>
+:root{
+  --fondo:#F4F7F9; --sup:#FFFFFF; --tinta:#0F172A; --t2:#475569; --borde:#E2E8F0;
+  --prim:#0F766E; --prim-suave:#F0FDFA; --prim-borde:#99F6E4; --acento:#2DD4BF;
+  --ctrl:#DBEAFE; --ctrl-t:#1E40AF; --serv:#D1FAE5; --serv-t:#065F46; --dao:#FEF3C7; --dao-t:#92400E;
+  --mod:#EDE9FE; --mod-t:#5B21B6; --bd:#FFE4E6; --bd-t:#9F1239; --ui:#E0F2FE; --ui-t:#075985; --util:#F1F5F9; --util-t:#334155;
+  --codigo:#0B1F2A; --codigo-t:#C3D0D8;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --fondo:#0B1219; --sup:#111B24; --tinta:#E6EDF3; --t2:#9FB0BF; --borde:#233140;
+    --prim:#2DD4BF; --prim-suave:#0F2A2C; --prim-borde:#14534F; --acento:#2DD4BF;
+    --ctrl:#16294A; --ctrl-t:#93C5FD; --serv:#0F3326; --serv-t:#6EE7B7; --dao:#3A2A0C; --dao-t:#FCD34D;
+    --mod:#2A1F4D; --mod-t:#C4B5FD; --bd:#4A1A26; --bd-t:#FDA4AF; --ui:#0E2F44; --ui-t:#7DD3FC; --util:#1B2733; --util-t:#CBD5E1;
+    --codigo:#060B10;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);font:16px/1.55 Inter,"Segoe UI",system-ui,sans-serif}
+.pagina{max-width:1040px;margin:0 auto;padding:28px 16px 64px}
+h1{font-size:30px;margin:0 0 4px;letter-spacing:-.01em}
+h2{font-size:22px;margin:0 0 4px}
+h3{font-size:16px;margin:18px 0 6px}
+p{margin:8px 0}
+.sub{color:var(--t2);margin:0 0 18px}
+nav.ruta{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 26px}
+nav.ruta a{display:flex;gap:8px;align-items:center;text-decoration:none;color:var(--tinta);background:var(--sup);border:1px solid var(--borde);border-radius:999px;padding:6px 12px;font-size:14px}
+nav.ruta a b{color:var(--prim)}
+section{background:var(--sup);border:1px solid var(--borde);border-radius:14px;padding:22px 24px;margin:0 0 20px;box-shadow:0 1px 4px rgba(15,23,42,.05)}
+.tiempo{display:inline-block;background:var(--prim-suave);color:var(--prim);border:1px solid var(--prim-borde);border-radius:999px;font-size:13px;font-weight:600;padding:2px 10px;margin-bottom:6px}
+.meta{background:var(--prim-suave);border:1px solid var(--prim-borde);border-radius:10px;padding:10px 14px;margin:12px 0;font-size:15px}
+.decir{border-left:4px solid var(--acento);background:var(--fondo);padding:8px 14px;border-radius:0 10px 10px 0;margin:12px 0;font-size:15px}
+.decir::before{content:"Qué decir en la demo — ";font-weight:700;color:var(--prim)}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:10px 0}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--borde);vertical-align:top}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--t2)}
+code{font-family:Consolas,"Cascadia Mono",monospace;font-size:13px;background:var(--util);color:var(--util-t);padding:1px 6px;border-radius:5px}
+pre{background:var(--codigo);color:var(--codigo-t);padding:14px 16px;border-radius:10px;overflow-x:auto;font:13px/1.5 Consolas,"Cascadia Mono",monospace;margin:10px 0}
+.capa{display:inline-block;border-radius:999px;font-size:12px;font-weight:700;padding:1px 9px}
+.c-ctrl{background:var(--ctrl);color:var(--ctrl-t)} .c-serv{background:var(--serv);color:var(--serv-t)} .c-dao{background:var(--dao);color:var(--dao-t)}
+.c-mod{background:var(--mod);color:var(--mod-t)} .c-bd{background:var(--bd);color:var(--bd-t)} .c-ui{background:var(--ui);color:var(--ui-t)} .c-util{background:var(--util);color:var(--util-t)}
+figure{margin:14px 0}
+figure svg{width:100%;height:auto;display:block;border:1px solid var(--borde);border-radius:12px;background:var(--fondo)}
+figcaption{font-size:13px;color:var(--t2);margin-top:6px}
+svg text{font-family:Inter,"Segoe UI",system-ui,sans-serif;fill:var(--tinta)}
+.cajaC{fill:var(--ctrl);stroke:var(--ctrl-t)} .cajaS{fill:var(--serv);stroke:var(--serv-t)} .cajaD{fill:var(--dao);stroke:var(--dao-t)}
+.cajaM{fill:var(--mod);stroke:var(--mod-t)} .cajaB{fill:var(--bd);stroke:var(--bd-t)} .cajaU{fill:var(--ui);stroke:var(--ui-t)} .cajaX{fill:var(--util);stroke:var(--util-t)}
+.caja{stroke-width:1.5}
+.flecha{stroke:var(--t2);stroke-width:1.6;fill:none}
+.flecha-ret{stroke:var(--t2);stroke-width:1.4;fill:none;stroke-dasharray:5 4}
+.t-chico{font-size:12px;fill:var(--t2)} .t-med{font-size:14px;font-weight:600} .t-grande{font-size:16px;font-weight:700}
+.rejilla{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.tarjeta{border:1px solid var(--borde);border-radius:12px;padding:12px 14px;background:var(--fondo)}
+.tarjeta h3{margin:0 0 4px}
+ul{margin:6px 0;padding-left:22px} li{margin:3px 0}
+.qa dt{font-weight:700;margin-top:12px} .qa dd{margin:2px 0 0;color:var(--t2)}
+.aviso{border:1px solid #FED7AA;background:#FFF7ED;color:#9A3412;border-radius:10px;padding:10px 14px;font-size:14px;margin:14px 0}
+@media (prefers-color-scheme: dark){.aviso{background:#3A1F0C;border-color:#7C3F12;color:#FDBA74}}
+@media (max-width:600px){section{padding:16px}}
+</style>
+</head>
+<body>
+<div class="pagina">
+
+<h1>Vyra · Guía de estudio de 30 minutos</h1>
+<p class="sub">Para entender a fondo cómo funciona la aplicación —archivo por archivo, dependencia por dependencia— y poder explicarla mientras corres la demo.</p>
+
+<div class="aviso"><b>Sobre qué versión es esta guía.</b> Describe el código del commit <code>8851bc8</code> (el que corrió la demo: 94 archivos fuente, 185 pruebas). Tu repositorio tiene un merge pendiente con <code>origin/main</code>, donde tus compañeros agregaron archivos propios (por ejemplo <code>Lanzador</code>, <code>HistoriaClinicaPanelController</code>, <code>GraficoBarras</code>). Si la presentación va a usar la versión fusionada, revisa esos nombres antes de exponer. La arquitectura (capas, flujo, dependencias) es la misma.</div>
+
+<nav class="ruta" aria-label="Ruta de estudio">
+  <a href="#b1"><b>0–3</b> Mapa general</a>
+  <a href="#b2"><b>3–8</b> Dependencias</a>
+  <a href="#b3"><b>8–13</b> Arranque y datos</a>
+  <a href="#b4"><b>13–20</b> Un caso completo</a>
+  <a href="#b5"><b>20–25</b> Archivo por archivo</a>
+  <a href="#b6"><b>25–30</b> Guion de la demo</a>
+</nav>
+
+<div class="meta"><b>Cómo usarla:</b> lee cada bloque con el cronómetro, y mientras tanto ten la demo abierta (<code>mvn javafx:run "-Dvyra.demo=true"</code>). Cada bloque termina con algo que mostrar en pantalla.
+  <br><b>Preparación (2 min, antes de empezar):</b> en este código la demo solo trae el usuario <code>admin</code> / <code>admin123</code> más pacientes, profesionales y citas de ejemplo. Entra como admin y en <b>Usuarios y roles</b> crea <code>recepcion</code> (rol Recepción) y <code>msalinas</code> (rol Odontólogo), con la contraseña que quieras (mínimo 6 caracteres). Luego en <b>Profesionales</b> abre a un profesional y asóciale el usuario <code>msalinas</code> (así ese odontólogo ve solo sus citas). Si la versión fusionada de tus compañeros ya trae usuarios de demostración, puedes saltarte este paso.</div>
+
+<!-- ============ BLOQUE 1 ============ -->
+<section id="b1">
+  <span class="tiempo">Minutos 0–3</span>
+  <h2>1. Mapa general: qué es y cómo está armada</h2>
+  <p>Vyra es una <b>aplicación de escritorio</b> (no web) en <b>Java 21 + JavaFX</b> para un consultorio dental: pacientes, agenda, historia clínica, odontograma, tratamientos y pagos. Guarda todo en un archivo <b>SQLite</b> (<code>vyra.db</code>). Tiene <b>tres roles</b> —Administrador, Recepción, Odontólogo— y cada uno ve pantallas distintas.</p>
+  <p>La idea central es una arquitectura <b>en capas estrictas</b>: cada capa solo habla con la de abajo.</p>
+
+  <figure>
+  <svg viewBox="0 0 900 400" role="img" aria-label="Capas de la aplicación: Vista, Controller, Service, DAO, SQLite">
+    <defs><marker id="p" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--t2)"/></marker></defs>
+    <rect class="caja cajaU" x="40" y="20" width="520" height="56" rx="10"/>
+    <text class="t-grande" x="60" y="44">Vista · FXML + CSS</text><text class="t-chico" x="60" y="64">XxxView.fxml (qué se ve) y vyra.css (cómo se ve). Sin lógica.</text>
+    <rect class="caja cajaC" x="40" y="100" width="520" height="56" rx="10"/>
+    <text class="t-grande" x="60" y="124">Controller</text><text class="t-chico" x="60" y="144">Reacciona a clics, lee los campos, llama al Service y muestra el resultado o el error.</text>
+    <rect class="caja cajaS" x="40" y="180" width="520" height="56" rx="10"/>
+    <text class="t-grande" x="60" y="204">Service</text><text class="t-chico" x="60" y="224">Las reglas de negocio (RN-01…RN-15) y los permisos por rol. Lanza ReglaNegocioException.</text>
+    <rect class="caja cajaD" x="40" y="260" width="520" height="56" rx="10"/>
+    <text class="t-grande" x="60" y="284">DAO (interfaz) → DAOSqlite</text><text class="t-chico" x="60" y="304">Único lugar con SQL (PreparedStatement). El Service solo conoce la interfaz.</text>
+    <rect class="caja cajaB" x="40" y="340" width="520" height="48" rx="10"/>
+    <text class="t-grande" x="60" y="370">SQLite · vyra.db  (9 tablas)</text>
+    <path class="flecha" d="M300 76V98" marker-end="url(#p)"/><path class="flecha" d="M300 156V178" marker-end="url(#p)"/>
+    <path class="flecha" d="M300 236V258" marker-end="url(#p)"/><path class="flecha" d="M300 316V338" marker-end="url(#p)"/>
+
+    <rect class="caja cajaM" x="600" y="100" width="260" height="216" rx="10" stroke-dasharray="6 4"/>
+    <text class="t-grande" x="620" y="126">Model</text>
+    <text class="t-chico" x="620" y="148">Paciente, Cita, Pago, Usuario…</text>
+    <text class="t-chico" x="620" y="166">enums: Rol, EstadoCita…</text>
+    <text class="t-chico" x="620" y="192">Lo usan TODAS las capas:</text>
+    <text class="t-chico" x="620" y="210">son los “datos” que viajan</text>
+    <text class="t-chico" x="620" y="228">de la pantalla a la base y</text>
+    <text class="t-chico" x="620" y="246">de vuelta. Llevan las</text>
+    <text class="t-chico" x="620" y="264">validaciones (Jakarta).</text>
+    <rect class="caja cajaX" x="600" y="330" width="260" height="58" rx="10"/>
+    <text class="t-med" x="620" y="354">util</text><text class="t-chico" x="620" y="374">Validador, HashUtil, Formatos, ConexionBD</text>
+    <rect class="caja cajaU" x="600" y="20" width="260" height="56" rx="10"/>
+    <text class="t-med" x="620" y="44">ui</text><text class="t-chico" x="620" y="64">Avatar, Pill, Aviso… piezas reutilizables</text>
+  </svg>
+  <figcaption>Regla de oro (está en <code>CLAUDE.md</code>): sin SQL fuera de los DAO y sin JavaFX fuera de <code>controller/</code> y <code>ui/</code>. Los controladores nunca llaman a un DAO.</figcaption>
+  </figure>
+
+  <h3>Por qué importa (para explicarlo en una frase)</h3>
+  <p>“Si mañana cambiamos SQLite por otra base, solo se reescriben los DAO. Si cambiamos el diseño, solo se tocan FXML y CSS. Las reglas del negocio viven en un solo lugar: los Service.”</p>
+  <div class="decir">“Es una app de escritorio en Java con tres capas: pantallas, reglas de negocio y base de datos. Cada rol ve solo lo suyo.”  <i>Muestra:</i> inicia sesión como <code>recepcion</code> y luego como <code>msalinas</code> (los que creaste en la preparación); el menú de la izquierda cambia.</div>
+</section>
+
+<!-- ============ BLOQUE 2 ============ -->
+<section id="b2">
+  <span class="tiempo">Minutos 3–8</span>
+  <h2>2. Dependencias: qué se usó y para qué</h2>
+  <p>Todo se declara en <code>pom.xml</code> (Maven las descarga solas). Son pocas y cada una tiene un trabajo claro:</p>
+  <table>
+    <tr><th>Dependencia</th><th>Versión</th><th>Para qué sirve</th><th>Dónde se nota</th></tr>
+    <tr><td><b>javafx-controls</b></td><td>21.0.3</td><td>Los componentes visuales: botones, tablas, campos, ventanas.</td><td>Todo <code>controller/</code> y <code>ui/</code></td></tr>
+    <tr><td><b>javafx-fxml</b></td><td>21.0.3</td><td>Cargar pantallas descritas en archivos <code>.fxml</code> y enlazarlas con su controlador.</td><td><code>App</code>, <code>MainController</code> (<code>FXMLLoader</code>)</td></tr>
+    <tr><td><b>sqlite-jdbc</b> (xerial)</td><td>3.46.1.3</td><td>El driver JDBC: permite que Java hable con el archivo <code>vyra.db</code>. No hay servidor de base de datos.</td><td><code>ConexionBD</code> y los <code>DAOSqlite</code></td></tr>
+    <tr><td><b>jakarta.validation-api</b></td><td>3.0.2</td><td>Las anotaciones de validación: <code>@NotBlank</code>, <code>@Size</code>, <code>@Positive</code>…</td><td>Clases de <code>model/</code></td></tr>
+    <tr><td><b>hibernate-validator</b> + <b>expressly</b></td><td>8.0.1 / 5.0.0</td><td>El motor que ejecuta esas anotaciones y arma los mensajes en español.</td><td><code>util/Validador</code></td></tr>
+    <tr><td><b>lombok</b></td><td>1.18.46</td><td>Genera getters, setters y constructores al compilar (<code>@Data</code>). Solo se usa al compilar (<code>provided</code>).</td><td>Todo <code>model/</code></td></tr>
+    <tr><td><b>openpdf</b></td><td>2.0.3</td><td>Crear los PDF de historia clínica y odontograma.</td><td><code>ExportacionPdfService</code></td></tr>
+    <tr><td><b>junit-jupiter</b></td><td>5.11.3</td><td>Pruebas automáticas (185). Solo en pruebas (<code>test</code>).</td><td><code>src/test/</code></td></tr>
+  </table>
+  <p><b>Plugins de Maven:</b> <code>maven-compiler-plugin</code> (compila con Java 21 y Lombok), <code>maven-surefire-plugin</code> (ejecuta las pruebas con una base <i>en memoria</i>, para no tocar <code>vyra.db</code>) y <code>javafx-maven-plugin</code> (lo que hace funcionar <code>mvn javafx:run</code>).</p>
+
+  <h3>Los módulos de Java (<code>module-info.java</code>)</h3>
+  <p>El proyecto usa el sistema de módulos de Java: un archivo que dice <b>qué librerías necesita</b> (<code>requires javafx.controls</code>, <code>requires java.sql</code>…) y <b>qué paquetes abre</b> para que otros puedan leerlos. Dos <code>opens</code> importan: <code>controller</code> y <code>ui</code> se abren a <code>javafx.fxml</code>, porque el cargador de FXML crea los controladores “por reflexión”; y <code>model</code> se abre a <code>javafx.base</code> (tablas) y a <code>hibernate.validator</code> (lee las anotaciones). Si falta uno, la app falla al abrir la pantalla.</p>
+
+  <h3>Qué NO se usó (y por qué lo preguntarán)</h3>
+  <ul>
+    <li><b>Sin framework web ni servidor</b>: es de escritorio, un solo equipo.</li>
+    <li><b>Sin ORM (Hibernate/JPA)</b>: el SQL se escribe a mano en los DAO. Hibernate aquí solo se usa para <i>validar</i>, no para guardar.</li>
+    <li><b>Sin Spring</b>: los servicios se crean a mano en una clase fábrica (<code>Servicios</code>).</li>
+  </ul>
+  <div class="decir">“Usamos solo lo necesario: JavaFX para la interfaz, SQLite como base embebida, Jakarta Validation para validar y OpenPDF para los PDF.”  <i>Muestra:</i> abre <code>pom.xml</code> y recorre el bloque <code>&lt;dependencies&gt;</code>.</div>
+</section>
+
+<!-- ============ BLOQUE 3 ============ -->
+<section id="b3">
+  <span class="tiempo">Minutos 8–13</span>
+  <h2>3. Arranque y base de datos</h2>
+  <h3>Qué pasa desde que se abre la app hasta que ves el login</h3>
+  <figure>
+  <svg viewBox="0 0 900 190" role="img" aria-label="Flujo de arranque">
+    <defs><marker id="q" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--t2)"/></marker></defs>
+    <rect class="caja cajaC" x="10" y="50" width="130" height="64" rx="10"/><text class="t-med" x="30" y="78">App.start()</text><text class="t-chico" x="24" y="98">JavaFX lo llama</text>
+    <rect class="caja cajaX" x="170" y="50" width="140" height="64" rx="10"/><text class="t-med" x="186" y="78">cargarFuentes</text><text class="t-chico" x="186" y="98">tipografía Inter</text>
+    <rect class="caja cajaX" x="340" y="50" width="150" height="64" rx="10"/><text class="t-med" x="356" y="78">ConexionBD</text><text class="t-chico" x="356" y="98">abre vyra.db + schema</text>
+    <rect class="caja cajaX" x="520" y="50" width="170" height="64" rx="10"/><text class="t-med" x="536" y="78">DatosIniciales</text><text class="t-chico" x="536" y="98">crea admin / ejemplos</text>
+    <rect class="caja cajaU" x="720" y="50" width="170" height="64" rx="10"/><text class="t-med" x="736" y="78">LoginView.fxml</text><text class="t-chico" x="736" y="98">se muestra la ventana</text>
+    <path class="flecha" d="M140 82H168" marker-end="url(#q)"/><path class="flecha" d="M310 82H338" marker-end="url(#q)"/>
+    <path class="flecha" d="M490 82H518" marker-end="url(#q)"/><path class="flecha" d="M690 82H718" marker-end="url(#q)"/>
+    <text class="t-chico" x="150" y="150">Con <tspan font-weight="700">-Dvyra.demo=true</tspan> se cargan pacientes, profesionales y citas de ejemplo (ficticios).</text>
+  </svg>
+  <figcaption>Archivos: <code>App.java</code>, <code>util/ConexionBD.java</code>, <code>util/DatosIniciales.java</code>, <code>resources/com/vyra/schema.sql</code>.</figcaption>
+  </figure>
+
+  <ul>
+    <li><b><code>ConexionBD</code></b> mantiene <i>una sola conexión compartida</i> (por eso los DAO nunca la cierran). La primera vez que se pide, activa las claves foráneas (<code>PRAGMA foreign_keys = ON</code>) y ejecuta <code>schema.sql</code>, que usa <code>CREATE TABLE IF NOT EXISTS</code>: si el archivo no existe, se crea con todas las tablas.</li>
+    <li><b><code>DatosIniciales</code></b> crea el usuario <code>admin</code> solo si no hay ningún usuario. Su contraseña se guarda con <code>HashUtil</code> (PBKDF2 con sal), nunca en texto plano.</li>
+  </ul>
+
+  <h3>Las 9 tablas y cómo se relacionan</h3>
+  <figure>
+  <svg viewBox="0 0 900 360" role="img" aria-label="Diagrama de las 9 tablas de la base de datos">
+    <rect class="caja cajaB" x="20" y="20" width="150" height="56" rx="8"/><text class="t-med" x="36" y="44">usuario</text><text class="t-chico" x="36" y="64">rol, hash, activo</text>
+    <rect class="caja cajaB" x="20" y="130" width="150" height="56" rx="8"/><text class="t-med" x="36" y="154">profesional</text><text class="t-chico" x="36" y="174">id_usuario (opcional)</text>
+    <rect class="caja cajaB" x="350" y="130" width="150" height="56" rx="8"/><text class="t-med" x="366" y="154">cita</text><text class="t-chico" x="366" y="174">fecha, hora, estado</text>
+    <rect class="caja cajaB" x="350" y="20" width="150" height="56" rx="8"/><text class="t-med" x="366" y="44">paciente</text><text class="t-chico" x="366" y="64">DNI único, activo</text>
+    <rect class="caja cajaB" x="680" y="20" width="190" height="56" rx="8"/><text class="t-med" x="696" y="44">historia_clinica_entrada</text><text class="t-chico" x="696" y="64">fecha, diagnóstico</text>
+    <rect class="caja cajaB" x="680" y="100" width="190" height="56" rx="8"/><text class="t-med" x="696" y="124">odontograma_pieza</text><text class="t-chico" x="696" y="144">pieza FDI, estado, fecha</text>
+    <rect class="caja cajaB" x="350" y="260" width="150" height="56" rx="8"/><text class="t-med" x="366" y="284">tratamiento</text><text class="t-chico" x="366" y="304">costo, estado, id_cita</text>
+    <rect class="caja cajaB" x="680" y="230" width="190" height="56" rx="8"/><text class="t-med" x="696" y="254">tratamiento_pieza</text><text class="t-chico" x="696" y="274">tratamiento ↔ piezas</text>
+    <rect class="caja cajaB" x="20" y="260" width="150" height="56" rx="8"/><text class="t-med" x="36" y="284">pago</text><text class="t-chico" x="36" y="304">monto, método, fecha</text>
+    <g class="flecha">
+      <path d="M95 76V130"/><path d="M170 158H350"/><path d="M425 76V130"/>
+      <path d="M500 40H680"/><path d="M500 60L590 60 590 128H680"/>
+      <path d="M425 186V260"/><path d="M500 288H680"/><path d="M350 288H170"/>
+    </g>
+    <text class="t-chico" x="105" y="108">1 usuario ⇢ 0..1 profesional</text>
+    <text class="t-chico" x="205" y="150">profesional ← cita</text>
+    <text class="t-chico" x="432" y="108">paciente ← cita</text>
+    <text class="t-chico" x="520" y="32">paciente ← historia</text>
+    <text class="t-chico" x="610" y="150">paciente ← odontograma</text>
+    <text class="t-chico" x="432" y="228">cita ← tratamiento</text>
+    <text class="t-chico" x="190" y="280">tratamiento ← pagos</text>
+    <text class="t-chico" x="540" y="280">piezas</text>
+  </svg>
+  <figcaption>Cada flecha es una clave foránea. Dos reglas del diseño: la historia y el odontograma <b>nunca se sobrescriben</b> (cada cambio es una fila nueva, RN-09), y el <b>saldo no se guarda</b>: se calcula como costo − suma de pagos (RN-12).</figcaption>
+  </figure>
+  <div class="decir">“La base se crea sola la primera vez. Nada del saldo se guarda a mano: se calcula, así nunca queda desactualizado.”  <i>Muestra:</i> en la carpeta del proyecto aparece <code>vyra.db</code> tras abrir la app.</div>
+</section>
+
+<!-- ============ BLOQUE 4 ============ -->
+<section id="b4">
+  <span class="tiempo">Minutos 13–20</span>
+  <h2>4. Un caso completo de punta a punta: “Agendar una cita”</h2>
+  <p>La mejor forma de entender las capas es seguir <b>un clic</b>. Este es el recorrido cuando recepción pulsa <b>Agendar cita</b>:</p>
+
+  <figure>
+  <svg viewBox="0 0 900 470" role="img" aria-label="Diagrama de secuencia de agendar una cita">
+    <defs><marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--t2)"/></marker></defs>
+    <rect class="caja cajaU" x="10" y="10" width="130" height="44" rx="8"/><text class="t-med" x="22" y="37">AgendaView.fxml</text>
+    <rect class="caja cajaC" x="170" y="10" width="140" height="44" rx="8"/><text class="t-med" x="182" y="37">AgendaController</text>
+    <rect class="caja cajaS" x="340" y="10" width="130" height="44" rx="8"/><text class="t-med" x="358" y="37">CitaService</text>
+    <rect class="caja cajaX" x="500" y="10" width="130" height="44" rx="8"/><text class="t-med" x="528" y="37">Validador</text>
+    <rect class="caja cajaD" x="660" y="10" width="110" height="44" rx="8"/><text class="t-med" x="672" y="37">CitaDAO</text>
+    <rect class="caja cajaB" x="790" y="10" width="100" height="44" rx="8"/><text class="t-med" x="808" y="37">SQLite</text>
+    <g stroke="var(--borde)" stroke-width="1.5" stroke-dasharray="4 4"><path d="M75 54V460"/><path d="M240 54V460"/><path d="M405 54V460"/><path d="M565 54V460"/><path d="M715 54V460"/><path d="M840 54V460"/></g>
+
+    <path class="flecha" d="M75 90H238" marker-end="url(#r)"/><text class="t-chico" x="82" y="84">1. clic en “Agendar cita”</text>
+    <path class="flecha" d="M240 128H403" marker-end="url(#r)"/><text class="t-chico" x="246" y="122">2. arma la Cita y llama agendar(cita)</text>
+    <path class="flecha" d="M405 166H563" marker-end="url(#r)"/><text class="t-chico" x="410" y="160">3. valida campos (@NotNull…)</text>
+    <path class="flecha" d="M405 204H713" marker-end="url(#r)"/><text class="t-chico" x="410" y="198">4. ¿cruce de horario? buscarCruce()  (RN-06)</text>
+    <path class="flecha" d="M715 242H838" marker-end="url(#r)"/><text class="t-chico" x="722" y="236">SELECT … ?</text>
+    <path class="flecha-ret" d="M838 280H717" marker-end="url(#r)"/><text class="t-chico" x="722" y="274">¿hay cita?</text>
+    <path class="flecha" d="M405 318H713" marker-end="url(#r)"/><text class="t-chico" x="410" y="312">5. si está libre: crear(cita)</text>
+    <path class="flecha" d="M715 356H838" marker-end="url(#r)"/><text class="t-chico" x="722" y="350">INSERT … ?</text>
+    <path class="flecha-ret" d="M405 394H242" marker-end="url(#r)"/><text class="t-chico" x="252" y="388">6. devuelve la Cita con su id</text>
+    <path class="flecha-ret" d="M240 432H77" marker-end="url(#r)"/><text class="t-chico" x="84" y="426">7. muestra “Cita agendada” y refresca</text>
+    <text class="t-chico" x="420" y="452" style="fill:var(--bd-t)">Si hay cruce: el Service lanza ReglaNegocioException → el controller muestra el aviso rojo y los horarios libres.</text>
+  </svg>
+  <figcaption>Las flechas continuas son llamadas; las punteadas, respuestas. Cada capa hace <b>una sola cosa</b>.</figcaption>
+  </figure>
+
+  <h3>Qué hace cada capa en ese recorrido</h3>
+  <div class="rejilla">
+    <div class="tarjeta"><span class="capa c-ui">Vista</span><h3>AgendaView.fxml</h3><p>Dibuja el formulario y los botones. Cada botón dice <code>onAction="#guardarCita"</code>: así el FXML sabe qué método del controlador ejecutar. Los campos con <code>fx:id</code> se inyectan en variables <code>@FXML</code>.</p></div>
+    <div class="tarjeta"><span class="capa c-ctrl">Controller</span><h3>AgendaController</h3><p>Lee lo que escribió el usuario, construye un objeto <code>Cita</code>, llama al Service y <b>atrapa los errores</b> para mostrarlos junto al campo. No decide reglas: solo conecta pantalla y Service. Pide su Service a <code>Servicios.citas()</code>.</p></div>
+    <div class="tarjeta"><span class="capa c-serv">Service</span><h3>CitaService</h3><p>Aquí viven las reglas: horario de 08:00 a 20:00 (RN-05), sin cruces (RN-06), sin fechas pasadas (RN-08), y qué rol puede hacer qué. Recibe su DAO <b>por constructor</b>, así en las pruebas se le pasa uno “falso” en memoria.</p></div>
+    <div class="tarjeta"><span class="capa c-dao">DAO</span><h3>CitaDAO → CitaDAOSqlite</h3><p><code>CitaDAO</code> es la <i>interfaz</i> (el contrato: <code>crear</code>, <code>buscarPorId</code>, <code>listarPorFecha</code>…). <code>CitaDAOSqlite</code> la implementa con SQL. Siempre <code>PreparedStatement</code> con <code>?</code>, por seguridad contra inyección SQL.</p></div>
+    <div class="tarjeta"><span class="capa c-mod">Model</span><h3>Cita, Paciente, EstadoCita…</h3><p>Clases simples con datos (Lombok genera getters/setters) y las anotaciones de validación. Los <b>enums</b> (<code>EstadoCita</code>, <code>Rol</code>…) tienen su texto para mostrar (<code>getEtiqueta()</code>).</p></div>
+    <div class="tarjeta"><span class="capa c-util">Util</span><h3>Validador, Formatos…</h3><p><code>Validador</code> ejecuta las anotaciones y lanza <code>ValidacionException</code> con un mensaje por campo. <code>Formatos</code> da las fechas en español y el dinero como <code>S/ 1,250.00</code>.</p></div>
+  </div>
+
+  <h3>Dos piezas “transversales” que conviene dominar</h3>
+  <ul>
+    <li><b><code>Servicios</code></b> (fábrica): crea cada Service <i>una sola vez</i> con sus DAO de SQLite. Es el único lugar donde se “enchufan” las capas. Ej.: <code>new CitaService(new CitaDAOSqlite())</code>.</li>
+    <li><b><code>Sesion</code></b> (singleton): guarda quién inició sesión y su rol. Los Service la consultan (<code>Sesion.get().tieneRol(Rol.ADMIN)</code>) para decidir si permiten una acción. Es la “defensa en profundidad”: aunque el menú oculte una pantalla, el Service también verifica.</li>
+  </ul>
+  <h3>¿Y los errores?</h3>
+  <p>Hay dos tipos y ambos terminan como texto rojo junto al campo: <code>ValidacionException</code> (un campo mal escrito, viene de las anotaciones del modelo) y <code>ReglaNegocioException</code> (una regla del negocio rota, viene del Service, con el mensaje ya listo para el usuario).</p>
+  <div class="decir">“La pantalla nunca decide si una cita es válida: eso lo hace el servicio. Por eso las reglas se prueban sin abrir ninguna ventana — tenemos 185 pruebas automáticas.”  <i>Muestra:</i> en la agenda, intenta agendar a la misma hora del mismo odontólogo y enseña el aviso de cruce con los horarios libres.</div>
+</section>
+
+<!-- ============ BLOQUE 5 ============ -->
+<section id="b5">
+  <span class="tiempo">Minutos 20–25</span>
+  <h2>5. Archivo por archivo: dónde está cada cosa</h2>
+
+  <h3>Cómo se conectan los paquetes</h3>
+  <figure>
+  <svg viewBox="0 0 900 330" role="img" aria-label="Dependencias entre paquetes">
+    <defs><marker id="s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--t2)"/></marker></defs>
+    <rect class="caja cajaU" x="20" y="20" width="150" height="50" rx="8"/><text class="t-med" x="36" y="42">resources/views</text><text class="t-chico" x="36" y="60">*.fxml + vyra.css</text>
+    <rect class="caja cajaC" x="230" y="20" width="160" height="50" rx="8"/><text class="t-med" x="246" y="42">controller</text><text class="t-chico" x="246" y="60">17 archivos</text>
+    <rect class="caja cajaU" x="450" y="20" width="130" height="50" rx="8"/><text class="t-med" x="466" y="42">ui</text><text class="t-chico" x="466" y="60">10 componentes</text>
+    <rect class="caja cajaS" x="230" y="120" width="160" height="50" rx="8"/><text class="t-med" x="246" y="142">service</text><text class="t-chico" x="246" y="160">17 archivos</text>
+    <rect class="caja cajaD" x="230" y="220" width="160" height="50" rx="8"/><text class="t-med" x="246" y="242">dao (interfaces)</text><text class="t-chico" x="246" y="260">8 archivos</text>
+    <rect class="caja cajaD" x="20" y="280" width="170" height="44" rx="8"/><text class="t-med" x="34" y="300">dao/memoria</text><text class="t-chico" x="34" y="316">solo para pruebas</text>
+    <rect class="caja cajaD" x="430" y="280" width="160" height="44" rx="8"/><text class="t-med" x="444" y="300">dao/impl</text><text class="t-chico" x="444" y="316">SQL de verdad</text>
+    <rect class="caja cajaB" x="650" y="280" width="140" height="44" rx="8"/><text class="t-med" x="672" y="306">SQLite</text>
+    <rect class="caja cajaM" x="650" y="120" width="170" height="50" rx="8"/><text class="t-med" x="666" y="142">model</text><text class="t-chico" x="666" y="160">14: entidades + enums</text>
+    <rect class="caja cajaX" x="650" y="20" width="170" height="50" rx="8"/><text class="t-med" x="666" y="42">util</text><text class="t-chico" x="666" y="60">7: BD, hash, formatos…</text>
+    <path class="flecha" d="M170 45H228" marker-end="url(#s)"/><text class="t-chico" x="168" y="36">fx:controller</text>
+    <path class="flecha" d="M310 70V118" marker-end="url(#s)"/><path class="flecha" d="M310 170V218" marker-end="url(#s)"/>
+    <path class="flecha" d="M390 45H448" marker-end="url(#s)"/>
+    <path class="flecha" d="M280 270L150 280" marker-end="url(#s)"/><path class="flecha" d="M350 270L480 280" marker-end="url(#s)"/>
+    <path class="flecha" d="M590 302H648" marker-end="url(#s)"/>
+    <path class="flecha-ret" d="M390 145H648" marker-end="url(#s)"/><text class="t-chico" x="470" y="138">todas usan model</text>
+    <path class="flecha-ret" d="M580 45H648" marker-end="url(#s)"/>
+  </svg>
+  <figcaption>Las flechas van de “usa a”. Fíjate en que <code>controller</code> nunca llega a <code>dao</code> y que <code>dao/memoria</code> y <code>dao/impl</code> son dos implementaciones intercambiables de la misma interfaz.</figcaption>
+  </figure>
+
+  <h3>Qué hay en cada carpeta (<code>src/main/java/com/vyra/dental/</code>)</h3>
+  <table>
+    <tr><th>Carpeta</th><th>Archivos clave</th><th>Qué hace</th></tr>
+    <tr><td><b>raíz</b></td><td><code>App</code>, <code>Launcher</code></td><td><code>App</code> arranca JavaFX y cambia entre login y pantalla principal. <code>Launcher</code> es la entrada de la versión empaquetada (guarda la BD en <code>%APPDATA%\Vyra</code>).</td></tr>
+    <tr><td><span class="capa c-mod">model</span></td><td><code>Paciente</code>, <code>Cita</code>, <code>Profesional</code>, <code>Usuario</code>, <code>HistoriaClinicaEntrada</code>, <code>OdontogramaPieza</code>, <code>Tratamiento</code>, <code>Pago</code> · enums <code>Rol</code>, <code>EstadoCita</code>, <code>EstadoPieza</code>, <code>EstadoTratamiento</code>, <code>MetodoPago</code>, <code>FiltroPaciente</code></td><td>Los datos del negocio. Una clase por tabla, más los enums con sus textos y clases CSS.</td></tr>
+    <tr><td><span class="capa c-dao">dao</span></td><td>8 interfaces (<code>PacienteDAO</code>, <code>CitaDAO</code>…)</td><td>El contrato de acceso a datos de cada entidad.</td></tr>
+    <tr><td><span class="capa c-dao">dao/impl</span></td><td><code>PacienteDAOSqlite</code>, <code>CitaDAOSqlite</code>… (9)</td><td>El SQL real. Aquí, y solo aquí, hay <code>SELECT/INSERT/UPDATE</code>.</td></tr>
+    <tr><td><span class="capa c-dao">dao/memoria</span></td><td><code>PacienteDAOMemoria</code>… (9)</td><td>Versión “de mentira” con listas en memoria, para probar los Service sin base de datos.</td></tr>
+    <tr><td><span class="capa c-serv">service</span></td><td><code>AuthService</code>, <code>PacienteService</code>, <code>CitaService</code>, <code>ProfesionalService</code>, <code>HistoriaClinicaService</code>, <code>OdontogramaService</code>, <code>TratamientoService</code>, <code>PagoService</code>, <code>ReporteService</code>, <code>UsuarioService</code>, <code>ExportacionPdfService</code></td><td>Reglas de negocio y permisos. Además: <code>Servicios</code> (fábrica), <code>Sesion</code> (usuario actual), <code>ReglaNegocioException</code>, y los registros <code>TratamientoResumen</code> y <code>PagoDetalle</code> (datos ya combinados para las tablas).</td></tr>
+    <tr><td><span class="capa c-ctrl">controller</span></td><td><code>LoginController</code>, <code>MainController</code>, <code>InicioController</code>, <code>PacientesController</code>, <code>AgendaController</code>, <code>OdontogramaController</code>, <code>HistoriaClinicaController</code>, <code>TratamientosController</code>, <code>PagosController</code>, <code>ReportesController</code>, <code>ProfesionalesController</code>, <code>UsuariosController</code></td><td>Uno por pantalla. Más: <code>Pantalla</code> (el menú), <code>RecibeParametro</code> y <code>ConfirmaSalida</code> (interfaces), <code>ExportarPdf</code> (guardar PDF en segundo plano).</td></tr>
+    <tr><td><span class="capa c-ui">ui</span></td><td><code>Icono</code>, <code>Avatar</code>, <code>Pill</code>, <code>Aviso</code>, <code>Notificacion</code>, <code>CampoFormulario</code>, <code>Dialogos</code>, <code>EstadoVacio</code>, <code>PiezaDental</code></td><td>Piezas visuales reutilizables: el ícono, el círculo con iniciales, la píldora de estado, el aviso de color, el “toast”, el diente del odontograma…</td></tr>
+    <tr><td><span class="capa c-util">util</span></td><td><code>ConexionBD</code>, <code>Validador</code>, <code>HashUtil</code>, <code>Formatos</code>, <code>Busqueda</code>, <code>DatosIniciales</code>, <code>ValidacionException</code></td><td>Herramientas sin lógica de negocio: la conexión, validar, cifrar contraseñas, dar formato, buscar sin tildes, datos iniciales.</td></tr>
+    <tr><td><b>resources</b></td><td><code>views/*.fxml</code> (11), <code>styles/vyra.css</code>, <code>fonts/</code>, <code>schema.sql</code></td><td>Las pantallas, el único archivo de estilos (con variables <code>-vy-*</code> para los colores), la tipografía Inter y la definición de las tablas.</td></tr>
+  </table>
+
+  <h3>La navegación: cómo se pasa de una pantalla a otra</h3>
+  <ol>
+    <li><code>MainView.fxml</code> es el <b>marco</b>: menú lateral + barra superior + un área central.</li>
+    <li><code>MainController</code> construye el menú leyendo el enum <code>Pantalla</code>, que dice, para cada pantalla, su título, ícono, archivo FXML y <b>qué roles la ven</b>. Por eso un rol no ve lo que no le toca.</li>
+    <li>Al hacer clic, <code>navegar(Pantalla)</code> carga el FXML con <code>FXMLLoader</code> y lo pone en el área central.</li>
+    <li>Si una pantalla necesita un dato (ej. “abrir el odontograma <i>de este paciente</i>”), su controlador implementa <code>RecibeParametro</code> y recibe el objeto: <code>navegar(Pantalla.ODONTOGRAMA, paciente)</code>.</li>
+    <li>Si una pantalla tiene cambios sin guardar (el odontograma), implementa <code>ConfirmaSalida</code> y el marco le pregunta antes de dejarte salir.</li>
+  </ol>
+
+  <h3>Cómo se ve por dentro una pantalla (patrón repetido)</h3>
+  <pre>PacientesView.fxml  ──fx:controller──▶  PacientesController
+   (tabla, campos, botones)                   @FXML TableView tabla;   ← se llena sola desde el FXML
+                                              @FXML TextField campoDni;
+                                              private final PacienteService servicio = Servicios.pacientes();
+                                              @FXML void guardar() { servicio.registrar(paciente); ... }</pre>
+  <div class="decir">“Todas las pantallas siguen el mismo patrón: un FXML que dibuja, un controlador que conecta, un servicio que decide y un DAO que guarda.”  <i>Muestra:</i> abre en el editor <code>PacientesView.fxml</code> y <code>PacientesController.java</code> lado a lado.</div>
+</section>
+
+<!-- ============ BLOQUE 6 ============ -->
+<section id="b6">
+  <span class="tiempo">Minutos 25–30</span>
+  <h2>6. Guion de la demo (5 minutos) y preguntas probables</h2>
+  <h3>Recorrido sugerido</h3>
+  <table>
+    <tr><th>Min</th><th>Qué haces en pantalla</th><th>Qué concepto refuerza</th></tr>
+    <tr><td>0:00</td><td>(Ya creados los usuarios de la preparación.) Entras como <code>recepcion</code>. Señalas que el menú no tiene Odontograma ni Reportes.</td><td>Roles y <code>Pantalla</code> (RN-15)</td></tr>
+    <tr><td>0:45</td><td><b>Pacientes</b>: buscas “lucia” (sin tilde) y abres la ficha.</td><td>Búsqueda sin tildes (<code>Busqueda</code>), patrón lista + panel</td></tr>
+    <tr><td>1:30</td><td><b>Agenda</b>: provocas un cruce de horario y usas un horario libre sugerido.</td><td>Reglas en el Service (RN-06), flujo de la sección 4</td></tr>
+    <tr><td>2:15</td><td>Cierras sesión y entras como <code>msalinas</code> (odontólogo). En <b>Odontograma</b> marcas piezas: quedan en naranja; intentas salir y te pregunta.</td><td>Cambios pendientes, <code>ConfirmaSalida</code>; el historial no se sobrescribe (RN-09)</td></tr>
+    <tr><td>3:15</td><td><b>Tratamientos</b>: registras uno con piezas “36, 47” y costo. Exportas la <b>historia clínica a PDF</b>.</td><td>Transacción en <code>TratamientoDAOSqlite</code>; OpenPDF en segundo plano</td></tr>
+    <tr><td>4:00</td><td>Entras como <code>admin</code>: <b>Pagos</b>, cobras en partes y intentas pagar más que el saldo. Muestras <b>Reportes</b> e <b>Inicio</b>.</td><td>Saldo calculado (RN-12), permisos del administrador</td></tr>
+  </table>
+
+  <h3>Preguntas que te pueden hacer</h3>
+  <dl class="qa">
+    <dt>¿Dónde se guardan los datos?</dt><dd>En un archivo SQLite, <code>vyra.db</code>, en la carpeta donde corre la app (en la versión empaquetada, en <code>%APPDATA%\Vyra</code>). No hay servidor.</dd>
+    <dt>¿Las contraseñas están seguras?</dt><dd>Se guardan como hash PBKDF2 con sal (<code>HashUtil</code>), nunca en texto plano. El login no dice cuál dato falló.</dd>
+    <dt>¿Qué evita que dos citas se crucen?</dt><dd>El <code>CitaService</code> consulta al DAO si hay una cita del mismo profesional que se traslape, antes de guardar. La pantalla solo muestra el resultado.</dd>
+    <dt>¿Por qué hay DAO “en memoria” y DAO “Sqlite”?</dt><dd>Para probar las reglas del negocio sin base de datos real: las pruebas usan los de memoria (o SQLite en memoria) y corren en segundos.</dd>
+    <dt>¿Qué pasa si recepción intenta ver el odontograma?</dt><dd>No lo ve en el menú, y aunque llegara, el <code>OdontogramaService</code> lanza “sin permiso”: se verifica en las dos capas.</dd>
+    <dt>¿Se puede borrar una cita, un pago o una entrada de historia?</dt><dd>No. Las citas se cancelan, la historia y el odontograma solo agregan filas nuevas, y los usuarios se desactivan. Así queda un historial confiable.</dd>
+    <dt>¿Cómo se prueba?</dt><dd>185 pruebas JUnit (<code>mvn test</code>), sobre todo de los Service y los DAO, con una base en memoria.</dd>
+    <dt>¿Cómo se entrega?</dt><dd><code>scripts/empaquetar.ps1</code> genera una carpeta con <code>Vyra.exe</code> usando <code>jpackage</code>; incluye su propio Java.</dd>
+  </dl>
+
+  <h3>Autoevaluación (si respondes estas 5, ya lo dominas)</h3>
+  <ol>
+    <li>¿Qué capas toca un clic en “Agendar cita” y en qué orden?</li>
+    <li>¿Por qué el controlador no llama directamente al DAO?</li>
+    <li>¿Para qué sirve <code>Servicios</code> y para qué <code>Sesion</code>?</li>
+    <li>¿Dónde y por qué se calcula el saldo en vez de guardarlo?</li>
+    <li>¿Qué cambia en el menú según el rol y qué archivo lo define?</li>
+  </ol>
+</section>
+
+<section>
+  <h2>Comandos útiles</h2>
+  <pre>mvn javafx:run "-Dvyra.demo=true"     # abre la app con datos de ejemplo (en PowerShell, comillas en -D)
+mvn test                               # las 185 pruebas
+mvn compile                            # solo compilar
+powershell -ExecutionPolicy Bypass -File scripts/empaquetar.ps1   # genera target/instalador/Vyra/Vyra.exe</pre>
+  <p class="sub">Documentos del repositorio para profundizar: <code>docs/05-arquitectura.md</code> (capas y paquetes), <code>docs/04-diagrama-clases.md</code> (clases, DAO y servicios), <code>docs/03-modelo-base-datos.md</code> (tablas), <code>docs/01-requerimientos.md</code> §6 (reglas RN-01 a RN-15) y <code>docs/08-guia-frontend.md</code> (pantallas).</p>
+</section>
+
+</div>
+</body>
+</html>
