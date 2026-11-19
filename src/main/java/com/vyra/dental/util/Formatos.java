@@ -110,6 +110,13 @@ public final class Formatos {
         return "S/ " + formato.format(monto);
     }
 
+    /** "80" o "80.50": un monto para volver a escribirlo en un campo (sin S/ ni comas). */
+    public static String montoCampo(double monto) {
+        DecimalFormat formato = new DecimalFormat("0.##", DecimalFormatSymbols.getInstance(Locale.US));
+        String texto = formato.format(monto);
+        return texto.contains(".") && texto.indexOf('.') == texto.length() - 2 ? texto + "0" : texto;
+    }
+
     /** "1,120" (sin decimales, para las cifras de los gráficos). */
     public static String miles(double monto) {
         DecimalFormat formato = new DecimalFormat("#,##0", DecimalFormatSymbols.getInstance(Locale.US));

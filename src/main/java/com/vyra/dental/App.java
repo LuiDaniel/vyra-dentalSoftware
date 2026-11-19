@@ -21,6 +21,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -47,7 +48,8 @@ public class App extends Application {
         DatosIniciales.crearAdminSiNoExiste(new UsuarioDAOSqlite());
         if (DatosIniciales.demoActivada()) {
             DatosIniciales.cargarEjemplos(new PacienteDAOSqlite());
-            DatosIniciales.cargarEjemplosAgenda(new PacienteDAOSqlite(), new ProfesionalDAOSqlite(), new CitaDAOSqlite());
+            DatosIniciales.cargarEjemplosAgenda(new PacienteDAOSqlite(), new ProfesionalDAOSqlite(), new CitaDAOSqlite(),
+                    new PagoDAOSqlite());
             DatosIniciales.cargarUsuariosDeEjemplo(new UsuarioDAOSqlite(), new ProfesionalDAOSqlite());
             DatosIniciales.cargarEjemplosClinicos(new PacienteDAOSqlite(), new ProfesionalDAOSqlite(),
                     new OdontogramaDAOSqlite(), new HistoriaClinicaDAOSqlite());
@@ -56,6 +58,13 @@ public class App extends Application {
         }
 
         ventana = stage;
+        try (InputStream icono = App.class.getResourceAsStream("/com/vyra/vyra.png")) {
+            if (icono != null) {
+                stage.getIcons().add(new Image(icono));
+            }
+        } catch (IOException e) {
+            // Sin ícono propio se usa el de Java
+        }
         mostrarLogin();
         stage.show();
     }

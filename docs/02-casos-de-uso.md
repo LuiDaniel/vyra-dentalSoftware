@@ -29,6 +29,7 @@ flowchart LR
     CU10(CU-10 Registrar pago)
     CU11(CU-11 Exportar a PDF)
     CU12(CU-12 Ver alertas del día)
+    CU13(CU-13 Cobrar en línea)
 
     Recepcionista --> CU01
     Recepcionista --> CU02
@@ -134,9 +135,10 @@ flowchart LR
 |---|---|---|---|
 | CU-07 | Gestionar profesionales | Administrador | CRUD de odontólogos: nombres, especialidad, horario de atención. |
 | CU-09 | Generar reportes | Administrador | Selecciona tipo de reporte (citas del día/semana, historial de paciente, ingresos por periodo) y rango de fechas; el sistema consulta la BD y muestra/exporta el resultado. |
-| CU-10 | Registrar pago | Recepcionista | Selecciona un tratamiento, ingresa monto, fecha y método de pago; el sistema valida que el monto no supere el saldo (RN-12), guarda el pago y muestra el saldo actualizado. El saldo no se guarda: se calcula como costo − suma de pagos. |
+| CU-10 | Registrar pago | Recepcionista | Busca al paciente y elige **la consulta de una cita** (RN-16) o **un tratamiento** con saldo; ingresa monto, fecha y método de pago; el sistema valida que el monto no supere el saldo (RN-12), guarda el pago y muestra el saldo actualizado. El saldo no se guarda: se calcula como costo − suma de pagos. Desde la Agenda, "Cobrar consulta" abre Pagos con la consulta elegida. |
 | CU-11 | Exportar a PDF | Odontólogo/a | Selecciona historia clínica u odontograma de un paciente y genera un PDF listo para imprimir. |
 | CU-12 | Ver alertas del día | Recepcionista | Al iniciar sesión, el inicio muestra un aviso con las citas de la próxima hora y la agenda completa del día. |
+| CU-13 | Cobrar en línea | Recepcionista | En Pagos, con la consulta o el tratamiento y el monto elegidos, pulsa "Cobrar con Mercado Pago". El sistema crea el cobro en Mercado Pago (RF-13) y muestra un QR; el paciente paga desde su celular. El sistema pregunta cada pocos segundos y, cuando el pago se aprueba, lo registra con método `MERCADO_PAGO` y su número de operación (una sola vez). Si se rechaza, lo avisa. Sin credenciales, el modo demo tiene un botón "Simular pago aprobado". |
 
 ---
 
@@ -172,6 +174,7 @@ Qué pantallas ve cada rol en el menú lateral. "Lectura" significa que puede ve
 | CU-10 | Pagos |
 | CU-11 | Botón "Exportar PDF" en Odontograma e Historia clínica |
 | CU-12 | Aviso en Inicio |
+| CU-13 | Pagos (botón "Cobrar con Mercado Pago") |
 
 ---
 

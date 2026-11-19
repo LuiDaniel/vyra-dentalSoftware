@@ -26,7 +26,19 @@ public interface PagoDAO {
     /** Suma de los pagos del tratamiento (0 si no tiene). */
     double totalPagado(int idTratamiento);
 
-    /** Pagos del periodo con concepto y paciente, del más reciente al más antiguo. */
+    /** Pagos de la consulta de la cita, del más reciente al más antiguo (RN-16). */
+    List<Pago> listarPorCita(int idCita);
+
+    /** Suma de los pagos de la consulta de la cita (0 si no tiene). */
+    double totalPagadoConsulta(int idCita);
+
+    /** true si ya hay un pago con ese método y número de operación (un cobro en línea no se registra dos veces). */
+    boolean existeOperacion(MetodoPago metodo, String numeroOperacion);
+
+    /**
+     * Pagos del periodo con concepto y paciente, del más reciente al más antiguo.
+     * El concepto de un pago de consulta es "Consulta".
+     */
     List<PagoResumen> resumenesEntre(LocalDate desde, LocalDate hasta);
 
     /** Total cobrado por método en el periodo (docs/03-modelo-base-datos.md §5.5); sin los métodos sin pagos. */

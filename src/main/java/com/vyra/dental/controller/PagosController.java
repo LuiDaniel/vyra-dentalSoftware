@@ -6,12 +6,17 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
+import com.vyra.dental.model.Cita;
+import com.vyra.dental.model.Cobro;
 import com.vyra.dental.model.MetodoPago;
 import com.vyra.dental.model.Pago;
 import com.vyra.dental.model.PagoResumen;
 import com.vyra.dental.model.TratamientoResumen;
+import com.vyra.dental.pasarela.PasarelaPago.OrdenCobro;
+import com.vyra.dental.service.CobroEnLineaService;
 import com.vyra.dental.service.PagoService;
 import com.vyra.dental.service.PagoService.Periodo;
 import com.vyra.dental.service.PagoService.Rango;
@@ -19,6 +24,7 @@ import com.vyra.dental.service.ReglaNegocioException;
 import com.vyra.dental.service.Servicios;
 import com.vyra.dental.ui.Aviso;
 import com.vyra.dental.ui.CampoFormulario;
+import com.vyra.dental.ui.DialogoCobroEnLinea;
 import com.vyra.dental.ui.EstadoVacio;
 import com.vyra.dental.ui.ExportarPdf;
 import com.vyra.dental.ui.Icono;
@@ -57,8 +63,10 @@ import javafx.util.Duration;
 import javafx.util.StringConverter;
 
 /**
- * Pagos (docs/08-guia-frontend.md §7.8, CU-10): indicadores del periodo, pagos
- * registrados en él y el panel "Registrar pago". Solo Administrador y Recepción.
+ * Pagos (docs/08-guia-frontend.md §7.8, CU-10, CU-13): indicadores del periodo,
+ * pagos registrados en él y el panel "Registrar pago", que cobra consultas
+ * (RN-16) y tratamientos, a mano o en línea con Mercado Pago (RF-13). Solo
+ * Administrador y Recepción.
  */
 public class PagosController implements RecibeParametro {
 
@@ -66,6 +74,7 @@ public class PagosController implements RecibeParametro {
     private static final double ALTO_ENCABEZADO = 44;
     private static final int FILAS_MINIMAS = 5;
     private static final int MAX_SUGERENCIAS = 8;
+    /** Métodos que se eligen a mano; Mercado Pago lo registra la pasarela (botón aparte). */
     private static final Map<MetodoPago, String> ICONOS = Map.of(MetodoPago.EFECTIVO, "efectivo",
             MetodoPago.YAPE_PLIN, "celular", MetodoPago.TARJETA, "pagos", MetodoPago.TRANSFERENCIA, "banco");
 
@@ -103,8 +112,10 @@ public class PagosController implements RecibeParametro {
     @FXML private Aviso avisoPago;
     @FXML private Label saldoDespues;
     @FXML private Button botonRegistrar;
+    @FXML private Button botonMercadoPago;
 
     private final PagoService servicio = Servicios.pagos();
+    private final CobroEnLineaService enLinea = Servicios.cobroEnLinea();
     private final ObservableList<PagoResumen> filas = FXCollections.observableArrayList();
     private final ToggleGroup grupoMetodos = new ToggleGroup();
     private final Map<MetodoPago, ToggleButton> botonesMetodo = new EnumMap<>(MetodoPago.class);
@@ -114,12 +125,13 @@ public class PagosController implements RecibeParametro {
     private final Map<String, CampoFormulario> campos = new HashMap<>();
 
     private Periodo periodo = Periodo.MES;
-    /** Tratamiento al que se le registra el pago; null si todavía no se eligió. */
-    private TratamientoResumen elegido;
+    /** Consulta o tratamiento al que se le registra el pago; null si todavía no se eligió. */
+    private Cobro elegido;
 
     @FXML
     private void initialize() {
         campos.put("idTratamiento", cfTratamiento);
+        campos.put("idCita", cfTratamiento);
         campos.put("monto", cfMonto);
         campos.put("fechaPago", cfFecha);
         campos.put("metodoPago", cfMetodo);
@@ -134,11 +146,20 @@ public class PagosController implements RecibeParametro {
         cargarPeriodo();
     }
 
-    /** Desde Tratamientos o la ficha del paciente: "Registrar pago" de un tratamiento. */
+    /**
+     * Desde Tratamientos o la ficha del paciente: "Registrar pago" de un
+     * tratamiento; desde la Agenda: "Cobrar consulta" de una cita.
+     */
     @Override
     public void recibir(Object parametro) {
         if (parametro instanceof TratamientoResumen resumen) {
-            Servicios.tratamientos().resumen(resumen.getTratamiento().getIdTratamiento()).ifPresent(this::elegirTratamiento);
+            servicio.cobroDeTratamiento(resumen.getTratamiento().getIdTratamiento()).ifPresent(this::elegirCobro);
+        } else if (parametro instanceof Cita cita) {
+            servicio.cobroDeConsulta(cita.getIdCita()).ifPresent(cobro -> {
+                elegirCobro(cobro);
+                // Lo normal es cobrar la consulta completa
+                campoMonto.setText(Formatos.montoCampo(cobro.getSaldo()));
+            });
         }
     }
 
@@ -331,6 +352,9 @@ public class PagosController implements RecibeParametro {
     private void construirMetodos() {
         int i = 0;
         for (MetodoPago metodo : MetodoPago.values()) {
+            if (!ICONOS.containsKey(metodo)) {
+                continue;
+            }
             ToggleButton boton = new ToggleButton(metodo.getEtiqueta(), new Icono(ICONOS.get(metodo), 18));
             boton.getStyleClass().add("boton-metodo");
             boton.setToggleGroup(grupoMetodos);
@@ -411,33 +435,33 @@ public class PagosController implements RecibeParametro {
         });
     }
 
-    /** Tratamientos que aún deben algo y coinciden con el paciente escrito. */
+    /** Consultas sin pagar y tratamientos con saldo de los pacientes que coinciden con lo escrito. */
     private void mostrarSugerencias() {
-        List<TratamientoResumen> encontrados;
+        List<Cobro> encontrados;
         try {
-            encontrados = servicio.tratamientosConSaldo(campoTratamiento.getText()).stream()
-                    .limit(MAX_SUGERENCIAS).toList();
+            encontrados = servicio.porCobrar(campoTratamiento.getText()).stream().limit(MAX_SUGERENCIAS).toList();
         } catch (RuntimeException e) {
-            avisoPago.mostrar(Aviso.Tipo.ERROR, "No se pudo buscar los tratamientos: " + e.getMessage());
+            avisoPago.mostrar(Aviso.Tipo.ERROR, "No se pudo buscar qué cobrar: " + e.getMessage());
             return;
         }
         sugerencias.getItems().clear();
         if (encontrados.isEmpty()) {
-            Label nada = new Label("No hay tratamientos con saldo pendiente para esa búsqueda");
+            Label nada = new Label("No hay consultas ni tratamientos por cobrar para esa búsqueda");
             nada.getStyleClass().add("texto-tenue");
             CustomMenuItem item = new CustomMenuItem(nada, false);
             item.setDisable(true);
             sugerencias.getItems().add(item);
         }
-        for (TratamientoResumen r : encontrados) {
-            Label descripcion = new Label(r.getTratamiento().getDescripcion());
+        for (Cobro r : encontrados) {
+            Label descripcion = new Label(r.getConcepto());
             descripcion.getStyleClass().add("celda-titulo");
-            Label detalle = new Label(r.getPaciente().getNombreCompleto() + " · Saldo " + Formatos.dinero(r.getSaldo()));
+            Label detalle = new Label(r.getPaciente().getNombreCompleto() + " · "
+                    + (r.esConsulta() ? "Por cobrar " : "Saldo ") + Formatos.dinero(r.getSaldo()));
             detalle.getStyleClass().add("celda-sub");
             VBox fila = new VBox(descripcion, detalle);
             fila.setPrefWidth(buscadorTratamiento.getWidth() - 24);
             CustomMenuItem item = new CustomMenuItem(fila, true);
-            item.setOnAction(e -> elegirTratamiento(r));
+            item.setOnAction(e -> elegirCobro(r));
             sugerencias.getItems().add(item);
         }
         if (!sugerencias.isShowing()) {
@@ -445,13 +469,13 @@ public class PagosController implements RecibeParametro {
         }
     }
 
-    private void elegirTratamiento(TratamientoResumen r) {
+    private void elegirCobro(Cobro r) {
         elegido = r;
         sugerencias.hide();
         cfTratamiento.limpiarError();
-        tarjetaDescripcion.setText(r.getTratamiento().getDescripcion());
-        tarjetaPaciente.setText(r.getPaciente().getNombreCompleto() + " · " + r.getTratamiento().getEstado().getEtiqueta());
-        tarjetaCosto.setText(Formatos.dinero(r.getTratamiento().getCosto()));
+        tarjetaDescripcion.setText(r.getConcepto());
+        tarjetaPaciente.setText(r.getPaciente().getNombreCompleto() + " · " + r.getDetalle());
+        tarjetaCosto.setText(Formatos.dinero(r.getCosto()));
         tarjetaAvance.setProgress(r.getAvance());
         tarjetaSaldo.setText("Pagado " + Formatos.dinero(r.getPagado()) + " · Saldo " + Formatos.dinero(r.getSaldo()));
         alternar(buscadorTratamiento, false);
@@ -474,9 +498,12 @@ public class PagosController implements RecibeParametro {
     private void actualizarPie() {
         Double monto = montoEscrito();
         botonRegistrar.setText(monto == null ? "Registrar pago" : "Registrar pago de " + Formatos.dinero(monto));
+        botonMercadoPago.setText((monto == null ? "Cobrar" : "Cobrar " + Formatos.dinero(monto)) + " con "
+                + enLinea.nombrePasarela());
+        botonMercadoPago.setDisable(elegido == null || monto == null);
         saldoDespues.getStyleClass().remove("texto-error");
         if (elegido == null) {
-            saldoDespues.setText("Elige un tratamiento para ver su saldo.");
+            saldoDespues.setText("Elige una consulta o un tratamiento para ver su saldo.");
         } else if (monto == null) {
             saldoDespues.setText("Saldo pendiente: " + Formatos.dinero(elegido.getSaldo()));
         } else if (Math.round(monto * 100) > Math.round(elegido.getSaldo() * 100)) {
@@ -500,7 +527,7 @@ public class PagosController implements RecibeParametro {
     private void registrar() {
         limpiarErrores();
         if (elegido == null) {
-            cfTratamiento.mostrarError("Elige el tratamiento que se paga.");
+            cfTratamiento.mostrarError("Elige la consulta o el tratamiento que se paga.");
             campoTratamiento.requestFocus();
             return;
         }
@@ -521,28 +548,71 @@ public class PagosController implements RecibeParametro {
         }
         MetodoPago metodo = grupoMetodos.getSelectedToggle() == null ? null
                 : (MetodoPago) grupoMetodos.getSelectedToggle().getUserData();
-        Pago pago = new Pago(0, elegido.getTratamiento().getIdTratamiento(), monto, fecha, metodo,
-                campoOperacion.getText());
+        Pago pago = elegido.esConsulta()
+                ? Pago.deConsulta(elegido.getId(), monto, fecha, metodo, campoOperacion.getText())
+                : new Pago(0, elegido.getId(), monto, fecha, metodo, campoOperacion.getText());
         try {
             servicio.registrar(pago);
             Notificacion.mostrar(raiz.getScene().getWindow(), "Pago de " + Formatos.dinero(monto) + " registrado");
-            campoMonto.clear();
-            campoOperacion.clear();
-            campoFecha.setValue(LocalDate.now());
-            cargarPeriodo();
-            // Se vuelve a leer el tratamiento: si ya no debe nada, se suelta
-            TratamientoResumen actualizado = Servicios.tratamientos().resumen(pago.getIdTratamiento()).orElse(null);
-            if (actualizado == null || actualizado.getSaldo() <= 0) {
-                quitarTratamiento();
-            } else {
-                elegirTratamiento(actualizado);
-            }
+            despuesDePagar();
         } catch (ValidacionException e) {
             e.getErrores().forEach(this::mostrarError);
         } catch (ReglaNegocioException e) {
             mostrarError(e.getCampo().orElse(""), e.getMessage());
         } catch (RuntimeException e) {
             avisoPago.mostrar(Aviso.Tipo.ERROR, e.getMessage() + ".");
+        }
+    }
+
+    /** Limpia el formulario y vuelve a leer lo cobrado: si ya no debe nada, se suelta. */
+    private void despuesDePagar() {
+        campoMonto.clear();
+        campoOperacion.clear();
+        campoFecha.setValue(LocalDate.now());
+        cargarPeriodo();
+        Cobro actualizado = servicio.releer(elegido).orElse(null);
+        if (actualizado == null || actualizado.getSaldo() <= 0) {
+            quitarTratamiento();
+        } else {
+            elegirCobro(actualizado);
+        }
+    }
+
+    /** RF-13, CU-13: QR de Mercado Pago (o de la demo); el pago se registra solo cuando se aprueba. */
+    @FXML
+    private void cobrarEnLinea() {
+        limpiarErrores();
+        if (elegido == null) {
+            cfTratamiento.mostrarError("Elige la consulta o el tratamiento que se paga.");
+            campoTratamiento.requestFocus();
+            return;
+        }
+        Double monto = montoEscrito();
+        if (monto == null) {
+            cfMonto.mostrarError("Escribe el monto como 200 o 200.50");
+            campoMonto.requestFocus();
+            return;
+        }
+        Cobro cobro = elegido;
+        OrdenCobro orden;
+        try {
+            orden = enLinea.iniciar(cobro, monto);
+        } catch (ReglaNegocioException e) {
+            mostrarError(e.getCampo().orElse(""), e.getMessage());
+            return;
+        } catch (RuntimeException e) {
+            avisoPago.mostrar(Aviso.Tipo.ERROR, e.getMessage());
+            return;
+        }
+        Optional<Pago> pagado = DialogoCobroEnLinea.mostrar(raiz.getScene().getWindow(), enLinea.nombrePasarela(),
+                cobro.getConcepto() + " · " + cobro.getPaciente().getNombreCompleto(), orden.monto(), orden.enlace(),
+                () -> enLinea.verificar(cobro, orden), enLinea.esDemo() ? () -> enLinea.simularPago(orden) : null);
+        if (pagado.isPresent()) {
+            Notificacion.mostrar(raiz.getScene().getWindow(), "Pago de " + Formatos.dinero(pagado.get().getMonto())
+                    + " aprobado por Mercado Pago");
+            despuesDePagar();
+        } else {
+            avisoPago.mostrar(Aviso.Tipo.INFO, "El cobro en línea se cerró sin pago. Puedes intentarlo de nuevo.");
         }
     }
 

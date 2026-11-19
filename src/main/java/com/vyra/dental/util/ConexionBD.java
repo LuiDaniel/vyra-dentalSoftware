@@ -36,8 +36,18 @@ public class ConexionBD {
      * no se puede escribir: la base va en %LOCALAPPDATA%\Vyra\vyra.db.
      */
     private static String urlPorDefecto() {
+        return "jdbc:sqlite:" + (System.getProperty("jpackage.app-path") == null ? "vyra.db"
+                : carpetaDatos().resolve("vyra.db"));
+    }
+
+    /**
+     * Carpeta de los datos: la de ejecución en desarrollo y %LOCALAPPDATA%\Vyra
+     * en la versión instalada. Ahí van vyra.db y vyra.properties (configuración
+     * de Mercado Pago).
+     */
+    public static Path carpetaDatos() {
         if (System.getProperty("jpackage.app-path") == null) {
-            return "jdbc:sqlite:vyra.db";
+            return Path.of("").toAbsolutePath();
         }
         String base = System.getenv("LOCALAPPDATA");
         Path carpeta = base != null ? Path.of(base, "Vyra") : Path.of(System.getProperty("user.home"), ".vyra");
@@ -46,7 +56,7 @@ public class ConexionBD {
         } catch (IOException e) {
             throw new UncheckedIOException("No se pudo crear la carpeta de datos " + carpeta, e);
         }
-        return "jdbc:sqlite:" + carpeta.resolve("vyra.db");
+        return carpeta;
     }
 
     public static synchronized Connection obtenerConexion() {
@@ -95,25 +105,83 @@ public class ConexionBD {
      * las columnas nuevas se agregan aquí con ALTER TABLE, para que una vyra.db
      * de una fase anterior siga funcionando (docs/03-modelo-base-datos.md §3).
      */
-    private static void actualizarEsquema(Connection conexion) throws SQLException {
+    static void actualizarEsquema(Connection conexion) throws SQLException {
         // Fase 5: quién registró cada entrada de historia clínica y cada cambio del odontograma
         agregarColumnaSiFalta(conexion, "historia_clinica_entrada", "id_profesional",
                 "INTEGER REFERENCES profesional(id_profesional)");
         agregarColumnaSiFalta(conexion, "odontograma_pieza", "id_profesional",
                 "INTEGER REFERENCES profesional(id_profesional)");
+        // Fase 9: costo de la consulta (RN-16)
+        agregarColumnaSiFalta(conexion, "profesional", "costo_consulta",
+                "REAL NOT NULL DEFAULT 0 CHECK (costo_consulta >= 0)");
+        agregarColumnaSiFalta(conexion, "cita", "costo_consulta",
+                "REAL NOT NULL DEFAULT 0 CHECK (costo_consulta >= 0)");
+        migrarPagoAConsultas(conexion);
+        try (Statement statement = conexion.createStatement()) {
+            statement.execute("CREATE INDEX IF NOT EXISTS idx_pago_cita ON pago(id_cita)");
+        }
+    }
+
+    /**
+     * Fase 9: el pago puede ser de la consulta de una cita (id_cita) y por
+     * Mercado Pago. SQLite no deja cambiar un NOT NULL ni un CHECK con ALTER
+     * TABLE, así que una tabla pago antigua se copia a una nueva con la forma
+     * de schema.sql, dentro de una transacción.
+     */
+    private static void migrarPagoAConsultas(Connection conexion) throws SQLException {
+        if (tieneColumna(conexion, "pago", "id_cita")) {
+            return;
+        }
+        boolean autoCommit = conexion.getAutoCommit();
+        try (Statement statement = conexion.createStatement()) {
+            statement.execute("PRAGMA foreign_keys = OFF");
+            conexion.setAutoCommit(false);
+            statement.execute("CREATE TABLE pago_nueva ("
+                    + "id_pago INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    + "id_tratamiento INTEGER REFERENCES tratamiento(id_tratamiento), "
+                    + "monto REAL NOT NULL CHECK (monto > 0), "
+                    + "fecha_pago TEXT NOT NULL, "
+                    + "metodo_pago TEXT NOT NULL CHECK (metodo_pago IN "
+                    + "('EFECTIVO','YAPE_PLIN','TARJETA','TRANSFERENCIA','MERCADO_PAGO')), "
+                    + "numero_operacion TEXT, "
+                    + "id_cita INTEGER REFERENCES cita(id_cita), "
+                    + "CHECK ((id_tratamiento IS NULL) <> (id_cita IS NULL)))");
+            statement.execute("INSERT INTO pago_nueva (id_pago, id_tratamiento, monto, fecha_pago, metodo_pago, "
+                    + "numero_operacion) SELECT id_pago, id_tratamiento, monto, fecha_pago, metodo_pago, "
+                    + "numero_operacion FROM pago");
+            statement.execute("DROP TABLE pago");
+            statement.execute("ALTER TABLE pago_nueva RENAME TO pago");
+            statement.execute("CREATE INDEX IF NOT EXISTS idx_pago_tratamiento ON pago(id_tratamiento)");
+            statement.execute("CREATE INDEX IF NOT EXISTS idx_pago_fecha ON pago(fecha_pago)");
+            conexion.commit();
+        } catch (SQLException e) {
+            conexion.rollback();
+            throw e;
+        } finally {
+            conexion.setAutoCommit(autoCommit);
+            activarClavesForaneas(conexion);
+        }
+    }
+
+    private static boolean tieneColumna(Connection conexion, String tabla, String columna) throws SQLException {
+        try (Statement statement = conexion.createStatement();
+             // Los nombres son constantes de esta clase, nunca texto del usuario
+             ResultSet columnas = statement.executeQuery("PRAGMA table_info(" + tabla + ")")) {
+            while (columnas.next()) {
+                if (columnas.getString("name").equals(columna)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private static void agregarColumnaSiFalta(Connection conexion, String tabla, String columna, String definicion)
             throws SQLException {
+        if (tieneColumna(conexion, tabla, columna)) {
+            return;
+        }
         try (Statement statement = conexion.createStatement()) {
-            // Los nombres son constantes de esta clase, nunca texto del usuario
-            try (ResultSet columnas = statement.executeQuery("PRAGMA table_info(" + tabla + ")")) {
-                while (columnas.next()) {
-                    if (columnas.getString("name").equals(columna)) {
-                        return;
-                    }
-                }
-            }
             statement.execute("ALTER TABLE " + tabla + " ADD COLUMN " + columna + " " + definicion);
         }
     }

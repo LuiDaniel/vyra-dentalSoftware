@@ -51,6 +51,8 @@
     -vy-pill-cancelada-fondo: #FEE2E2;   -vy-pill-cancelada-texto: #991B1B;
     -vy-pill-alergia-fondo: #FFEDD5;     -vy-pill-alergia-texto: #9A3412;
     -vy-pill-yape-fondo: #EDE9FE;        -vy-pill-yape-texto: #5B21B6;
+    -vy-pill-mp-fondo: #E0F2FE;          -vy-pill-mp-texto: #075985;
+    -vy-mercado-pago: #0284C7;
     /* Tercer color de la barra de métodos de pago (tarjeta), docs/ui/Pagos.html */
     -vy-celeste: #7DD3FC;
 
@@ -2021,6 +2023,7 @@
 .pill-yape-plin     { -fx-background-color: -vy-pill-yape-fondo;       -fx-text-fill: -vy-pill-yape-texto; }
 .pill-tarjeta       { -fx-background-color: -vy-pill-confirmada-fondo; -fx-text-fill: -vy-pill-confirmada-texto; }
 .pill-transferencia { -fx-background-color: -vy-separador;             -fx-text-fill: -vy-etiqueta; }
+.pill-mercado-pago  { -fx-background-color: -vy-pill-mp-fondo;         -fx-text-fill: -vy-pill-mp-texto; }
 
 /* Barra de lo pagado (ui.AvancePago y detalle) */
 .avance-pago {
@@ -2149,6 +2152,8 @@
 .leyenda-cuadro.pill-tarjeta          { -fx-background-color: -vy-celeste; }
 .segmento-metodo.pill-transferencia,
 .leyenda-cuadro.pill-transferencia    { -fx-background-color: -vy-borde-campo; }
+.segmento-metodo.pill-mercado-pago,
+.leyenda-cuadro.pill-mercado-pago     { -fx-background-color: -vy-mercado-pago; }
 
 .leyenda-metodos {
     -fx-hgap: 14px;
@@ -2493,4 +2498,54 @@
     -fx-pref-height: 16px;
     -fx-max-width: 16px;
     -fx-max-height: 16px;
+}
+
+/* ===== 17. Consulta y cobro en línea (fase 9: RN-16, RF-13) ===== */
+
+/* Estado de la consulta en el detalle de la cita */
+.texto-exito       { -fx-text-fill: -vy-aviso-exito-texto; }
+.texto-advertencia { -fx-text-fill: -vy-aviso-advertencia-texto; }
+
+/* Botón "Cobrar con Mercado Pago" de la pantalla Pagos */
+.btn-mercado-pago {
+    -fx-background-color: -vy-mercado-pago;
+    -fx-text-fill: white;
+    -fx-font-weight: 600;
+    -fx-background-radius: 8px;
+    -fx-padding: 9px 16px;
+    -fx-cursor: hand;
+}
+.btn-mercado-pago .icono { -fx-stroke: white; }
+.btn-mercado-pago:disabled { -fx-opacity: 0.45; }
+
+/* Ventana del cobro en línea (ui.DialogoCobroEnLinea) */
+.cobro-linea {
+    -fx-background-color: -vy-superficie;
+    -fx-padding: 24px;
+    -fx-spacing: 14px;
+    -fx-alignment: top-center;
+}
+.cobro-linea-monto {
+    -fx-font-size: 28px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -vy-tinta;
+}
+.cobro-linea-qr {
+    -fx-background-color: white;
+    -fx-border-color: -vy-borde;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
+    -fx-padding: 12px;
+}
+.cobro-linea-demo {
+    -fx-background-color: -vy-pill-pendiente-fondo;
+    -fx-text-fill: -vy-pill-pendiente-texto;
+    -fx-background-radius: 999px;
+    -fx-padding: 3px 10px;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+}
+.cobro-linea-enlace {
+    -fx-font-size: 12px;
+    -fx-text-fill: -vy-etiqueta;
 }

@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -25,14 +26,14 @@ import com.vyra.dental.util.ConexionBD;
 public class PagoDAOSqlite implements PagoDAO {
 
     private static final String COLUMNAS =
-            "p.id_pago, p.id_tratamiento, p.monto, p.fecha_pago, p.metodo_pago, p.numero_operacion ";
+            "p.id_pago, p.id_tratamiento, p.monto, p.fecha_pago, p.metodo_pago, p.numero_operacion, p.id_cita ";
     private static final String SELECT = "SELECT " + COLUMNAS + "FROM pago p ";
     private static final String ORDEN = " ORDER BY p.fecha_pago DESC, p.id_pago DESC";
 
     @Override
     public Pago crear(Pago pago) {
-        String sql = "INSERT INTO pago (id_tratamiento, monto, fecha_pago, metodo_pago, numero_operacion) "
-                + "VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO pago (id_tratamiento, monto, fecha_pago, metodo_pago, numero_operacion, id_cita) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
         Connection conexion = ConexionBD.obtenerConexion();
         try (PreparedStatement ps = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             escribirCampos(ps, pago);
@@ -83,12 +84,47 @@ public class PagoDAOSqlite implements PagoDAO {
     }
 
     @Override
+    public List<Pago> listarPorCita(int idCita) {
+        return listar(SELECT + "WHERE p.id_cita = ?" + ORDEN, idCita);
+    }
+
+    @Override
+    public double totalPagadoConsulta(int idCita) {
+        Connection conexion = ConexionBD.obtenerConexion();
+        try (PreparedStatement ps = conexion.prepareStatement(
+                "SELECT IFNULL(SUM(monto), 0) FROM pago WHERE id_cita = ?")) {
+            ps.setInt(1, idCita);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getDouble(1) : 0;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("No se pudo calcular lo pagado de la consulta", e);
+        }
+    }
+
+    @Override
+    public boolean existeOperacion(MetodoPago metodo, String numeroOperacion) {
+        Connection conexion = ConexionBD.obtenerConexion();
+        try (PreparedStatement ps = conexion.prepareStatement(
+                "SELECT 1 FROM pago WHERE metodo_pago = ? AND numero_operacion = ? LIMIT 1")) {
+            ps.setString(1, metodo.name());
+            ps.setString(2, numeroOperacion);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("No se pudo buscar la operación", e);
+        }
+    }
+
+    @Override
     public List<PagoResumen> resumenesEntre(LocalDate desde, LocalDate hasta) {
-        String sql = "SELECT " + COLUMNAS + ", t.descripcion, "
+        // El pago es de un tratamiento (y de su cita) o de la consulta de una cita
+        String sql = "SELECT " + COLUMNAS + ", IFNULL(t.descripcion, 'Consulta') AS descripcion, "
                 + "pa.id_paciente, pa.nombres, pa.apellidos, pa.dni "
                 + "FROM pago p "
-                + "JOIN tratamiento t ON t.id_tratamiento = p.id_tratamiento "
-                + "JOIN cita c ON c.id_cita = t.id_cita "
+                + "LEFT JOIN tratamiento t ON t.id_tratamiento = p.id_tratamiento "
+                + "JOIN cita c ON c.id_cita = IFNULL(t.id_cita, p.id_cita) "
                 + "JOIN paciente pa ON pa.id_paciente = c.id_paciente "
                 + "WHERE p.fecha_pago BETWEEN ? AND ?" + ORDEN;
         Connection conexion = ConexionBD.obtenerConexion();
@@ -136,11 +172,11 @@ public class PagoDAOSqlite implements PagoDAO {
     @Override
     public boolean actualizar(Pago pago) {
         String sql = "UPDATE pago SET id_tratamiento = ?, monto = ?, fecha_pago = ?, metodo_pago = ?, "
-                + "numero_operacion = ? WHERE id_pago = ?";
+                + "numero_operacion = ?, id_cita = ? WHERE id_pago = ?";
         Connection conexion = ConexionBD.obtenerConexion();
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             escribirCampos(ps, pago);
-            ps.setInt(6, pago.getIdPago());
+            ps.setInt(7, pago.getIdPago());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new RuntimeException("No se pudo actualizar el pago", e);
@@ -176,22 +212,38 @@ public class PagoDAOSqlite implements PagoDAO {
         }
     }
 
-    /** Llena los parametros 1 a 5 (los mismos en INSERT y UPDATE). */
+    /** Llena los parametros 1 a 6 (los mismos en INSERT y UPDATE). */
     private static void escribirCampos(PreparedStatement ps, Pago pago) throws SQLException {
-        ps.setInt(1, pago.getIdTratamiento());
+        setEnteroONulo(ps, 1, pago.getIdTratamiento());
         ps.setDouble(2, pago.getMonto());
         ps.setString(3, pago.getFechaPago().toString());
         ps.setString(4, pago.getMetodoPago().name());
         ps.setString(5, pago.getNumeroOperacion());
+        setEnteroONulo(ps, 6, pago.getIdCita());
+    }
+
+    private static void setEnteroONulo(PreparedStatement ps, int indice, Integer valor) throws SQLException {
+        if (valor == null) {
+            ps.setNull(indice, Types.INTEGER);
+        } else {
+            ps.setInt(indice, valor);
+        }
+    }
+
+    /** null si la columna es NULL (getInt devolvería 0). */
+    private static Integer enteroONulo(ResultSet rs, String columna) throws SQLException {
+        int valor = rs.getInt(columna);
+        return rs.wasNull() ? null : valor;
     }
 
     private static Pago leer(ResultSet rs) throws SQLException {
         return new Pago(
                 rs.getInt("id_pago"),
-                rs.getInt("id_tratamiento"),
+                enteroONulo(rs, "id_tratamiento"),
                 rs.getDouble("monto"),
                 LocalDate.parse(rs.getString("fecha_pago")),
                 MetodoPago.valueOf(rs.getString("metodo_pago")),
-                rs.getString("numero_operacion"));
+                rs.getString("numero_operacion"),
+                enteroONulo(rs, "id_cita"));
     }
 }

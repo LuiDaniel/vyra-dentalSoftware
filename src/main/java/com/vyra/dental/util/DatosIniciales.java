@@ -94,43 +94,59 @@ public final class DatosIniciales {
         }
     }
 
+    /** Igual que el de abajo, sin pagos de consulta. */
+    public static void cargarEjemplosAgenda(PacienteDAO pacienteDAO, ProfesionalDAO profesionalDAO, CitaDAO citaDAO) {
+        cargarEjemplosAgenda(pacienteDAO, profesionalDAO, citaDAO, null);
+    }
+
     /**
      * Profesionales y citas ficticios del diseño (docs/ui/Citas.html). Las citas
      * se crean para hoy y mañana, y solo la primera vez (si ningún profesional
-     * de ejemplo existía).
+     * de ejemplo existía). Cada cita lleva el costo de consulta de su
+     * profesional; las atendidas y algunas confirmadas ya tienen su consulta
+     * pagada (RN-16), las demás quedan por cobrar.
      */
-    public static void cargarEjemplosAgenda(PacienteDAO pacienteDAO, ProfesionalDAO profesionalDAO, CitaDAO citaDAO) {
+    public static void cargarEjemplosAgenda(PacienteDAO pacienteDAO, ProfesionalDAO profesionalDAO, CitaDAO citaDAO,
+                                            PagoDAO pagoDAO) {
         boolean yaExistian = profesionalDAO.listarTodos().stream()
                 .anyMatch(p -> p.getApellidos().equals("Núñez Paredes"));
         if (yaExistian) {
             return;
         }
         Profesional nunez = profesionalDAO.crear(new Profesional(0, null, "Patricia", "Núñez Paredes", "Ortodoncia",
-                "951444210", "Lun-Sáb 08:00-14:00"));
+                "951444210", "Lun-Sáb 08:00-14:00", 60));
         Profesional salinas = profesionalDAO.crear(new Profesional(0, null, "Marco", "Salinas Vega", "Endodoncia",
-                "987111203", "Lun-Vie 08:00-16:00"));
+                "987111203", "Lun-Vie 08:00-16:00", 80));
         Profesional rios = profesionalDAO.crear(new Profesional(0, null, "Claudia", "Ríos Mendoza", "Odontopediatría",
-                "912600318", "Lun-Vie 09:00-18:00"));
+                "912600318", "Lun-Vie 09:00-18:00", 50));
 
         LocalDate hoy = LocalDate.now();
         LocalDate manana = hoy.plusDays(1);
+        // { profesional, DNI, fecha, inicio, fin, motivo, estado, método con que se pagó la consulta (null = por cobrar) }
         Object[][] citas = {
-            { nunez, "29874561", hoy, "08:00", "08:30", "Control de prótesis", EstadoCita.ATENDIDA },
-            { nunez, "45812307", hoy, "09:30", "10:00", "Limpieza dental", EstadoCita.CONFIRMADA },
-            { nunez, "70356219", hoy, "10:00", "10:30", "Ajuste de brackets", EstadoCita.PENDIENTE },
-            { nunez, "76104352", hoy, "11:30", "12:30", "Control de ortodoncia", EstadoCita.CONFIRMADA },
-            { salinas, "72481935", hoy, "09:00", "10:00", "Endodoncia pieza 36", EstadoCita.CONFIRMADA },
-            { salinas, "43920185", hoy, "11:00", "11:30", "Evaluación general", EstadoCita.CANCELADA },
-            { salinas, "29874561", hoy, "12:00", "13:00", "Corona provisional", EstadoCita.PENDIENTE },
-            { rios, "71592846", hoy, "08:30", "09:30", "Primera visita", EstadoCita.ATENDIDA },
-            { rios, "71592846", hoy, "10:30", "11:00", "Sellantes", EstadoCita.PENDIENTE },
-            { salinas, "45812307", manana, "10:00", "10:30", "Control", EstadoCita.PENDIENTE },
-            { rios, "76104352", manana, "15:00", "15:30", "Evaluación", EstadoCita.CONFIRMADA },
+            { nunez, "29874561", hoy, "08:00", "08:30", "Control de prótesis", EstadoCita.ATENDIDA, MetodoPago.EFECTIVO },
+            { nunez, "45812307", hoy, "09:30", "10:00", "Limpieza dental", EstadoCita.CONFIRMADA, null },
+            { nunez, "70356219", hoy, "10:00", "10:30", "Ajuste de brackets", EstadoCita.PENDIENTE, null },
+            { nunez, "76104352", hoy, "11:30", "12:30", "Control de ortodoncia", EstadoCita.CONFIRMADA, MetodoPago.YAPE_PLIN },
+            { salinas, "72481935", hoy, "09:00", "10:00", "Endodoncia pieza 36", EstadoCita.CONFIRMADA, MetodoPago.YAPE_PLIN },
+            { salinas, "43920185", hoy, "11:00", "11:30", "Evaluación general", EstadoCita.CANCELADA, null },
+            { salinas, "29874561", hoy, "12:00", "13:00", "Corona provisional", EstadoCita.PENDIENTE, null },
+            { rios, "71592846", hoy, "08:30", "09:30", "Primera visita", EstadoCita.ATENDIDA, MetodoPago.TARJETA },
+            { rios, "71592846", hoy, "10:30", "11:00", "Sellantes", EstadoCita.PENDIENTE, null },
+            { salinas, "45812307", manana, "10:00", "10:30", "Control", EstadoCita.PENDIENTE, null },
+            { rios, "76104352", manana, "15:00", "15:30", "Evaluación", EstadoCita.CONFIRMADA, null },
         };
         for (Object[] datos : citas) {
-            pacienteDAO.buscarPorDni((String) datos[1]).ifPresent(paciente -> citaDAO.crear(new Cita(0, paciente,
-                    (Profesional) datos[0], (LocalDate) datos[2], LocalTime.parse((String) datos[3]),
-                    LocalTime.parse((String) datos[4]), (String) datos[5], (EstadoCita) datos[6])));
+            Profesional profesional = (Profesional) datos[0];
+            pacienteDAO.buscarPorDni((String) datos[1]).ifPresent(paciente -> {
+                Cita cita = citaDAO.crear(new Cita(0, paciente, profesional, (LocalDate) datos[2],
+                        LocalTime.parse((String) datos[3]), LocalTime.parse((String) datos[4]), (String) datos[5],
+                        (EstadoCita) datos[6], profesional.getCostoConsulta()));
+                if (pagoDAO != null && datos[7] != null) {
+                    pagoDAO.crear(Pago.deConsulta(cita.getIdCita(), cita.getCostoConsulta(), hoy,
+                            (MetodoPago) datos[7], null));
+                }
+            });
         }
     }
 

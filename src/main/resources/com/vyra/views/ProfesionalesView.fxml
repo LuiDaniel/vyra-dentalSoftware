@@ -65,8 +65,11 @@
                     <CampoFormulario fx:id="cfTelefono" etiqueta="Teléfono" GridPane.columnIndex="1" GridPane.rowIndex="1">
                         <TextField fx:id="campoTelefono" promptText="9 dígitos"/>
                     </CampoFormulario>
-                    <CampoFormulario fx:id="cfHorario" etiqueta="Horario de atención" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="2">
+                    <CampoFormulario fx:id="cfHorario" etiqueta="Horario de atención" GridPane.columnIndex="0" GridPane.rowIndex="2">
                         <TextField fx:id="campoHorario" promptText="Ej. Lun-Vie 08:00-14:00"/>
+                    </CampoFormulario>
+                    <CampoFormulario fx:id="cfCosto" etiqueta="Costo de consulta (S/)" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                        <TextField fx:id="campoCosto" promptText="Ej. 80 (0 = sin costo)"/>
                     </CampoFormulario>
                     <CampoFormulario fx:id="cfUsuario" etiqueta="Usuario para iniciar sesión" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.columnSpan="2">
                         <ComboBox fx:id="campoUsuario" maxWidth="Infinity"/>

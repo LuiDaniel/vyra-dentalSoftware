@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS profesional (
     apellidos TEXT NOT NULL,
     especialidad TEXT,
     telefono TEXT,
-    horario_atencion TEXT
+    horario_atencion TEXT,
+    costo_consulta REAL NOT NULL DEFAULT 0 CHECK (costo_consulta >= 0)
 );
 
 CREATE TABLE IF NOT EXISTS paciente (
@@ -48,7 +49,8 @@ CREATE TABLE IF NOT EXISTS cita (
     motivo TEXT,
     estado TEXT NOT NULL DEFAULT 'PENDIENTE'
         CHECK (estado IN ('PENDIENTE','CONFIRMADA','ATENDIDA','CANCELADA')),
-    fecha_creacion TEXT DEFAULT (datetime('now'))
+    fecha_creacion TEXT DEFAULT (datetime('now')),
+    costo_consulta REAL NOT NULL DEFAULT 0 CHECK (costo_consulta >= 0)
 );
 
 CREATE TABLE IF NOT EXISTS historia_clinica_entrada (
@@ -88,16 +90,20 @@ CREATE TABLE IF NOT EXISTS tratamiento_pieza (
     PRIMARY KEY (id_tratamiento, numero_pieza)
 );
 
+-- Un pago es de un tratamiento o de la consulta de una cita, nunca de los dos (RN-16)
 CREATE TABLE IF NOT EXISTS pago (
     id_pago INTEGER PRIMARY KEY AUTOINCREMENT,
-    id_tratamiento INTEGER NOT NULL REFERENCES tratamiento(id_tratamiento),
+    id_tratamiento INTEGER REFERENCES tratamiento(id_tratamiento),
     monto REAL NOT NULL CHECK (monto > 0),
     fecha_pago TEXT NOT NULL,
     metodo_pago TEXT NOT NULL
-        CHECK (metodo_pago IN ('EFECTIVO','YAPE_PLIN','TARJETA','TRANSFERENCIA')),
-    numero_operacion TEXT
+        CHECK (metodo_pago IN ('EFECTIVO','YAPE_PLIN','TARJETA','TRANSFERENCIA','MERCADO_PAGO')),
+    numero_operacion TEXT,
+    id_cita INTEGER REFERENCES cita(id_cita),
+    CHECK ((id_tratamiento IS NULL) <> (id_cita IS NULL))
 );
 
+-- El indice idx_pago_cita (pago.id_cita) lo crea ConexionBD.actualizarEsquema, despues de migrar una vyra.db antigua
 CREATE INDEX IF NOT EXISTS idx_cita_profesional_fecha ON cita(id_profesional, fecha);
 CREATE INDEX IF NOT EXISTS idx_cita_fecha ON cita(fecha);
 CREATE INDEX IF NOT EXISTS idx_cita_paciente ON cita(id_paciente);

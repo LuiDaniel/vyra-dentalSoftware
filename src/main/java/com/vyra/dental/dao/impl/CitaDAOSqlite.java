@@ -28,7 +28,7 @@ public class CitaDAOSqlite implements CitaDAO {
     private static final DateTimeFormatter HORA = DateTimeFormatter.ofPattern("HH:mm");
 
     // Consulta de docs/03-modelo-base-datos.md §5.4
-    private static final String SELECT = "SELECT c.id_cita, c.fecha, c.hora_inicio, c.hora_fin, c.motivo, c.estado, "
+    private static final String SELECT = "SELECT c.id_cita, c.fecha, c.hora_inicio, c.hora_fin, c.motivo, c.estado, c.costo_consulta, "
             + "pa.id_paciente, pa.nombres AS pa_nombres, pa.apellidos AS pa_apellidos, pa.dni, "
             + "pr.id_profesional, pr.nombres AS pr_nombres, pr.apellidos AS pr_apellidos, pr.especialidad "
             + "FROM cita c "
@@ -37,8 +37,8 @@ public class CitaDAOSqlite implements CitaDAO {
 
     @Override
     public Cita crear(Cita cita) {
-        String sql = "INSERT INTO cita (id_paciente, id_profesional, fecha, hora_inicio, hora_fin, motivo, estado) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO cita (id_paciente, id_profesional, fecha, hora_inicio, hora_fin, motivo, estado, "
+                + "costo_consulta) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         Connection conexion = ConexionBD.obtenerConexion();
         try (PreparedStatement ps = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             escribirCampos(ps, cita);
@@ -125,11 +125,11 @@ public class CitaDAOSqlite implements CitaDAO {
     @Override
     public boolean actualizar(Cita cita) {
         String sql = "UPDATE cita SET id_paciente = ?, id_profesional = ?, fecha = ?, hora_inicio = ?, hora_fin = ?, "
-                + "motivo = ?, estado = ? WHERE id_cita = ?";
+                + "motivo = ?, estado = ?, costo_consulta = ? WHERE id_cita = ?";
         Connection conexion = ConexionBD.obtenerConexion();
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             escribirCampos(ps, cita);
-            ps.setInt(8, cita.getIdCita());
+            ps.setInt(9, cita.getIdCita());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new RuntimeException("No se pudo actualizar la cita", e);
@@ -166,7 +166,7 @@ public class CitaDAOSqlite implements CitaDAO {
         }
     }
 
-    /** Llena los parametros 1 a 7 (los mismos en INSERT y UPDATE). */
+    /** Llena los parametros 1 a 8 (los mismos en INSERT y UPDATE). */
     private static void escribirCampos(PreparedStatement ps, Cita cita) throws SQLException {
         ps.setInt(1, cita.getPaciente().getIdPaciente());
         ps.setInt(2, cita.getProfesional().getIdProfesional());
@@ -175,6 +175,7 @@ public class CitaDAOSqlite implements CitaDAO {
         ps.setString(5, HORA.format(cita.getHoraFin()));
         ps.setString(6, cita.getMotivo());
         ps.setString(7, cita.getEstado().name());
+        ps.setDouble(8, cita.getCostoConsulta());
     }
 
     private static Cita leer(ResultSet rs) throws SQLException {
@@ -198,6 +199,7 @@ public class CitaDAOSqlite implements CitaDAO {
                 LocalTime.parse(rs.getString("hora_inicio")),
                 LocalTime.parse(rs.getString("hora_fin")),
                 rs.getString("motivo"),
-                EstadoCita.valueOf(rs.getString("estado")));
+                EstadoCita.valueOf(rs.getString("estado")),
+                rs.getDouble("costo_consulta"));
     }
 }

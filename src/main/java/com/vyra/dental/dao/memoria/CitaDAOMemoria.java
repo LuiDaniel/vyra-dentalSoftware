@@ -107,6 +107,6 @@ public class CitaDAOMemoria implements CitaDAO {
 
     private static Cita copia(Cita cita) {
         return new Cita(cita.getIdCita(), cita.getPaciente(), cita.getProfesional(), cita.getFecha(),
-                cita.getHoraInicio(), cita.getHoraFin(), cita.getMotivo(), cita.getEstado());
+                cita.getHoraInicio(), cita.getHoraFin(), cita.getMotivo(), cita.getEstado(), cita.getCostoConsulta());
     }
 }

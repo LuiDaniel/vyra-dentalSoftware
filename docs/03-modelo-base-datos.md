@@ -21,6 +21,7 @@ erDiagram
     CITA ||--o{ TRATAMIENTO : genera
     TRATAMIENTO ||--o{ TRATAMIENTO_PIEZA : involucra
     TRATAMIENTO ||--o{ PAGO : recibe
+    CITA ||--o{ PAGO : "consulta"
 
     USUARIO {
         int id_usuario PK
@@ -38,6 +39,7 @@ erDiagram
         string especialidad
         string telefono
         string horario_atencion
+        float costo_consulta
     }
     PACIENTE {
         int id_paciente PK
@@ -63,6 +65,7 @@ erDiagram
         string motivo
         string estado
         datetime fecha_creacion
+        float costo_consulta
     }
     HISTORIA_CLINICA_ENTRADA {
         int id_entrada PK
@@ -99,6 +102,7 @@ erDiagram
         date fecha_pago
         string metodo_pago
         string numero_operacion
+        int id_cita FK
     }
 ```
 
@@ -108,6 +112,7 @@ erDiagram
 - `TRATAMIENTO_PIEZA` es una tabla intermedia porque un tratamiento puede involucrar varias piezas dentales (muchos a muchos).
 - `PROFESIONAL.id_usuario` es opcional: puede haber profesionales sin cuenta propia, aunque no es lo recomendado.
 - El **saldo** de un tratamiento no se guarda; se calcula como `costo − SUM(pago.monto)` (consulta 5.3). Así nunca queda desactualizado.
+- Lo mismo con la **consulta** de una cita (fase 9): `cita.costo_consulta − SUM(pago.monto WHERE pago.id_cita = cita)`. Con saldo, la cita no se puede marcar como atendida (RN-16).
 - **Pacientes con baja lógica:** `activo = 0` los oculta de las búsquedas, pero sus citas, tratamientos y pagos siguen existiendo (RN-04).
 
 ## 2. Diccionario de datos
@@ -138,6 +143,7 @@ Convenciones de SQLite para todo el proyecto:
 | especialidad | TEXT | | Ej. Ortodoncia, Endodoncia |
 | telefono | TEXT | | 9 dígitos |
 | horario_atencion | TEXT | | Ej. "Lun-Vie 08:00-14:00" (texto informativo) |
+| costo_consulta | REAL | NOT NULL, default 0, ≥ 0 | Costo de su consulta; se copia a cada cita nueva (RN-16, fase 9) |
 
 ### PACIENTE
 | Campo | Tipo | Restricciones | Descripción |
@@ -165,6 +171,7 @@ Convenciones de SQLite para todo el proyecto:
 | motivo | TEXT | | |
 | estado | TEXT | NOT NULL, default 'PENDIENTE' | `PENDIENTE`, `CONFIRMADA`, `ATENDIDA`, `CANCELADA` |
 | fecha_creacion | TEXT | default ahora | |
+| costo_consulta | REAL | NOT NULL, default 0, ≥ 0 | Lo que cuesta la consulta de esta cita. Se cobra antes de atender (RN-16, fase 9). 0 = sin costo |
 
 ### HISTORIA_CLINICA_ENTRADA
 | Campo | Tipo | Restricciones | Descripción |
@@ -208,11 +215,12 @@ Convenciones de SQLite para todo el proyecto:
 | Campo | Tipo | Restricciones | Descripción |
 |---|---|---|---|
 | id_pago | INTEGER | PK, autoincrement | |
-| id_tratamiento | INTEGER | FK → TRATAMIENTO, NOT NULL | |
-| monto | REAL | NOT NULL, > 0 | No puede superar el saldo (RN-12) |
+| id_tratamiento | INTEGER | FK → TRATAMIENTO, NULL permitido | Tratamiento que se paga |
+| id_cita | INTEGER | FK → CITA, NULL permitido | Cita cuya **consulta** se paga (fase 9). Un `CHECK` exige que el pago sea de un tratamiento **o** de una consulta, nunca de los dos |
+| monto | REAL | NOT NULL, > 0 | No puede superar el saldo (RN-12, RN-16) |
 | fecha_pago | TEXT | NOT NULL | No futura |
-| metodo_pago | TEXT | NOT NULL | `EFECTIVO`, `YAPE_PLIN`, `TARJETA`, `TRANSFERENCIA` (enum `MetodoPago`) |
-| numero_operacion | TEXT | | Opcional, para Yape/Plin, tarjeta o transferencia |
+| metodo_pago | TEXT | NOT NULL | `EFECTIVO`, `YAPE_PLIN`, `TARJETA`, `TRANSFERENCIA`, `MERCADO_PAGO` (enum `MetodoPago`) |
+| numero_operacion | TEXT | | Opcional, para Yape/Plin, tarjeta o transferencia. Obligatorio con Mercado Pago (id del pago; no se repite) |
 
 ## 3. Script SQL (SQLite)
 
@@ -221,6 +229,8 @@ Este es el contenido que debe tener `src/main/resources/com/vyra/schema.sql`. `C
 > **Importante (desarrollo):** `CREATE TABLE IF NOT EXISTS` no agrega columnas nuevas a una tabla que ya existe. Si cambias el esquema, borra el archivo `vyra.db` local (está en `.gitignore`) para que se cree de nuevo. Cuando haya datos reales, los cambios se harán con `ALTER TABLE`.
 
 > **Columnas agregadas después (fase 5):** `id_profesional` de `historia_clinica_entrada` y de `odontograma_pieza`. Para que una `vyra.db` creada en una fase anterior siga funcionando, `ConexionBD.actualizarEsquema()` las agrega con `ALTER TABLE ... ADD COLUMN` si faltan. Las columnas que se agreguen en adelante deben seguir el mismo camino.
+
+> **Fase 9 (consulta y Mercado Pago):** `costo_consulta` de `profesional` y de `cita` se agregan con `ALTER TABLE`. La tabla `pago` cambia más (`id_tratamiento` deja de ser NOT NULL, se agrega `id_cita`, el `CHECK` de un solo dueño y `MERCADO_PAGO`): como SQLite no cambia restricciones con `ALTER TABLE`, `ConexionBD.migrarPagoAConsultas()` copia la tabla vieja a una nueva dentro de una transacción, sin perder pagos (prueba: `MigracionPagoTest`). El índice `idx_pago_cita` se crea después de esa migración.
 
 > **Importante (claves foráneas):** SQLite no las verifica por defecto. `ConexionBD` debe ejecutar `PRAGMA foreign_keys = ON;` justo después de abrir la conexión.
 
@@ -241,7 +251,8 @@ CREATE TABLE IF NOT EXISTS profesional (
     apellidos TEXT NOT NULL,
     especialidad TEXT,
     telefono TEXT,
-    horario_atencion TEXT
+    horario_atencion TEXT,
+    costo_consulta REAL NOT NULL DEFAULT 0 CHECK (costo_consulta >= 0)
 );
 
 CREATE TABLE IF NOT EXISTS paciente (
@@ -269,7 +280,8 @@ CREATE TABLE IF NOT EXISTS cita (
     motivo TEXT,
     estado TEXT NOT NULL DEFAULT 'PENDIENTE'
         CHECK (estado IN ('PENDIENTE','CONFIRMADA','ATENDIDA','CANCELADA')),
-    fecha_creacion TEXT DEFAULT (datetime('now'))
+    fecha_creacion TEXT DEFAULT (datetime('now')),
+    costo_consulta REAL NOT NULL DEFAULT 0 CHECK (costo_consulta >= 0)
 );
 
 CREATE TABLE IF NOT EXISTS historia_clinica_entrada (
@@ -309,16 +321,20 @@ CREATE TABLE IF NOT EXISTS tratamiento_pieza (
     PRIMARY KEY (id_tratamiento, numero_pieza)
 );
 
+-- Un pago es de un tratamiento o de la consulta de una cita, nunca de los dos (RN-16)
 CREATE TABLE IF NOT EXISTS pago (
     id_pago INTEGER PRIMARY KEY AUTOINCREMENT,
-    id_tratamiento INTEGER NOT NULL REFERENCES tratamiento(id_tratamiento),
+    id_tratamiento INTEGER REFERENCES tratamiento(id_tratamiento),
     monto REAL NOT NULL CHECK (monto > 0),
     fecha_pago TEXT NOT NULL,
     metodo_pago TEXT NOT NULL
-        CHECK (metodo_pago IN ('EFECTIVO','YAPE_PLIN','TARJETA','TRANSFERENCIA')),
-    numero_operacion TEXT
+        CHECK (metodo_pago IN ('EFECTIVO','YAPE_PLIN','TARJETA','TRANSFERENCIA','MERCADO_PAGO')),
+    numero_operacion TEXT,
+    id_cita INTEGER REFERENCES cita(id_cita),
+    CHECK ((id_tratamiento IS NULL) <> (id_cita IS NULL))
 );
 
+-- El indice idx_pago_cita (pago.id_cita) lo crea ConexionBD.actualizarEsquema, despues de migrar una vyra.db antigua
 CREATE INDEX IF NOT EXISTS idx_cita_profesional_fecha ON cita(id_profesional, fecha);
 CREATE INDEX IF NOT EXISTS idx_cita_fecha ON cita(fecha);
 CREATE INDEX IF NOT EXISTS idx_cita_paciente ON cita(id_paciente);
@@ -371,6 +387,15 @@ SELECT t.costo - IFNULL(SUM(p.monto), 0) AS saldo
 FROM tratamiento t LEFT JOIN pago p ON p.id_tratamiento = t.id_tratamiento
 WHERE t.id_tratamiento = ?
 GROUP BY t.id_tratamiento;
+```
+
+### 5.3 b Saldo de la consulta de una cita (RN-16)
+
+```sql
+SELECT c.costo_consulta - IFNULL(SUM(p.monto), 0) AS saldo
+FROM cita c LEFT JOIN pago p ON p.id_cita = c.id_cita
+WHERE c.id_cita = ?
+GROUP BY c.id_cita;
 ```
 
 ### 5.4 Citas de un día, con paciente y profesional (agenda e inicio)

@@ -24,6 +24,7 @@ import com.vyra.dental.model.Paciente;
 import com.vyra.dental.model.Profesional;
 import com.vyra.dental.service.CitaService;
 import com.vyra.dental.service.PacienteService;
+import com.vyra.dental.service.PagoService;
 import com.vyra.dental.service.ProfesionalService;
 import com.vyra.dental.service.ReglaNegocioException;
 import com.vyra.dental.service.Servicios;
@@ -116,6 +117,9 @@ public class AgendaController implements RecibeParametro {
     @FXML private Aviso avisoDisponibilidad;
     @FXML private FlowPane horariosLibres;
     @FXML private TextArea campoMotivo;
+    @FXML private CampoFormulario cfCosto;
+    @FXML private TextField campoCosto;
+    @FXML private Aviso avisoDeuda;
     @FXML private VBox bloqueEstado;
     @FXML private ToggleButton estadoPendiente;
     @FXML private ToggleButton estadoConfirmada;
@@ -130,6 +134,7 @@ public class AgendaController implements RecibeParametro {
     @FXML private Label detalleDni;
     @FXML private Label detalleProfesional;
     @FXML private Label detalleMotivo;
+    @FXML private Label detalleConsulta;
     @FXML private Aviso avisoDetalle;
     @FXML private VBox accionesDetalle;
     @FXML private HBox pieDetalle;
@@ -655,6 +660,20 @@ public class AgendaController implements RecibeParametro {
         detalleProfesional.setText(profesional.getNombreCompleto()
                 + (profesional.getEspecialidad() == null ? "" : " · " + profesional.getEspecialidad()));
         detalleMotivo.setText(cita.getMotivo() == null ? "Sin motivo registrado" : cita.getMotivo());
+        // RN-16: la consulta se cobra antes de atender
+        double pagadoConsulta = citas.pagadoConsulta(cita.getIdCita());
+        double saldoConsulta = citas.saldoConsulta(cita);
+        detalleConsulta.getStyleClass().removeAll("texto-exito", "texto-advertencia");
+        if (cita.getCostoConsulta() <= 0) {
+            detalleConsulta.setText("Sin costo");
+        } else if (saldoConsulta <= 0) {
+            detalleConsulta.setText(Formatos.dinero(cita.getCostoConsulta()) + " · Pagada");
+            detalleConsulta.getStyleClass().add("texto-exito");
+        } else {
+            detalleConsulta.setText(Formatos.dinero(cita.getCostoConsulta()) + " · Falta cobrar "
+                    + Formatos.dinero(saldoConsulta));
+            detalleConsulta.getStyleClass().add("texto-advertencia");
+        }
 
         accionesDetalle.getChildren().clear();
         boolean activa = cita.getEstado() == EstadoCita.PENDIENTE || cita.getEstado() == EstadoCita.CONFIRMADA;
@@ -667,7 +686,14 @@ public class AgendaController implements RecibeParametro {
                 accionesDetalle.getChildren().add(boton("Confirmar cita", "btn-primario", "check",
                         () -> ejecutar(() -> citas.confirmar(cita.getIdCita()), "Cita confirmada", cita)));
             }
-            if (puedeAtender) {
+            if (saldoConsulta > 0 && gestiona) {
+                accionesDetalle.getChildren().add(boton("Cobrar consulta (" + Formatos.dinero(saldoConsulta) + ")",
+                        "btn-primario", "pagos", () -> MainController.actual().navegar(Pantalla.PAGOS, cita)));
+            }
+            if (puedeAtender && saldoConsulta > 0) {
+                avisoDetalle.mostrar(Aviso.Tipo.ADVERTENCIA, "Primero se cobra la consulta: falta "
+                        + Formatos.dinero(saldoConsulta) + ". Después se puede marcar como atendida.");
+            } else if (puedeAtender) {
                 accionesDetalle.getChildren().add(boton("Marcar atendida",
                         cita.getEstado() == EstadoCita.CONFIRMADA || !gestiona ? "btn-primario" : "btn-secundario", "check",
                         () -> ejecutar(() -> citas.marcarAtendida(cita.getIdCita()), "Cita marcada como atendida", cita)));
@@ -676,9 +702,11 @@ public class AgendaController implements RecibeParametro {
                 accionesDetalle.getChildren().add(boton("Reprogramar", "btn-secundario", "agenda",
                         () -> prepararReprogramacion(cita)));
                 accionesDetalle.getChildren().add(boton("Cancelar cita", "btn-peligro", "cerrar", () -> {
+                    String detalle = "La cita no se borra: queda como cancelada y el horario se libera."
+                            + (pagadoConsulta > 0 ? " Ojo: ya se cobró " + Formatos.dinero(pagadoConsulta)
+                            + " de la consulta; devuélveselo al paciente o mejor reprograma la cita." : "");
                     if (Dialogos.confirmar(areaVista.getScene().getWindow(), "Cancelar cita",
-                            "¿Cancelar la cita de " + paciente.getNombreCompleto() + "?",
-                            "La cita no se borra: queda como cancelada y el horario se libera.", "Cancelar cita")) {
+                            "¿Cancelar la cita de " + paciente.getNombreCompleto() + "?", detalle, "Cancelar cita")) {
                         ejecutar(() -> citas.cancelar(cita.getIdCita()), "Cita cancelada", cita);
                     }
                 }));
@@ -771,6 +799,10 @@ public class AgendaController implements RecibeParametro {
             });
         }
         campoProfesional.valueProperty().addListener((obs, a, n) -> cfProfesional.limpiarError());
+        // RN-16: el costo de la consulta se copia del profesional (se puede cambiar, 0 = sin costo)
+        campoProfesional.valueProperty().addListener((obs, a, n) ->
+                campoCosto.setText(n == null ? "" : Formatos.montoCampo(n.getCostoConsulta())));
+        campoCosto.textProperty().addListener((obs, a, n) -> cfCosto.limpiarError());
         campoFecha.valueProperty().addListener((obs, a, n) -> cfFecha.limpiarError());
 
         configurarBuscadorPaciente();
@@ -897,6 +929,14 @@ public class AgendaController implements RecibeParametro {
         }
         Cita cita = borrador();
         cita.setMotivo(campoMotivo.getText());
+        String costo = campoCosto.getText() == null ? "" : campoCosto.getText().strip();
+        try {
+            cita.setCostoConsulta(costo.isEmpty() ? 0 : Formatos.leerMonto(costo));
+        } catch (NumberFormatException e) {
+            cfCosto.mostrarError("Escribe el costo como 80 o 80.50 (0 si la consulta no cuesta)");
+            campoCosto.requestFocus();
+            return;
+        }
         try {
             if (citaEnEdicion == null) {
                 cita.setEstado(estadoConfirmada.isSelected() ? EstadoCita.CONFIRMADA : EstadoCita.PENDIENTE);
@@ -916,6 +956,8 @@ public class AgendaController implements RecibeParametro {
             String campo = e.getCampo().orElse("");
             switch (campo) {
                 case "fecha" -> cfFecha.mostrarError(e.getMessage());
+                case "costoConsulta" -> cfCosto.mostrarError(e.getMessage());
+                case "idPaciente" -> cfPaciente.mostrarError(e.getMessage());
                 case "horaInicio", "horaFin" -> {
                     avisoDisponibilidad.mostrar(Aviso.Tipo.ERROR, e.getMessage());
                     cfInicio.mostrarError("Revisa el horario");
@@ -976,6 +1018,7 @@ public class AgendaController implements RecibeParametro {
         actualizarOpcionesFin(cita.getHoraInicio());
         campoFin.setValue(cita.getHoraFin());
         campoMotivo.setText(cita.getMotivo());
+        campoCosto.setText(Formatos.montoCampo(cita.getCostoConsulta()));
         cargandoFormulario = false;
         actualizarDisponibilidad();
     }
@@ -1002,6 +1045,7 @@ public class AgendaController implements RecibeParametro {
         cfPaciente.limpiarError();
         cfFecha.limpiarError();
         cfInicio.limpiarError();
+        cfCosto.limpiarError();
         actualizarDisponibilidad();
     }
 
@@ -1080,11 +1124,28 @@ public class AgendaController implements RecibeParametro {
         dniPaciente.setText("DNI " + paciente.getDni());
         mostrar(buscadorPaciente, false);
         mostrar(tarjetaPaciente, true);
+        mostrarDeuda(paciente);
+    }
+
+    /** RN-18: si el paciente debe algo de sus tratamientos, se avisa (no impide agendar). */
+    private void mostrarDeuda(Paciente paciente) {
+        avisoDeuda.ocultar();
+        try {
+            PagoService.SaldoPendiente deuda = Servicios.pagos().deudaDePaciente(paciente.getIdPaciente());
+            if (deuda.total() > 0) {
+                avisoDeuda.mostrar(Aviso.Tipo.ADVERTENCIA, paciente.getNombres() + " debe "
+                        + Formatos.dinero(deuda.total()) + (deuda.tratamientos() == 1 ? " de 1 tratamiento."
+                        : " de " + deuda.tratamientos() + " tratamientos.") + " Recuérdale pasar por caja.");
+            }
+        } catch (RuntimeException e) {
+            // El aviso es una ayuda: si falla la consulta, se puede agendar igual
+        }
     }
 
     @FXML
     private void quitarPaciente() {
         pacienteElegido = null;
+        avisoDeuda.ocultar();
         campoPaciente.clear();
         sugerencias.hide();
         mostrar(tarjetaPaciente, false);

@@ -1,5 +1,6 @@
 package com.vyra.dental.service;
 
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.vyra.dental.dao.CitaDAO;
+import com.vyra.dental.dao.PagoDAO;
 import com.vyra.dental.model.Cita;
 import com.vyra.dental.model.EstadoCita;
 import com.vyra.dental.model.Profesional;
@@ -21,7 +23,8 @@ import com.vyra.dental.util.Validador;
  * Agenda: agendar, reprogramar, confirmar, cancelar y marcar atendidas las citas
  * (RF-02, RF-03, CU-02, CU-03, RN-05 a RN-08).
  * Administrador y Recepción gestionan todas las citas; el odontólogo solo ve
- * las suyas y puede marcarlas como atendidas.
+ * las suyas y puede marcarlas como atendidas. RN-16: si la cita tiene costo de
+ * consulta, primero se cobra y después se atiende.
  */
 public class CitaService {
 
@@ -31,15 +34,26 @@ public class CitaService {
     public static final int MINUTOS_BLOQUE = 30;
 
     private final CitaDAO citaDAO;
+    /** Para saber si la consulta está pagada (RN-16); null = sin pagos (solo en pruebas antiguas). */
+    private final PagoDAO pagoDAO;
     /** Fecha y hora "actuales"; las pruebas usan un reloj fijo. */
     private final Clock reloj;
 
     public CitaService(CitaDAO citaDAO) {
-        this(citaDAO, Clock.systemDefaultZone());
+        this(citaDAO, null, Clock.systemDefaultZone());
     }
 
     public CitaService(CitaDAO citaDAO, Clock reloj) {
+        this(citaDAO, null, reloj);
+    }
+
+    public CitaService(CitaDAO citaDAO, PagoDAO pagoDAO) {
+        this(citaDAO, pagoDAO, Clock.systemDefaultZone());
+    }
+
+    public CitaService(CitaDAO citaDAO, PagoDAO pagoDAO, Clock reloj) {
         this.citaDAO = citaDAO;
+        this.pagoDAO = pagoDAO;
         this.reloj = reloj;
     }
 
@@ -58,12 +72,27 @@ public class CitaService {
         return citaDAO.crear(cita);
     }
 
-    /** Cambia paciente, profesional, fecha, horas o motivo de una cita pendiente o confirmada. */
+    /**
+     * Cambia paciente, profesional, fecha, horas, motivo o costo de una cita
+     * pendiente o confirmada. Si ya se cobró algo de la consulta, el paciente no
+     * cambia y el costo no puede quedar por debajo de lo cobrado.
+     */
     public void reprogramar(Cita cita) {
         verificarGestion();
         Cita actual = buscarActiva(cita.getIdCita());
         cita.setEstado(actual.getEstado());
         cita.setMotivo(limpiar(cita.getMotivo()));
+        double pagado = pagadoConsulta(actual.getIdCita());
+        if (pagado > 0) {
+            if (cita.getPaciente() == null || cita.getPaciente().getIdPaciente() != actual.getPaciente().getIdPaciente()) {
+                throw new ReglaNegocioException("idPaciente",
+                        "La consulta ya está pagada por este paciente: no se puede cambiar de paciente.");
+            }
+            if (centimos(cita.getCostoConsulta()) < centimos(pagado)) {
+                throw new ReglaNegocioException("costoConsulta", "Ya se cobró " + Formatos.dinero(pagado)
+                        + " de la consulta: el costo no puede ser menor.");
+            }
+        }
         validar(cita);
         citaDAO.actualizar(cita);
     }
@@ -92,7 +121,31 @@ public class CitaService {
         if (cita.getFecha().isAfter(hoy())) {
             throw new ReglaNegocioException("No se puede marcar como atendida una cita de una fecha futura.");
         }
+        // RN-16: primero se paga la consulta, después se atiende
+        double saldo = saldoConsulta(cita);
+        if (saldo > 0) {
+            throw new ReglaNegocioException("Falta cobrar la consulta (" + Formatos.dinero(saldo)
+                    + "). Recepción debe registrar el pago antes de atender al paciente.");
+        }
         citaDAO.actualizarEstado(idCita, EstadoCita.ATENDIDA);
+    }
+
+    // ===== Consulta (RN-16) =====
+
+    /** Lo cobrado de la consulta de la cita. */
+    public double pagadoConsulta(int idCita) {
+        return pagoDAO == null ? 0 : pagoDAO.totalPagadoConsulta(idCita);
+    }
+
+    /** Lo que falta cobrar de la consulta (0 si no tiene costo o ya está pagada). */
+    public double saldoConsulta(Cita cita) {
+        long saldo = centimos(cita.getCostoConsulta()) - centimos(pagadoConsulta(cita.getIdCita()));
+        return Math.max(0, saldo) / 100.0;
+    }
+
+    /** true si la consulta no cuesta nada o ya se cobró completa. */
+    public boolean consultaPagada(Cita cita) {
+        return saldoConsulta(cita) <= 0;
     }
 
     // ===== Validación de horario (CU-03) =====
@@ -248,9 +301,12 @@ public class CitaService {
         return LocalDate.now(reloj);
     }
 
-    /** Jakarta + RN-05 (horario) + RN-08 (fecha) + RN-06 (cruce). */
+    /** Jakarta + RN-16 (costo) + RN-05 (horario) + RN-08 (fecha) + RN-06 (cruce). */
     private void validar(Cita cita) {
         Validador.validar(cita);
+        if (BigDecimal.valueOf(cita.getCostoConsulta()).stripTrailingZeros().scale() > 2) {
+            throw new ReglaNegocioException("costoConsulta", "El costo puede tener hasta 2 decimales.");
+        }
         validarHorario(cita.getHoraInicio(), cita.getHoraFin());
         problemaDeFechaHora(cita.getFecha(), cita.getHoraInicio()).ifPresent(problema -> {
             throw new ReglaNegocioException(cita.getFecha().isBefore(hoy()) ? "fecha" : "horaInicio", problema);
@@ -304,6 +360,11 @@ public class CitaService {
                     + " y no se puede modificar.");
         }
         return cita;
+    }
+
+    /** Los montos se comparan en céntimos para que 0.1 + 0.2 no dé 0.30000000000000004. */
+    private static long centimos(double monto) {
+        return Math.round(monto * 100);
     }
 
     private static String limpiar(String texto) {

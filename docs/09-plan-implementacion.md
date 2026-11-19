@@ -5,7 +5,7 @@
 
 Este documento ordena el trabajo de programación en fases cortas. Cada fase deja la aplicación **compilando y ejecutable**, termina con un commit y tiene criterios claros para saber que está lista. Está pensado para seguirse en orden, ya sea a mano o pidiéndole cada fase a Claude Code (ver la sección 4).
 
-## 1. Estado actual del código (2026-11-10, después de la fase 8: versión 1.0)
+## 1. Estado actual del código (2026-11-19, después de la fase 9: consulta, pagos enlazados y Mercado Pago)
 
 | Parte | Estado |
 |---|---|
@@ -128,6 +128,18 @@ Este documento ordena el trabajo de programación en fases cortas. Cada fase dej
 5. Manual con 13 capturas reales en `docs/manual/` y memoria completada salvo los datos de los autores.
 
 Además: en la versión instalada la base va en `%LOCALAPPDATA%\Vyra\vyra.db`.
+
+### Fase 9 — Consulta antes de atender, pagos enlazados y Mercado Pago
+
+1. Costo de consulta en `profesional` y `cita` (se copia al agendar); `pago` puede ser de un tratamiento **o** de la consulta de una cita; migración de `vyra.db` sin perder datos.
+2. Reglas: RN-16 (sin pagar la consulta no se atiende), RN-17 (con saldo no se finaliza un tratamiento), RN-18 (aviso de deuda al agendar).
+3. Pantallas: costo en Profesionales y en el formulario de cita; en el detalle de la cita, estado de la consulta y "Cobrar consulta"; Pagos cobra consultas y tratamientos.
+4. RF-13 / CU-13: paquete `pasarela` (`MercadoPagoPasarela` con Checkout Pro, `PasarelaDemo`, `ConfigPasarela`), `CobroEnLineaService` y la ventana con el QR (`ui.DialogoCobroEnLinea`, `ui.CodigoQr`).
+5. Instalador `Vyra-Setup-1.0.0.exe` con Inno Setup y manual actualizado.
+
+**Listo cuando:** una cita con costo no se puede marcar atendida hasta cobrarla; se cobra desde la Agenda o desde Pagos, en caja o con el QR; un tratamiento con saldo no se finaliza; una `vyra.db` de la fase 8 abre sin perder pagos.
+
+*Hecho (2026-11-19):* los cinco puntos. Pruebas nuevas: `ConsultaYPagosTest`, `CobroEnLineaServiceTest`, `MigracionPagoTest` y dos en `TratamientoYPagoDAOSqliteTest`. `CapturasManualTest` (solo con `-Dvyra.capturas=carpeta`) abre la app con la demo y guarda las capturas del manual. Decisiones: el método `MERCADO_PAGO` no se elige a mano (lo registra la pasarela con su número de operación, que no se repite); la consulta se puede pagar en partes; cancelar una cita pagada avisa que hay que devolver el dinero (los reembolsos quedan fuera de alcance); sin credenciales la pasarela es la demo, así la exposición no depende de internet.
 
 ## 4. Cómo trabajar cada fase con Claude Code
 

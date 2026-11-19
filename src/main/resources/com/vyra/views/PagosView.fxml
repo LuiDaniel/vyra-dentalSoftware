@@ -24,7 +24,7 @@
     <HBox styleClass="pagina-encabezado">
         <VBox styleClass="pagina-titulos">
             <Label text="Pagos" styleClass="titulo-pagina"/>
-            <Label text="Registra pagos asociados a tratamientos." styleClass="texto-secundario"/>
+            <Label text="Cobra consultas y tratamientos: en caja o en línea con Mercado Pago." styleClass="texto-secundario"/>
         </VBox>
         <Region HBox.hgrow="ALWAYS"/>
         <HBox fx:id="selectorPeriodo" styleClass="segmentado" minWidth="-Infinity" maxHeight="-Infinity"/>
@@ -74,12 +74,12 @@
                 <Label text="Registrar pago" styleClass="panel-titulo"/>
             </VBox>
             <VBox styleClass="ficha-formulario">
-                <CampoFormulario fx:id="cfTratamiento" etiqueta="Tratamiento" obligatorio="true">
+                <CampoFormulario fx:id="cfTratamiento" etiqueta="Consulta o tratamiento" obligatorio="true">
                     <VBox>
                         <HBox fx:id="buscadorTratamiento" styleClass="buscador">
                             <Icono nombre="buscar" tamano="16"/>
                             <TextField fx:id="campoTratamiento" promptText="Buscar por paciente o DNI" HBox.hgrow="ALWAYS"
-                                       accessibleText="Buscar el tratamiento a pagar"/>
+                                       accessibleText="Buscar la consulta o el tratamiento a pagar"/>
                         </HBox>
                         <VBox fx:id="tarjetaTratamiento" styleClass="tarjeta-tratamiento">
                             <HBox styleClass="tarjeta-tratamiento-fila">
@@ -94,7 +94,7 @@
                                 <Label fx:id="tarjetaSaldo" styleClass="texto-apoyo" wrapText="true" HBox.hgrow="ALWAYS"
                                        maxWidth="Infinity"/>
                                 <Button text="Cambiar" styleClass="enlace" onAction="#quitarTratamiento" minWidth="-Infinity"
-                                        accessibleText="Cambiar de tratamiento"/>
+                                        accessibleText="Cambiar lo que se cobra"/>
                             </HBox>
                         </VBox>
                     </VBox>
@@ -131,6 +131,10 @@
             <VBox styleClass="panel-pie,pie-pago">
                 <Label fx:id="saldoDespues" styleClass="texto-secundario" wrapText="true"/>
                 <Button fx:id="botonRegistrar" styleClass="btn-primario" onAction="#registrar" maxWidth="Infinity"/>
+                <!-- RF-13: cobro en línea con QR; el pago se registra solo al aprobarse -->
+                <Button fx:id="botonMercadoPago" styleClass="btn-mercado-pago" onAction="#cobrarEnLinea" maxWidth="Infinity">
+                    <graphic><Icono nombre="celular" tamano="16"/></graphic>
+                </Button>
             </VBox>
         </VBox>
     </HBox>

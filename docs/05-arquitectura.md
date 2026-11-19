@@ -64,6 +64,7 @@ src/main/java/
     ├── service/                 CitaService, PagoService, PdfService, AuthService, Sesion, Servicios, ReglaNegocioException...
     ├── controller/              un controller por pantalla FXML
     ├── ui/                      componentes reutilizables: Icono, Avatar, Pill, PiezaDental...
+    ├── pasarela/                Mercado Pago (Checkout Pro), pasarela demo y su configuración (fase 9)
     └── util/                    ConexionBD, Validador, HashUtil, DatosIniciales, Formatos, Busqueda
 
 src/main/resources/com/vyra/

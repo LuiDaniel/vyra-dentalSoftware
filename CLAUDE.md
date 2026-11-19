@@ -7,7 +7,7 @@ Aplicación de escritorio JavaFX para gestionar un consultorio dental (pacientes
 1. `docs/09-plan-implementacion.md`: en qué fase está el proyecto y qué toca ahora. **Trabaja una fase (o una pantalla) a la vez.**
 2. `docs/08-guia-frontend.md`: cómo se ve y cómo se comporta cada pantalla. El diseño de referencia está en `docs/ui/*.html`; ábrelos para comparar.
 3. `docs/03-modelo-base-datos.md` y `docs/04-diagrama-clases.md`: tablas, clases, DAO y servicios esperados.
-4. `docs/01-requerimientos.md` §6: reglas de negocio (RN-01 a RN-15) y dónde se valida cada una.
+4. `docs/01-requerimientos.md` §6: reglas de negocio (RN-01 a RN-18) y dónde se valida cada una.
 
 Si el código y los documentos no coinciden, sigue los documentos y avisa de la diferencia. Si una decisión cambia el diseño o el modelo, actualiza el documento en el mismo cambio.
 
@@ -18,7 +18,9 @@ Si el código y los documentos no coinciden, sigue los documentos y avisa de la 
 - Pruebas: `mvn test`
 - Con datos de ejemplo: `mvn javafx:run "-Dvyra.demo=true"` (usuarios `admin`/`admin123`, `msalinas` y `recepcion` con `demo1234`)
 - En PowerShell las opciones `-D...` van entre comillas (si no, Maven dice "Unknown lifecycle phase").
-- Versión para Windows: `mvn -Pinstalador package` → `target/instalador/Vyra/Vyra.exe` (`-Djpackage.tipo=msi` necesita WiX 3)
+- Versión para Windows: `mvn -Pinstalador package` → `target/instalador/Vyra/Vyra.exe`; el instalador `Vyra-Setup-1.0.0.exe` lo arma `instalador\crear-instalador.ps1` (Inno Setup 6)
+- Capturas del manual: `mvn test "-Dtest=CapturasManualTest" "-Dvyra.capturas=docs/manual"` (abre la app con la demo en una base en memoria)
+- Mercado Pago: sin `vyra.properties` (ver `vyra.properties.ejemplo`) la pasarela es la demo. El token nunca va al repositorio
 - La base de datos `vyra.db` se crea en la carpeta de ejecución. Si cambias `schema.sql`, bórrala (está en `.gitignore`).
 
 ## Stack

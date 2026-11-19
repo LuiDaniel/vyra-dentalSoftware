@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.TreeSet;
 
 import com.vyra.dental.dao.CitaDAO;
+import com.vyra.dental.dao.PagoDAO;
 import com.vyra.dental.dao.TratamientoDAO;
 import com.vyra.dental.model.Cita;
 import com.vyra.dental.model.EstadoCita;
@@ -17,12 +18,14 @@ import com.vyra.dental.model.Profesional;
 import com.vyra.dental.model.Rol;
 import com.vyra.dental.model.Tratamiento;
 import com.vyra.dental.model.TratamientoResumen;
+import com.vyra.dental.util.Formatos;
 import com.vyra.dental.util.Validador;
 
 /**
  * Tratamientos realizados en una cita, con sus piezas dentales y su costo
  * (RF-06, CU-06, RN-10, RN-11). Solo el odontólogo registra y finaliza;
  * Administrador y Recepción los consultan (la recepción, para cobrar).
+ * RN-17: un tratamiento con saldo pendiente no se puede finalizar.
  */
 public class TratamientoService {
 
@@ -31,16 +34,27 @@ public class TratamientoService {
 
     private final TratamientoDAO tratamientoDAO;
     private final CitaDAO citaDAO;
+    /** Para el saldo al finalizar (RN-17); null = sin pagos (solo en pruebas antiguas). */
+    private final PagoDAO pagoDAO;
     /** Fecha "actual"; las pruebas usan un reloj fijo. */
     private final Clock reloj;
 
     public TratamientoService(TratamientoDAO tratamientoDAO, CitaDAO citaDAO) {
-        this(tratamientoDAO, citaDAO, Clock.systemDefaultZone());
+        this(tratamientoDAO, citaDAO, null, Clock.systemDefaultZone());
     }
 
     public TratamientoService(TratamientoDAO tratamientoDAO, CitaDAO citaDAO, Clock reloj) {
+        this(tratamientoDAO, citaDAO, null, reloj);
+    }
+
+    public TratamientoService(TratamientoDAO tratamientoDAO, CitaDAO citaDAO, PagoDAO pagoDAO) {
+        this(tratamientoDAO, citaDAO, pagoDAO, Clock.systemDefaultZone());
+    }
+
+    public TratamientoService(TratamientoDAO tratamientoDAO, CitaDAO citaDAO, PagoDAO pagoDAO, Clock reloj) {
         this.tratamientoDAO = tratamientoDAO;
         this.citaDAO = citaDAO;
+        this.pagoDAO = pagoDAO;
         this.reloj = reloj;
     }
 
@@ -63,7 +77,7 @@ public class TratamientoService {
         return tratamientoDAO.crear(tratamiento);
     }
 
-    /** CU-06, paso 4: el tratamiento en curso pasa a finalizado. */
+    /** CU-06, paso 4: el tratamiento en curso pasa a finalizado, si ya está pagado (RN-17). */
     public void finalizar(int idTratamiento) {
         verificarPermiso();
         Tratamiento tratamiento = tratamientoDAO.buscarPorId(idTratamiento)
@@ -71,7 +85,21 @@ public class TratamientoService {
         if (tratamiento.getEstado() == EstadoTratamiento.FINALIZADO) {
             throw new ReglaNegocioException("El tratamiento ya está finalizado.");
         }
+        double saldo = saldo(tratamiento);
+        if (saldo > 0) {
+            throw new ReglaNegocioException("Falta cobrar " + Formatos.dinero(saldo)
+                    + " de este tratamiento. Recepción debe registrar el pago antes de finalizarlo.");
+        }
         tratamientoDAO.actualizarEstado(idTratamiento, EstadoTratamiento.FINALIZADO);
+    }
+
+    /** Costo − pagado, en soles, sin bajar de 0. */
+    private double saldo(Tratamiento tratamiento) {
+        if (pagoDAO == null) {
+            return 0;
+        }
+        double pagado = pagoDAO.totalPagado(tratamiento.getIdTratamiento());
+        return Math.max(0, Math.round(tratamiento.getCosto() * 100) - Math.round(pagado * 100)) / 100.0;
     }
 
     // ===== Consultas =====

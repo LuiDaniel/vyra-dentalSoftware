@@ -1,7 +1,7 @@
 # Vyra — Manual de Usuario
 
-**Versión:** 1.0
-**Fecha:** 2026-11-10
+**Versión:** 1.1 (consulta antes de atender y cobro con Mercado Pago)
+**Fecha:** 2026-11-19
 
 Las capturas de este manual son de la aplicación real con los datos de ejemplo (pacientes y profesionales ficticios). Están en [`docs/manual/`](./manual).
 
@@ -13,7 +13,7 @@ La usan tres tipos de personas, cada una con su propio usuario y su rol:
 
 | Rol | Qué hace en Vyra |
 |---|---|
-| **Recepción** | Registra pacientes, agenda y confirma citas, y cobra los tratamientos. |
+| **Recepción** | Registra pacientes, agenda y confirma citas, y cobra las consultas y los tratamientos (en caja o con Mercado Pago). |
 | **Odontólogo/a** | Ve sus citas, escribe la historia clínica, marca el odontograma y registra los tratamientos. |
 | **Administrador** | Ve todo, consulta los reportes y gestiona los profesionales y los usuarios. |
 
@@ -23,8 +23,8 @@ El menú de la izquierda solo muestra las pantallas que tu rol puede usar (ver l
 
 **Requisitos:** Windows 10 u 11 de 64 bits. No hace falta instalar Java: la versión instalada lo trae incluido.
 
-1. Copia la carpeta `Vyra` (o ejecuta el instalador `.msi`, si te lo entregaron) en la computadora del consultorio.
-2. Abre `Vyra.exe`.
+1. Ejecuta **`Vyra-Setup-1.0.0.exe`** y sigue el asistente (Siguiente → Instalar). No pide permisos de administrador: se instala para tu usuario y crea un acceso directo en el menú Inicio (y en el escritorio, si marcas la casilla). Para quitarlo: *Configuración → Aplicaciones → Vyra → Desinstalar* (tus datos no se borran).
+2. Abre **Vyra** desde el menú Inicio o el escritorio.
 3. Ingresa con el usuario **`admin`** y la contraseña **`admin123`**.
 4. Entra a **Usuarios y roles**, crea un usuario para cada persona del consultorio y, en tu propio usuario, usa **Restablecer contraseña** para cambiar `admin123` por una contraseña propia.
 
@@ -85,6 +85,12 @@ La agenda muestra una columna por profesional. Arriba eliges el día con las fle
 
 ![Cruce de horario](./manual/05-agenda-cruce.png)
 
+**Costo de la consulta:** al elegir el profesional se copia el costo de su consulta (por ejemplo S/ 80.00). Puedes cambiarlo para esa cita; pon **0** si no se cobra (un control, por ejemplo).
+
+![Aviso de deuda al agendar](./manual/16-agenda-aviso-deuda.png)
+
+**Aviso de deuda:** si el paciente debe saldo de algún tratamiento, al elegirlo aparece un aviso naranja ("Rosa debe S/ 380.00 de 1 tratamiento"). No impide agendar: es para recordarle pasar por caja.
+
 **Cruce de horario:** si el profesional ya tiene una cita a esa hora, Vyra lo avisa antes de guardar y propone **horarios libres**; haz clic en uno para usarlo. Las citas van en bloques de 30 minutos, de 08:00 a 20:00, y no se pueden agendar en fechas u horas que ya pasaron.
 
 **Estados de una cita:**
@@ -93,10 +99,16 @@ La agenda muestra una columna por profesional. Arriba eliges el día con las fle
 |---|---|
 | Pendiente | Agendada, falta confirmar con el paciente. |
 | Confirmada | El paciente confirmó que vendrá. |
-| Atendida | El odontólogo la atendió (lo marca el odontólogo o recepción). |
+| Atendida | El odontólogo la atendió (lo marca el odontólogo o recepción). Solo se puede si la consulta ya está pagada. |
 | Cancelada | No se realizará. No se borra: queda en el historial y libera el horario. |
 
-Al elegir una cita se ven sus datos y los botones para **confirmar**, **reprogramar**, **cancelar** o **marcar como atendida**.
+Al elegir una cita se ven sus datos, el estado de la **consulta** y los botones para **confirmar**, **reprogramar**, **cancelar** o **marcar como atendida**.
+
+**Primero se paga, después se atiende (RN-16):** si la consulta tiene costo y todavía no se cobró, el detalle dice "Falta cobrar S/ 60.00", aparece el botón **Cobrar consulta** (abre Pagos con esa consulta ya elegida) y **Marcar atendida** no aparece hasta que se pague. Cuando está pagada, el detalle dice "Pagada" y ya se puede atender:
+
+![Consulta pagada](./manual/15-agenda-consulta-pagada.png)
+
+Si cancelas una cita cuya consulta ya se cobró, Vyra te recuerda devolver el dinero al paciente (o mejor, reprogramarla).
 
 ## 7. Historia clínica (CU-04)
 
@@ -126,7 +138,7 @@ Si sales de la pantalla con cambios sin guardar, Vyra pregunta antes de descarta
 
 Desde una pieza, **Registrar tratamiento para esta pieza** abre Tratamientos con la pieza ya escrita. **Exportar PDF** genera el odontograma impreso.
 
-## 9. Tratamientos y pagos (CU-06, CU-10)
+## 9. Tratamientos y pagos (CU-06, CU-10, CU-13)
 
 ![Tratamientos](./manual/08-tratamientos.png)
 
@@ -134,19 +146,40 @@ Desde una pieza, **Registrar tratamiento para esta pieza** abre Tratamientos con
 
 1. Pulsa **Nuevo tratamiento**.
 2. Elige la **cita** (de hoy o atendida en los últimos 30 días), escribe la **descripción**, las **piezas** separadas por comas (por ejemplo `36, 47`) y el **costo**.
-3. Pulsa **Registrar tratamiento**. Cuando termine, usa **Marcar como finalizado**.
+3. Pulsa **Registrar tratamiento**. Cuando termine y esté pagado, usa **Marcar como finalizado**.
 
-La barra de cada tratamiento muestra cuánto se pagó de su costo.
+La barra de cada tratamiento muestra cuánto se pagó de su costo. **Un tratamiento con saldo no se puede finalizar (RN-17):** el botón queda desactivado con el aviso "Para finalizarlo, recepción debe cobrar el saldo de S/ 380.00". Los tratamientos largos (ortodoncia, por ejemplo) se pueden ir pagando en partes mientras están en curso.
 
 ![Pagos](./manual/09-pagos.png)
 
 **Registrar un pago (recepción o administrador):**
 
-1. En **Pagos**, busca el tratamiento por el nombre o DNI del paciente (o pulsa **Registrar pago** desde Tratamientos, o **Cobrar** en la pestaña Pagos de la ficha).
+1. En **Pagos**, busca por el nombre o DNI del paciente y elige **la consulta** de una cita o **el tratamiento** que se paga (o pulsa **Cobrar consulta** en la Agenda, **Registrar pago** en Tratamientos o **Cobrar** en la pestaña Pagos de la ficha). Primero aparecen las consultas por cobrar más cercanas a hoy y después los tratamientos con saldo.
 2. Escribe el **monto**, revisa la **fecha** (no puede ser futura) y elige el **método**: efectivo, Yape/Plin, tarjeta o transferencia. El número de operación es opcional.
 3. Abajo verás el saldo que quedará. Pulsa **Registrar pago**.
 
-No se puede cobrar más que el saldo pendiente: "El monto supera el saldo pendiente (S/ 400.00)". Arriba, los indicadores muestran lo cobrado en el periodo (hoy, semana o mes), el saldo pendiente y el reparto por método. **Exportar** guarda los pagos del periodo en PDF.
+No se puede cobrar más que el saldo pendiente: "El monto supera el saldo pendiente (S/ 400.00)". Arriba, los indicadores muestran lo cobrado en el periodo (hoy, semana o mes), el saldo pendiente de los tratamientos y el reparto por método. En la tabla, los pagos de consulta dicen **Consulta** en la columna *Concepto*. **Exportar** guarda los pagos del periodo en PDF.
+
+### Cobrar con Mercado Pago (CU-13)
+
+![Cobro con Mercado Pago](./manual/14-cobro-mercado-pago.png)
+
+1. Elige la consulta o el tratamiento y escribe el monto, como en un pago normal.
+2. Pulsa **Cobrar S/ … con Mercado Pago**. Se abre una ventana con un **código QR**.
+3. El paciente lo escanea con la cámara de su celular y paga con tarjeta, Yape o su cuenta de Mercado Pago. También puedes **copiar el enlace** y mandárselo por WhatsApp, o abrirlo en el navegador.
+4. Vyra pregunta solo cada pocos segundos. Cuando Mercado Pago aprueba el pago, la ventana se cierra y el pago queda registrado con el método **Mercado Pago** y su número de operación. Si el paciente ya pagó y no quieres esperar, pulsa **Ya pagó, verificar**.
+
+Si cierras la ventana sin que el paciente pague, no se registra nada. Si Mercado Pago rechaza la tarjeta, la ventana lo dice y el paciente puede intentarlo otra vez con el mismo QR.
+
+**Modo demo:** si Vyra no tiene credenciales de Mercado Pago, la ventana dice *MODO DEMO · sin dinero real* y tiene el botón **Simular pago aprobado**, para practicar o exponer sin internet.
+
+**Activar Mercado Pago de verdad (administrador):** crea una cuenta en Mercado Pago, entra a *Tus integraciones* en mercadopago.com.pe/developers, crea una aplicación (Checkout Pro) y copia su **Access Token** (el de *Credenciales de prueba* para probar sin dinero real; el de *producción* para cobrar de verdad, con la comisión de Mercado Pago). Luego crea el archivo `%LOCALAPPDATA%\Vyra\vyra.properties` con esta línea y vuelve a abrir Vyra:
+
+```
+mercadopago.access_token=PEGA-AQUI-TU-ACCESS-TOKEN
+```
+
+El token es secreto: no lo compartas ni lo subas a GitHub.
 
 ![Pagos en la ficha del paciente](./manual/10-ficha-pagos.png)
 
@@ -166,7 +199,7 @@ Cambia las fechas o usa **Hoy**, **Esta semana** o **Este mes**; el reporte se a
 
 ![Profesionales](./manual/12-profesionales.png)
 
-**Profesionales (CU-07):** registra a cada odontólogo con su especialidad, teléfono y horario. Cada uno tiene su columna en la agenda. Para que un odontólogo vea sus citas al ingresar, asócialo a su **usuario** (con rol Odontólogo) en el campo *Usuario para iniciar sesión*. Un profesional con citas no se puede eliminar.
+**Profesionales (CU-07):** registra a cada odontólogo con su especialidad, teléfono, horario y **costo de consulta** (se copia a cada cita nueva; 0 = sin costo). Cada uno tiene su columna en la agenda. Para que un odontólogo vea sus citas al ingresar, asócialo a su **usuario** (con rol Odontólogo) en el campo *Usuario para iniciar sesión*. Un profesional con citas no se puede eliminar.
 
 ![Usuarios y roles](./manual/13-usuarios.png)
 
@@ -177,7 +210,7 @@ Cambia las fechas o usa **Hoy**, **Esta semana** o **Este mes**; el reporte se a
 | Pantalla | Administrador | Recepción | Odontólogo/a |
 |---|---|---|---|
 | Inicio | Sí | Sí | Sí (sus citas) |
-| Agenda | Sí | Sí | Sus citas + marcar "Atendida" |
+| Agenda | Sí | Sí (y cobrar la consulta) | Sus citas + marcar "Atendida" (con la consulta pagada) |
 | Pacientes | Sí | Sí | Solo lectura |
 | Historia clínica | Solo lectura | No | Sí |
 | Odontograma | Solo lectura | No | Sí |
@@ -192,6 +225,12 @@ Cambia las fechas o usa **Hoy**, **Esta semana** o **Este mes**; el reporte se a
 **Soy odontólogo y no veo ninguna cita.** Tu usuario no está asociado a un profesional. El administrador debe hacerlo en **Profesionales**, campo *Usuario para iniciar sesión*.
 
 **No me deja agendar a esa hora.** El profesional ya tiene otra cita que se cruza, la hora ya pasó o está fuera del horario (08:00 a 20:00 en bloques de 30 minutos). Usa uno de los horarios libres que propone el formulario.
+
+**No me deja marcar la cita como atendida.** Falta cobrar la consulta: pulsa **Cobrar consulta** en el detalle de la cita (recepción) o pide a recepción que la cobre.
+
+**No puedo finalizar un tratamiento.** Todavía tiene saldo. Recepción debe registrar el pago que falta en **Pagos**.
+
+**La ventana de Mercado Pago dice "MODO DEMO".** Vyra no encontró el Access Token. Revisa el archivo `vyra.properties` (sección 9).
 
 **No aparece un paciente que registré antes.** Revisa que el filtro sea *Todos* y que el texto del buscador esté vacío. Si se dio de baja, ya no aparece en las búsquedas (su historial se conserva).
 

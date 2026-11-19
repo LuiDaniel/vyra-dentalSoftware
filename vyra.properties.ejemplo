@@ -1,0 +1,18 @@
+# Configuración de la pasarela de pagos de Vyra (RF-13).
+#
+# Copia este archivo como "vyra.properties":
+#   - en desarrollo: en la carpeta donde ejecutas mvn javafx:run (junto a vyra.db);
+#   - en la versión instalada: en %LOCALAPPDATA%\Vyra\vyra.properties
+# Sin este archivo (o con el token vacío), Vyra usa la pasarela DEMO: no se
+# conecta a nada y tiene un botón "Simular pago aprobado".
+#
+# Access Token de tu aplicación de Mercado Pago (Checkout Pro):
+#   https://www.mercadopago.com.pe/developers/panel/app  ->  Credenciales
+# Usa el de PRUEBA para practicar sin dinero real. Con el de producción se cobra
+# de verdad (Mercado Pago descuenta su comisión por venta).
+# ES SECRETO: vyra.properties está en .gitignore; no lo subas a GitHub.
+# También se puede dar con la variable de entorno VYRA_MP_ACCESS_TOKEN.
+mercadopago.access_token=
+
+# Moneda del cobro (PEN = soles)
+mercadopago.moneda=PEN

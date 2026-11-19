@@ -20,12 +20,12 @@ import com.vyra.dental.util.ConexionBD;
 public class ProfesionalDAOSqlite implements ProfesionalDAO {
 
     private static final String COLUMNAS =
-            "id_profesional, id_usuario, nombres, apellidos, especialidad, telefono, horario_atencion";
+            "id_profesional, id_usuario, nombres, apellidos, especialidad, telefono, horario_atencion, costo_consulta";
 
     @Override
     public Profesional crear(Profesional profesional) {
-        String sql = "INSERT INTO profesional (id_usuario, nombres, apellidos, especialidad, telefono, horario_atencion) "
-                + "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO profesional (id_usuario, nombres, apellidos, especialidad, telefono, horario_atencion, "
+                + "costo_consulta) VALUES (?, ?, ?, ?, ?, ?, ?)";
         Connection conexion = ConexionBD.obtenerConexion();
         try (PreparedStatement ps = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             escribirCampos(ps, profesional);
@@ -70,11 +70,11 @@ public class ProfesionalDAOSqlite implements ProfesionalDAO {
     @Override
     public boolean actualizar(Profesional profesional) {
         String sql = "UPDATE profesional SET id_usuario = ?, nombres = ?, apellidos = ?, especialidad = ?, "
-                + "telefono = ?, horario_atencion = ? WHERE id_profesional = ?";
+                + "telefono = ?, horario_atencion = ?, costo_consulta = ? WHERE id_profesional = ?";
         Connection conexion = ConexionBD.obtenerConexion();
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             escribirCampos(ps, profesional);
-            ps.setInt(7, profesional.getIdProfesional());
+            ps.setInt(8, profesional.getIdProfesional());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new RuntimeException("No se pudo actualizar el profesional", e);
@@ -92,7 +92,7 @@ public class ProfesionalDAOSqlite implements ProfesionalDAO {
         }
     }
 
-    /** Llena los parametros 1 a 6 (los mismos en INSERT y UPDATE). */
+    /** Llena los parametros 1 a 7 (los mismos en INSERT y UPDATE). */
     private void escribirCampos(PreparedStatement ps, Profesional profesional) throws SQLException {
         if (profesional.getIdUsuario() == null) {
             ps.setNull(1, Types.INTEGER);
@@ -104,6 +104,7 @@ public class ProfesionalDAOSqlite implements ProfesionalDAO {
         ps.setString(4, profesional.getEspecialidad());
         ps.setString(5, profesional.getTelefono());
         ps.setString(6, profesional.getHorarioAtencion());
+        ps.setDouble(7, profesional.getCostoConsulta());
     }
 
     private Optional<Profesional> buscarUno(String sql, int valor) {
@@ -129,6 +130,7 @@ public class ProfesionalDAOSqlite implements ProfesionalDAO {
                 rs.getString("apellidos"),
                 rs.getString("especialidad"),
                 rs.getString("telefono"),
-                rs.getString("horario_atencion"));
+                rs.getString("horario_atencion"),
+                rs.getDouble("costo_consulta"));
     }
 }

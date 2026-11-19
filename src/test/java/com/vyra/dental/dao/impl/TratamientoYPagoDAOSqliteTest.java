@@ -126,4 +126,34 @@ class TratamientoYPagoDAOSqliteTest {
     private Tratamiento tratamiento(String descripcion, double costo, List<Integer> piezas) {
         return new Tratamiento(0, cita.getIdCita(), descripcion, costo, EstadoTratamiento.EN_CURSO, fecha, piezas);
     }
+
+    // Fase 9: pagos de la consulta de una cita (RN-16)
+
+    @Test
+    void guardaLosPagosDeConsultaYLosMuestraComoConsulta() {
+        Pago consulta = pagos.crear(Pago.deConsulta(cita.getIdCita(), 80, fecha, MetodoPago.MERCADO_PAGO, "MP-" + contador));
+
+        Pago leido = pagos.buscarPorId(consulta.getIdPago()).orElseThrow();
+        assertEquals(cita.getIdCita(), leido.getIdCita());
+        assertEquals(null, leido.getIdTratamiento());
+        assertEquals(80, pagos.totalPagadoConsulta(cita.getIdCita()));
+        assertEquals(1, pagos.listarPorCita(cita.getIdCita()).size());
+        assertTrue(pagos.existeOperacion(MetodoPago.MERCADO_PAGO, "MP-" + contador));
+
+        List<PagoResumen> resumenes = pagos.resumenesEntre(fecha, fecha);
+        assertEquals(1, resumenes.size());
+        assertEquals("Consulta", resumenes.get(0).getConcepto());
+        assertEquals(paciente.getIdPaciente(), resumenes.get(0).getPaciente().getIdPaciente());
+    }
+
+    @Test
+    void guardaElCostoDeConsultaDeLaCitaYDelProfesional() {
+        Profesional profesional = new ProfesionalDAOSqlite().crear(
+                new Profesional(0, null, "Costo" + contador, "Consulta Sql", null, null, null, 75.5));
+        assertEquals(75.5, new ProfesionalDAOSqlite().buscarPorId(profesional.getIdProfesional()).orElseThrow()
+                .getCostoConsulta());
+        Cita conCosto = new CitaDAOSqlite().crear(new Cita(0, paciente, profesional, fecha, LocalTime.of(11, 0),
+                LocalTime.of(11, 30), "Evaluación", EstadoCita.PENDIENTE, 75.5));
+        assertEquals(75.5, new CitaDAOSqlite().buscarPorId(conCosto.getIdCita()).orElseThrow().getCostoConsulta());
+    }
 }

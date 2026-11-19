@@ -34,11 +34,13 @@
 - Gestión de profesionales (odontólogos).
 - Control de acceso con usuario, contraseña y roles.
 - Reportes básicos (citas del día, historial de un paciente, tratamientos por periodo).
-- Registro simple de pagos por tratamiento/cita.
+- Registro simple de pagos por tratamiento y por consulta (la consulta se cobra antes de atender).
+- Cobro en línea con Mercado Pago (enlace/QR), con modo demo sin internet *(fase 9)*.
 
 ### 2.2 No incluye (fuera de alcance por ahora)
 - Agendamiento de citas por parte del paciente (portal web o app móvil).
 - Facturación electrónica integrada con SUNAT.
+- Reembolsos automáticos por la pasarela (si se cancela una cita ya pagada, la devolución se hace a mano).
 - Recordatorios automáticos por SMS.
 - Telemedicina o videoconsulta.
 
@@ -68,6 +70,8 @@ Estas exclusiones pueden convertirse en una "versión 2" del proyecto más adela
 | RF-10 | El sistema debe permitir registrar pagos asociados a un tratamiento o cita (monto, fecha, método de pago). | Recepcionista | Media |
 | RF-11 | El sistema debe permitir exportar la historia clínica o el odontograma de un paciente en PDF para impresión. | Odontólogo/a | Baja |
 | RF-12 | El sistema debe mostrar una alerta interna (no necesariamente correo) de las citas próximas del día al iniciar sesión. | Recepcionista | Baja |
+| RF-13 | El sistema debe permitir cobrar en línea con Mercado Pago (enlace y código QR); cuando el pago se aprueba, se registra solo con su número de operación. Sin credenciales funciona en modo demo, sin dinero real. *(Fase 9)* | Recepcionista | Media |
+| RF-14 | Cada cita tiene un costo de consulta, que se copia del profesional al agendarla y se cobra antes de atender al paciente. *(Fase 9)* | Recepcionista | Alta |
 
 
 ## 5. Requerimientos no funcionales (RNF)
@@ -103,6 +107,9 @@ Son las reglas concretas que el código debe hacer cumplir. Cada una indica en q
 | RN-13 | La contraseña se guarda como hash con sal (PBKDF2), nunca en texto plano. El mensaje de error del login no dice cuál dato falló. | `util.HashUtil` + `AuthService` |
 | RN-14 | Un usuario desactivado (`activo = 0`) no puede iniciar sesión. | `AuthService` |
 | RN-15 | Cada rol solo ve las pantallas que le corresponden (ver la matriz de permisos en [`02-casos-de-uso.md`](./02-casos-de-uso.md#3-matriz-de-permisos-por-rol)). | `MainController` (menú) + cada Service (defensa en profundidad) |
+| RN-16 | **Primero se paga la consulta, después se atiende.** Si la cita tiene costo de consulta, no se puede marcar como atendida hasta cobrarla completa (se puede pagar en partes, sin pasarse del costo). Costo 0 = consulta sin costo. Con pagos registrados, la cita no cambia de paciente ni baja su costo por debajo de lo cobrado. La consulta de una cita cancelada ya no se cobra. | `CitaService.marcarAtendida()` + `PagoService` |
+| RN-17 | Un tratamiento con saldo pendiente no se puede finalizar: primero recepción cobra el saldo. | `TratamientoService.finalizar()` |
+| RN-18 | Al agendar, si el paciente debe saldo de tratamientos, se muestra un aviso (no impide agendar). | `PagoService.deudaDePaciente()` + `AgendaController` |
 
 ## 7. Glosario
 

@@ -9,7 +9,9 @@ public enum MetodoPago {
     EFECTIVO("Efectivo", "pill-efectivo"),
     YAPE_PLIN("Yape / Plin", "pill-yape-plin"),
     TARJETA("Tarjeta", "pill-tarjeta"),
-    TRANSFERENCIA("Transferencia", "pill-transferencia");
+    TRANSFERENCIA("Transferencia", "pill-transferencia"),
+    /** Solo lo registra la pasarela, cuando Mercado Pago aprueba el cobro (RF-13). */
+    MERCADO_PAGO("Mercado Pago", "pill-mercado-pago");
 
     /** Texto que ve el usuario. */
     private final String etiqueta;

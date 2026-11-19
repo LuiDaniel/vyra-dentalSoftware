@@ -49,7 +49,7 @@ public class PagoDAOMemoria implements PagoDAO {
 
     @Override
     public List<Pago> listarPorTratamiento(int idTratamiento) {
-        return filtrar(p -> p.getIdTratamiento() == idTratamiento);
+        return filtrar(p -> Integer.valueOf(idTratamiento).equals(p.getIdTratamiento()));
     }
 
     @Override
@@ -59,7 +59,25 @@ public class PagoDAOMemoria implements PagoDAO {
 
     @Override
     public double totalPagado(int idTratamiento) {
-        return pagos.stream().filter(p -> p.getIdTratamiento() == idTratamiento).mapToDouble(Pago::getMonto).sum();
+        return pagos.stream().filter(p -> Integer.valueOf(idTratamiento).equals(p.getIdTratamiento()))
+                .mapToDouble(Pago::getMonto).sum();
+    }
+
+    @Override
+    public List<Pago> listarPorCita(int idCita) {
+        return filtrar(p -> Integer.valueOf(idCita).equals(p.getIdCita()));
+    }
+
+    @Override
+    public double totalPagadoConsulta(int idCita) {
+        return pagos.stream().filter(p -> Integer.valueOf(idCita).equals(p.getIdCita()))
+                .mapToDouble(Pago::getMonto).sum();
+    }
+
+    @Override
+    public boolean existeOperacion(MetodoPago metodo, String numeroOperacion) {
+        return pagos.stream().anyMatch(p -> p.getMetodoPago() == metodo
+                && numeroOperacion != null && numeroOperacion.equals(p.getNumeroOperacion()));
     }
 
     @Override
@@ -99,6 +117,6 @@ public class PagoDAOMemoria implements PagoDAO {
 
     private static Pago copia(Pago p) {
         return new Pago(p.getIdPago(), p.getIdTratamiento(), p.getMonto(), p.getFechaPago(), p.getMetodoPago(),
-                p.getNumeroOperacion());
+                p.getNumeroOperacion(), p.getIdCita());
     }
 }

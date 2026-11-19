@@ -337,6 +337,12 @@ public class TratamientosController implements RecibeParametro {
 
         boolean finalizable = editable && t.getEstado() == EstadoTratamiento.EN_CURSO;
         boolean cobrable = puedeCobrar && r.getSaldo() > 0;
+        // RN-17: con saldo no se finaliza; el botón queda, pero desactivado y con la razón
+        botonFinalizar.setDisable(r.getSaldo() > 0);
+        if (finalizable && r.getSaldo() > 0) {
+            avisoDetalle.mostrar(Aviso.Tipo.INFO, "Para finalizarlo, recepción debe cobrar el saldo de "
+                    + Formatos.dinero(r.getSaldo()) + ".");
+        }
         alternar(botonFinalizar, finalizable);
         alternar(botonPagar, cobrable);
         alternar(pieDetalle, finalizable || cobrable);

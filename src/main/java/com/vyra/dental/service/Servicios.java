@@ -8,6 +8,7 @@ import com.vyra.dental.dao.impl.PagoDAOSqlite;
 import com.vyra.dental.dao.impl.ProfesionalDAOSqlite;
 import com.vyra.dental.dao.impl.TratamientoDAOSqlite;
 import com.vyra.dental.dao.impl.UsuarioDAOSqlite;
+import com.vyra.dental.pasarela.ConfigPasarela;
 
 /**
  * Crea los servicios de la aplicación con sus DAO SQLite, una sola vez.
@@ -27,6 +28,7 @@ public final class Servicios {
     private static UsuarioService usuarios;
     private static ReporteService reportes;
     private static PdfService pdf;
+    private static CobroEnLineaService cobroEnLinea;
 
     private Servicios() {
     }
@@ -47,7 +49,7 @@ public final class Servicios {
 
     public static synchronized CitaService citas() {
         if (citas == null) {
-            citas = new CitaService(new CitaDAOSqlite());
+            citas = new CitaService(new CitaDAOSqlite(), new PagoDAOSqlite());
         }
         return citas;
     }
@@ -77,14 +79,14 @@ public final class Servicios {
 
     public static synchronized TratamientoService tratamientos() {
         if (tratamientos == null) {
-            tratamientos = new TratamientoService(new TratamientoDAOSqlite(), new CitaDAOSqlite());
+            tratamientos = new TratamientoService(new TratamientoDAOSqlite(), new CitaDAOSqlite(), new PagoDAOSqlite());
         }
         return tratamientos;
     }
 
     public static synchronized PagoService pagos() {
         if (pagos == null) {
-            pagos = new PagoService(new PagoDAOSqlite(), new TratamientoDAOSqlite());
+            pagos = new PagoService(new PagoDAOSqlite(), new TratamientoDAOSqlite(), new CitaDAOSqlite());
         }
         return pagos;
     }
@@ -101,6 +103,14 @@ public final class Servicios {
             reportes = new ReporteService(new CitaDAOSqlite(), new PagoDAOSqlite(), new TratamientoDAOSqlite());
         }
         return reportes;
+    }
+
+    /** Mercado Pago si hay credenciales (vyra.properties); si no, la pasarela demo. */
+    public static synchronized CobroEnLineaService cobroEnLinea() {
+        if (cobroEnLinea == null) {
+            cobroEnLinea = new CobroEnLineaService(pagos(), ConfigPasarela.crear());
+        }
+        return cobroEnLinea;
     }
 
     public static synchronized PdfService pdf() {

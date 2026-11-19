@@ -78,6 +78,19 @@
             <version>2.0.3</version>
         </dependency>
 
+        <!-- Pasarela Mercado Pago (fase 9): JSON de su API -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.17.2</version>
+        </dependency>
+        <!-- Código QR del cobro en línea (fase 9) -->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>3.5.3</version>
+        </dependency>
+
         <!-- Pruebas unitarias (JUnit 5) -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -205,17 +218,22 @@
                                         <argument>Vyra</argument>
                                         <argument>--description</argument>
                                         <argument>Gestión de un consultorio dental</argument>
+                                        <argument>--icon</argument>
+                                        <argument>${project.basedir}/instalador/vyra.ico</argument>
                                         <argument>--input</argument>
                                         <argument>${project.build.directory}/paquete</argument>
                                         <argument>--main-jar</argument>
                                         <argument>vyra.jar</argument>
                                         <argument>--main-class</argument>
                                         <argument>com.vyra.dental.Lanzador</argument>
-                                        <!-- jdk.localedata: meses y días en español; jdk.unsupported: JavaFX -->
+                                        <!-- jdk.localedata: meses y días en español; jdk.unsupported: JavaFX;
+                                             java.net.http: Mercado Pago. Sin strip-native-commands: el instalador
+                                             abre Vyra con runtime/bin/javaw.exe, que va firmado por Oracle y no lo
+                                             bloquea Smart App Control (Vyra.exe de jpackage no tiene firma) -->
                                         <argument>--add-modules</argument>
-                                        <argument>java.base,java.desktop,java.logging,java.management,java.naming,java.prefs,java.scripting,java.sql,java.sql.rowset,java.xml,jdk.charsets,jdk.crypto.ec,jdk.localedata,jdk.unsupported,jdk.zipfs</argument>
+                                        <argument>java.base,java.desktop,java.logging,java.management,java.naming,java.net.http,java.prefs,java.scripting,java.sql,java.sql.rowset,java.xml,jdk.charsets,jdk.crypto.ec,jdk.localedata,jdk.unsupported,jdk.zipfs</argument>
                                         <argument>--jlink-options</argument>
-                                        <argument>--strip-native-commands --strip-debug --no-man-pages --no-header-files --compress=zip-6</argument>
+                                        <argument>--strip-debug --no-man-pages --no-header-files --compress=zip-6</argument>
                                         <argument>--java-options</argument>
                                         <argument>-Dfile.encoding=UTF-8</argument>
                                         <argument>--dest</argument>

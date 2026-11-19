@@ -77,6 +77,8 @@
                             </HBox>
                         </StackPane>
                     </CampoFormulario>
+                    <!-- RN-18: aviso si el paciente debe algo -->
+                    <Aviso fx:id="avisoDeuda"/>
 
                     <CampoFormulario fx:id="cfProfesional" etiqueta="Profesional" obligatorio="true">
                         <ComboBox fx:id="campoProfesional" maxWidth="Infinity" promptText="Elige un profesional"/>
@@ -105,6 +107,12 @@
                     <CampoFormulario fx:id="cfMotivo" etiqueta="Motivo">
                         <TextArea fx:id="campoMotivo" promptText="Ej. Dolor en molar inferior derecho" prefRowCount="2" wrapText="true"/>
                     </CampoFormulario>
+
+                    <!-- RN-16: se copia del profesional; se cobra antes de atender -->
+                    <CampoFormulario fx:id="cfCosto" etiqueta="Costo de la consulta (S/)">
+                        <TextField fx:id="campoCosto" promptText="0 = sin costo"/>
+                    </CampoFormulario>
+
 
                     <VBox fx:id="bloqueEstado" styleClass="campo-formulario">
                         <Label text="Estado inicial" styleClass="campo-etiqueta"/>
@@ -150,6 +158,10 @@
                     <VBox styleClass="detalle-dato">
                         <Label text="Motivo" styleClass="detalle-etiqueta"/>
                         <Label fx:id="detalleMotivo" wrapText="true"/>
+                    </VBox>
+                    <VBox styleClass="detalle-dato">
+                        <Label text="Consulta" styleClass="detalle-etiqueta"/>
+                        <Label fx:id="detalleConsulta" wrapText="true"/>
                     </VBox>
                     <Aviso fx:id="avisoDetalle"/>
                     <VBox fx:id="accionesDetalle" styleClass="acciones-detalle"/>

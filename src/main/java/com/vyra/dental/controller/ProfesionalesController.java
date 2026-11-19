@@ -56,12 +56,14 @@ public class ProfesionalesController {
     @FXML private CampoFormulario cfEspecialidad;
     @FXML private CampoFormulario cfTelefono;
     @FXML private CampoFormulario cfHorario;
+    @FXML private CampoFormulario cfCosto;
     @FXML private CampoFormulario cfUsuario;
     @FXML private TextField campoNombres;
     @FXML private TextField campoApellidos;
     @FXML private TextField campoEspecialidad;
     @FXML private TextField campoTelefono;
     @FXML private TextField campoHorario;
+    @FXML private TextField campoCosto;
     @FXML private ComboBox<Usuario> campoUsuario;
     @FXML private Aviso avisoFormulario;
     @FXML private Button botonEliminar;
@@ -81,6 +83,7 @@ public class ProfesionalesController {
         campos.put("especialidad", cfEspecialidad);
         campos.put("telefono", cfTelefono);
         campos.put("horarioAtencion", cfHorario);
+        campos.put("costoConsulta", cfCosto);
         campos.put("idUsuario", cfUsuario);
         for (CampoFormulario campo : campos.values()) {
             if (campo.getControl() instanceof TextInputControl texto) {
@@ -176,13 +179,15 @@ public class ProfesionalesController {
         campoEspecialidad.setText(profesional.getEspecialidad());
         campoTelefono.setText(profesional.getTelefono() == null ? "" : Formatos.telefono(profesional.getTelefono()));
         campoHorario.setText(profesional.getHorarioAtencion());
+        campoCosto.setText(Formatos.montoCampo(profesional.getCostoConsulta()));
         cargarUsuarios(profesional.getIdProfesional(), profesional.getIdUsuario());
 
         avatarFicha.mostrar(Formatos.iniciales(profesional.getNombres(), profesional.getApellidos()),
                 profesional.getIdProfesional());
         tituloFicha.setText(profesional.getNombreCompleto());
-        subtituloFicha.setText(profesional.getEspecialidad() == null ? "Sin especialidad registrada"
-                : profesional.getEspecialidad());
+        subtituloFicha.setText((profesional.getEspecialidad() == null ? "Sin especialidad registrada"
+                : profesional.getEspecialidad()) + " · Consulta " + (profesional.getCostoConsulta() == 0 ? "sin costo"
+                : Formatos.dinero(profesional.getCostoConsulta())));
         botonGuardar.setText("Guardar cambios");
         botonEliminar.setVisible(true);
         botonEliminar.setManaged(true);
@@ -200,6 +205,14 @@ public class ProfesionalesController {
         profesional.setEspecialidad(campoEspecialidad.getText());
         profesional.setTelefono(campoTelefono.getText());
         profesional.setHorarioAtencion(campoHorario.getText());
+        String costo = campoCosto.getText() == null ? "" : campoCosto.getText().strip();
+        try {
+            profesional.setCostoConsulta(costo.isEmpty() ? 0 : Formatos.leerMonto(costo));
+        } catch (NumberFormatException e) {
+            cfCosto.mostrarError("Escribe el costo como 80 o 80.50 (0 si la consulta no cuesta)");
+            campoCosto.requestFocus();
+            return;
+        }
         Usuario usuario = campoUsuario.getValue();
         profesional.setIdUsuario(usuario == null || usuario.getIdUsuario() == 0 ? null : usuario.getIdUsuario());
         try {
