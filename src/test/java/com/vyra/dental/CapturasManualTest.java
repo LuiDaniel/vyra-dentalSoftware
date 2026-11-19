@@ -132,9 +132,27 @@ class CapturasManualTest {
         esperar(600);
         capturar("05-agenda-nueva-cita-deuda");
 
+        // Cruce de horario (CU-03): mañana a las 10:00 Marco Salinas ya atiende a Jorge Mamani
+        enFx(() -> {
+            Object agenda = controlador();
+            ((javafx.scene.control.DatePicker) campo(agenda, "campoFecha")).setValue(hoy.plusDays(1));
+            @SuppressWarnings("unchecked")
+            var inicio = (javafx.scene.control.ComboBox<java.time.LocalTime>) campo(agenda, "campoInicio");
+            inicio.setValue(java.time.LocalTime.of(10, 0));
+        });
+        esperar(700);
+        capturar("06-agenda-cruce");
+
         // ===== Odontólogo =====
         salir();
         entrar("msalinas");
+        var maria = Servicios.pacientes().buscar("72481935", com.vyra.dental.model.FiltroPaciente.TODOS, 0).get(0);
+        enFx(() -> MainController.actual().navegar(Pantalla.ODONTOGRAMA, maria));
+        esperar(900);
+        capturar("07-odontograma");
+        enFx(() -> MainController.actual().navegar(Pantalla.HISTORIA_CLINICA, maria));
+        esperar(900);
+        capturar("07b-historia-clinica");
         TratamientoResumen conSaldo = Servicios.tratamientos().buscar("", EstadoTratamiento.EN_CURSO).stream()
                 .filter(r -> r.getSaldo() > 0).findFirst().orElseThrow();
         enFx(() -> MainController.actual().navegar(Pantalla.TRATAMIENTOS));
